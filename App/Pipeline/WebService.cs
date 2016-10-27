@@ -15,11 +15,11 @@ namespace Websilk.Pipeline
         public WebService(Server server, HttpContext context, string[] paths, IFormCollection form = null)
         {
             //get parameters from request body, including page id
-            string pageId = "";
             object[] parms = new object[0];
             byte[] bytes = new byte[0];
             string data = "";
             int dataType = 0; //0 = ajax, 1 = form post, 2 = multi-part form
+            int x = 0;
 
             if (form == null)
             {
@@ -43,28 +43,14 @@ namespace Websilk.Pipeline
                 }
                 else if (data.IndexOf("{") >= 0 && data.IndexOf("}") > 0 && data.IndexOf(":") > 0)
                 {
-                    //JSON post data
+                    //get method parameters from JSON POST data
                     Dictionary<string, object> attr = JsonConvert.DeserializeObject<Dictionary<string, object>>(data);
-                    parms = new object[attr.Count - 1];
-                    int x = 0; string val = "";
+                    parms = new object[attr.Count];
+                    x = 0;
                     foreach (KeyValuePair<string, object> item in attr)
                     {
-                        if(item.Value != null) {
-                            val = item.Value.ToString(); ;
-                        }
-                        else {
-                            val = "";
-                        }
-                        
-                        if (item.Key == "pageId")
-                        {
-                            pageId = val;
-                        }
-                        else
-                        {
-                            parms[x] = item.Value.ToString();
-                            x = x + 1;
-                        }
+                        parms[x] = item.Value.ToString();
+                        x = x + 1;
                     }
                 }
                 else if (data.IndexOf("=") >= 0)
@@ -75,8 +61,15 @@ namespace Websilk.Pipeline
             }
             else
             {
-                //get pageid from query string
-                pageId = context.Request.Query["pid"];
+                //get method parameters from query string
+                parms = new object[context.Request.Query.Count];
+                x = 0;
+                foreach(var key in context.Request.Query.Keys)
+                {
+
+                    parms[x] = context.Request.Query[key].ToString();
+                    x++;
+                }
             }
 
             S = new Core(server, context);
@@ -93,7 +86,7 @@ namespace Websilk.Pipeline
                 //form post data
                 string[] items = S.Server.UrlDecode(data).Split('&');
                 string[] item;
-                for(int x = 0; x < items.Length; x++)
+                for(x = 0; x < items.Length; x++)
                 {
                     item = items[x].Split('=');
                     service.Form.Add(item[0], item[1]);
@@ -114,12 +107,12 @@ namespace Websilk.Pipeline
                 //add missing parameters
                 var tlen = parms.Length;
                 Array.Resize(ref parms, methodParams.Length);
-                for(var x = tlen; x < methodParams.Length; x++)
+                for(x = tlen; x < methodParams.Length; x++)
                 {
                     parms[x] = "";
                 }
             }
-            for(var x = 0; x < methodParams.Length; x++)
+            for(x = 0; x < methodParams.Length; x++)
             {
                 //cast params to correct (supported) types
                 switch (methodParams[x].ParameterType.Name.ToLower())
@@ -144,7 +137,7 @@ namespace Websilk.Pipeline
             {
                 switch (result.GetType().FullName)
                 {
-                    case "Websilk.WebRequest":
+                    case "Websilk.Services.WebRequest":
                         //send raw content (HTML)
                         var res = (Services.WebRequest)result;
                         context.Response.ContentType = res.contentType;

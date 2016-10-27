@@ -128,7 +128,7 @@ namespace Websilk
                 htm.Append(divcell.Render());
             }
 
-            div.Classes.Add("panel-" + name + " is-panel");
+            div.Classes.Add("panel-" + id + " is-panel");
             div.innerHTML = head + htm.ToString() + foot;
 
             return div.Render();

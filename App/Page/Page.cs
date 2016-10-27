@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Text;
 using System.Collections.Generic;
+using System.IO;
 
 namespace Websilk
 {
@@ -183,12 +184,21 @@ namespace Websilk
                 }else
                 {
                     //load page from file
-                    page.Add((structPage)S.Util.Serializer.OpenFromFile(typeof(structPage), filepath));
+                    if (File.Exists(S.Server.MapPath(filepath)))
+                    {
+                        page.Add((structPage)S.Util.Serializer.OpenFromFile(typeof(structPage), filepath));
+                    }
                 }
-            }else
+            }
+            if(page.Count == 0)
             {
                 //load empty page
-                page.Add(new structPage());
+                var p = new structPage();
+                p.components = new List<Component>();
+                p.layers = new List<int>();
+                p.panels = new List<Panel>();
+                page.Add(p);
+
             }
 
             if(page[0].layers.Count > 0)
@@ -266,8 +276,11 @@ namespace Websilk
                 if(item.name.IndexOf("panel-") == 0)
                 {
                     //create a new panel for the layout
-                    var id = item.arguments["name"].Split('-')[1];
-                    panels.Add(new Panel(S, id, "panel " + id));
+                    var id = item.name.Split('-')[1];
+                    var p = new Panel(S, id, "panel " + id);
+                    p.cells = new List<Panel.structCell>();
+                    p.arrangement = new Panel.structArrangement();
+                    panels.Add(p);
                 }
             }
 
@@ -301,7 +314,7 @@ namespace Websilk
             //this will force all components & panels within the hierarchy to render as well
             foreach(var panel in panels)
             {
-                scaffold.Data["panel (name:" + panel.id + ")"] = panel.Render();
+                scaffold.Data["panel-" + panel.id] = panel.Render();
             } 
 
             return scaffold.Render();

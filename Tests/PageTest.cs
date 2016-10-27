@@ -16,12 +16,17 @@ namespace Websilk.Services
         public WebRequest GeneratePage(string name)
         {
             //access this test from http://localhost:7770/api/PageTest/GeneratePage?name=home
-
+            
             var response = new WebRequest();
             var page = new Page.structPage();
             page.layers = new List<int>();
             page.panels = new List<Panel>();
             page.components = new List<Component>();
+
+            if(S.Server.environment != enumEnvironment.development) {
+                //exit function if not in development environment
+                return response;
+            }
 
             switch (name)
             {

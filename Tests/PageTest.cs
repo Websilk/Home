@@ -33,13 +33,11 @@ namespace Websilk.Services
                 case "home":
                     //generate a home page
                     page.pageId = 101;
-                    
-
                     break;
 
                 case "login":
                     //generate login page
-
+                    page.pageId = 102;
                     break;
             }
 

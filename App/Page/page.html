@@ -1,0 +1,39 @@
+﻿<!DOCTYPE html>
+<html xmlns="http:/www.w3.org/1999/xhtml">
+<head>
+    <title>{{title}}</title>
+    {{description}}
+    {{facebook}}
+
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,width=device-width,height=device-height,user-scalable=yes" />
+
+    <link type="text/css" rel="stylesheet" href="/css/platform.css" />
+    <style type="text/css">{{head-css}}</style>
+    <link type="text/css" rel="stylesheet" href="{{theme-css}}" id="themeCss" />
+    <link type="text/css" rel="stylesheet" href="{{website-css}}" id="websiteCss" />
+    {{editor-css}}
+    
+
+    <link rel="icon" type="image/ico" href="{{favicon}}" />
+    {{font-faces}}
+</head>
+<body class="{{body-class}}">
+    <div id="customCSS" class="absolute hide"></div>
+    <div id="customFontFaces"></div>
+    <div class="svgicons"></div>
+
+    {{background}}
+    {{editor}}
+    <div class="body">
+        <div class="webpage{{webpage-class}}">
+            {{body-sides}}
+            {{body}}
+        </div>
+    </div>
+
+    {{scripts}}
+
+</body>
+</html>

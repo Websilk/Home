@@ -35,13 +35,6 @@ namespace Websilk.Element
             }
 
             //setup classes & styling
-            if (scaffold.Arguments.ContainsKey("bg"))
-            {
-                if(scaffold.Arguments["bg"] == "hidden")
-                {
-                    classes += "nobg";
-                }
-            }
             if(styling.Length > 0) { styling = " style=\"" + styling + "\""; }
             if(value.Length > 0) { val=" value=\"" + value + "\""; }
             

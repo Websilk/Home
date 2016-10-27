@@ -17,10 +17,8 @@ Instead of hand-writing an HTML button like `<div class="button">Submit</div>` o
 
 Finally, when the user alters the properties for a component (when editing their web page in the web browser), they'll be able to select a button style from a list of styles defined within the *button.html* theme file. This allows the user to truly customize the components on their page without having to write custom CSS to change the style of the various elements on the page. 
 
-#### Layer.cs
-The *page layer* class is used to manage the various layers of content on a web page. Page layers are used to share content between web pages, such as the header & footer of a website. The user is able to create a new *page layer* for their web page, drag & drop components onto the page, and then load the same page layer onto another web page, which will load the same components onto the second web page. If a component that belongs to a layer is modified on one page, those changes will be applied to any other page that uses the same layer. 
-
-For example, if the user changes the logo of their website, the logo will be changed on every page on their site since all web pages on their site loads a layer called *header*, where the logo component resides.
+#### Page.cs
+Every page request uses this class to load information about a web page from the database, load the contents of the page, and render the layers of components & panels as HTML.
 
 #### Panel.cs 
 Every component on a web page is loaded into a panel, which is basically a `<div>` element. Web pages load a *layout* from the website's theme, such as */Content/themes/default/theme.html*, and the user is able to drag & drop components into panels defined by the theme layout.

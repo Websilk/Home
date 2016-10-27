@@ -229,7 +229,7 @@ namespace Websilk
         public string Render()
         {
             //setup page to render layout, panels, and components (and editor UI too if necessary)
-            var scaffold = new Scaffold(S, "/app/page/page.html");
+            var scaffold = new Scaffold(S, "/app/core/page.html");
 
             //setup scaffold variables
             scaffold.Data["favicon"] = "/images/favicon.gif";

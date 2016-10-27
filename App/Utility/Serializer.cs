@@ -13,34 +13,51 @@ namespace Websilk.Utility
             S = CollectorCore;
         }
 
-        public object ReadObject(string str, Type objType)
+        #region "Write"
+        public string WriteObjectAsString(object obj, Formatting formatting = Formatting.Indented, TypeNameHandling nameHandling = TypeNameHandling.Auto)
         {
-            return JsonConvert.DeserializeObject(str, objType, new JsonSerializerSettings() { TypeNameHandling = TypeNameHandling.Objects });
+            return JsonConvert.SerializeObject(obj, formatting,
+                    new JsonSerializerSettings
+                    {
+                        NullValueHandling = NullValueHandling.Ignore,
+                        TypeNameHandling = nameHandling
+                    });
         }
 
-        public byte[] WriteObject(object obj, Formatting formatting = Formatting.Indented)
+        public byte[] WriteObject(object obj, Formatting formatting = Formatting.Indented, TypeNameHandling nameHandling = TypeNameHandling.Auto)
         {
-            return S.Util.Str.GetBytes(JsonConvert.SerializeObject(obj, formatting, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore }));
+            return S.Util.Str.GetBytes(WriteObjectAsString(obj, formatting, nameHandling));
         }
 
-        public string WriteObjectAsString(object obj, Formatting formatting = Formatting.Indented)
-        {
-            return JsonConvert.SerializeObject(obj, formatting);
-        }
-
-        public void SaveToFile(object obj, string file, Formatting formatting = Formatting.Indented)
+        public void SaveToFile(object obj, string file, Formatting formatting = Formatting.Indented, TypeNameHandling nameHandling = TypeNameHandling.Auto)
         {
             var path = S.Util.Str.getFolder(file);
             if (!Directory.Exists(path))
             {
                 Directory.CreateDirectory(path);
             }
-            File.WriteAllText(file, WriteObjectAsString(obj, formatting));
+            File.WriteAllText(file, WriteObjectAsString(obj, formatting, nameHandling));
+        }
+        #endregion
+
+        #region "Read"
+        public object ReadObject(string str, Type objType, TypeNameHandling nameHandling = TypeNameHandling.Auto)
+        {
+            return JsonConvert.DeserializeObject(str, objType, new JsonSerializerSettings() { TypeNameHandling = nameHandling });
         }
 
-        public object OpenFromFile(Type objType, string file)
+        public object OpenFromFile(Type objType, string file, TypeNameHandling nameHandling = TypeNameHandling.Auto)
         {
             return ReadObject(File.ReadAllText(file), objType);
         }
+        
+        #endregion
+
+
+
+
+
+
+
     }
 }

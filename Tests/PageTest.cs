@@ -38,6 +38,8 @@ namespace Websilk.Services
                 case "login":
                     //generate login page
                     page.pageId = 102;
+
+                    var cLogin = new Components.Login(S);
                     break;
             }
 

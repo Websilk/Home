@@ -15,7 +15,7 @@ namespace Websilk.Pipeline
             var page = new Page(S);
             S.isFirstLoad = true;
 
-            if (S.Util.IsEmpty(S.User))
+            if (S.isFirstLoad == true)
             {
                 getUserAgent(context);
             }

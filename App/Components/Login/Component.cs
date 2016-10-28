@@ -3,7 +3,7 @@ namespace Websilk.Components
 {
     public class Login: Component
     {
-        public Login(Core WebsilkCore):base(WebsilkCore) { }
+        public Login() { }
 
         public override string Path
         {

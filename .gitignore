@@ -5,9 +5,6 @@
 *.suo
 *.user
 *.sln.docstates
-/CSS/tapestry
-/CSS/tapestry/css/util.css
-/CSS/tapestry/css/theme.css
 /wwwroot/css
 /wwwroot/js
 /wwwroot/content/themes/default

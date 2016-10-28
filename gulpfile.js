@@ -23,8 +23,7 @@ var paths = {
 paths.working = {
     js: {
         platform: [
-            paths.scripts + 'utility/jquery/jquery-2*.js',
-            paths.scripts + 'utility/global.js',
+            paths.scripts + 'core/selector.js',
             paths.scripts + 'core/platform.js',
             paths.scripts + 'platform/[^_]*.js',
             paths.scripts + 'platform/_init.js'
@@ -34,7 +33,6 @@ paths.working = {
             paths.scripts + 'editor/[^_]*.js',
             paths.scripts + 'utility/rangy.js',
             paths.scripts + 'utility/dropzone.js',
-            paths.scripts + 'utility/jquery/jquery-ui-*.js',
             paths.scripts + 'editor/_init.js'
         ],
         dashboard: paths.scripts + 'dashboard/**.*.js'

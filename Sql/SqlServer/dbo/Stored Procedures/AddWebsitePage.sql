@@ -10,6 +10,8 @@ CREATE PROCEDURE [dbo].[AddWebsitePage]
 	@title nvarchar(250) = '',
 	@description nvarchar(MAX) = '',
 	@pagetype int = 0,
+	@service nvarchar(100) = '',
+	@serviceargs nvarchar(250) = '',
 	@security bit = 0,
 	@enabled bit = 1
 AS
@@ -26,10 +28,10 @@ BEGIN
 	SET @pageId = NEXT VALUE FOR SequencePages
 
 	INSERT INTO Pages (pageId, ownerId, parentid, pagetype, websiteId, title, [path], pathIds,
-	datecreated, datemodified, datepublished, security, published,
+	datecreated, datemodified, datepublished, security, published, [service], serviceargs,
 	rating, ratingtotal, ratingcount, description, enabled, deleted) 
 	VALUES(@pageId, @websiteOwnerId, @parentid, @pagetype, @websiteId, @title, '', '',
-	@datenow, @datenow, @datenow, @security, 0, 0, 0, 0, @description, @enabled, 0)
+	@datenow, @datenow, @datenow, @security, 0, @service, @serviceargs, 0, 0, 0, @description, @enabled, 0)
 
 	/* update page heirarchy paths for title & ids */
 	UPDATE pages SET path=dbo.GetPagePath(@pageId), pathIds=dbo.GetPagePathIds(@pageId) WHERE pageid=@pageid

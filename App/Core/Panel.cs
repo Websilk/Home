@@ -105,6 +105,11 @@ namespace Websilk
         public void AddCell()
         {
             //set up settings for a new cell
+            var cell = new structCell();
+            cell.components = new List<Component>();
+            cell.componentIds = new List<string>();
+            cell.id = S.Util.Str.CreateID();
+            cells.Add(cell);
         }
 
         public string Render()

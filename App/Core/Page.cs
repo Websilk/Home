@@ -2,6 +2,7 @@
 using System.Text;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace Websilk
 {
@@ -154,7 +155,10 @@ namespace Websilk
                 websitePage404 = reader.GetInt("page404");
                 googleWebPropertyId = reader.Get("googlewebpropertyid");
                 pageFavIcon = reader.Get("icon");
-                
+
+                //set up page properties
+                pageFolder = "/Content/websites/" + websiteId + "/pages/" + pageId + "/";
+
                 //set up facebook meta tags
                 pageFacebook = "";
                 if (reader.Get("photo") != "")
@@ -173,20 +177,22 @@ namespace Websilk
         {
             //get a list of components to load onto the page
             var page = new List<structPage>();
+            var filename = "page.json";
 
-            if(pageId > 0 && pageFolder != "") {
-                var filepath = pageFolder;
+            if (pageId > 0 && pageFolder != "")
+            {
+                var folder = S.Server.MapPath(pageFolder.TrimStart('/'));
 
-                if (S.Server.Cache.ContainsKey(filepath))
+                if (S.Server.Cache.ContainsKey(folder + filename))
                 {
                     //load page from cache
-                    page.Add ((structPage)S.Server.Cache[filepath]);
+                    page.Add((structPage)S.Server.Cache[folder + filename]);
                 }else
                 {
                     //load page from file
-                    if (File.Exists(S.Server.MapPath(filepath)))
+                    if (File.Exists(folder + filename))
                     {
-                        page.Add((structPage)S.Util.Serializer.OpenFromFile(typeof(structPage), filepath));
+                        page.Add((structPage)S.Util.Serializer.OpenFromFile(typeof(structPage), folder + filename));
                     }
                 }
             }
@@ -221,6 +227,51 @@ namespace Websilk
             }
 
             return page;
+        }
+
+        public List<Panel> loadLayout(Scaffold scaffold)
+        {
+            var panels = new List<Panel>();
+            foreach (var item in scaffold.elements)
+            {
+                if (item.name.IndexOf("panel-") == 0)
+                {
+                    //create a new panel for the layout
+                    var id = item.name.Split('-')[1];
+                    var p = new Panel(S, id, "panel " + id);
+                    p.cells = new List<Panel.structCell>();
+                    p.arrangement = new Panel.structArrangement();
+                    p.AddCell();
+                    panels.Add(p);
+                }
+            }
+            return panels;
+        }
+
+        /// <summary>
+        /// Initializes a component & sets up default properties if they don't already exist
+        /// </summary>
+        /// <param name="component"></param>
+        /// <param name="panelId"></param>
+        public Panel loadComponent(Component component, Panel panel, Panel.structCell cell)
+        {
+            if(component.id == "")
+            {
+                //component is new
+                component.id = S.Util.Str.CreateID();
+            }
+            component.panelId = panel.id;
+            component.panelCellId = cell.id;
+
+            //add component to panel cell
+            var cellIndex = panel.cells.FindIndex(a => a.id == cell.id);
+            if (cellIndex < 0) { cellIndex = 0; }
+            var compIndex = panel.cells[cellIndex].components.Count;
+            panel.cells[cellIndex].components.Add(component);
+            panel.cells[cellIndex].componentIds.Add(component.id);
+            panel.cells[cellIndex].components[compIndex].Initialize(S);
+            panel.cells[cellIndex].components[compIndex].Load();
+            return panel;
         }
         #endregion
 
@@ -270,21 +321,10 @@ namespace Websilk
             var pages = loadPage(pageId);
 
             //get a list of panels in the layout HTML
-            var panels = new List<Panel>();
-            foreach(var item in scaffold.elements)
-            {
-                if(item.name.IndexOf("panel-") == 0)
-                {
-                    //create a new panel for the layout
-                    var id = item.name.Split('-')[1];
-                    var p = new Panel(S, id, "panel " + id);
-                    p.cells = new List<Panel.structCell>();
-                    p.arrangement = new Panel.structArrangement();
-                    panels.Add(p);
-                }
-            }
+            var panels = loadLayout(scaffold);
 
             //add components to layout panels
+            var components = new List<int[,,]>();
             for(var x = 0; x < panels.Count; x++)
             {
                 foreach (var page in pages)
@@ -295,21 +335,14 @@ namespace Websilk
                     {
                         if (c.panelId == panels[x].id)
                         {
-                            //found component that belongs to a layout panel
-                            for(var y = 0; y < panels[x].cells.Count; y++)
-                            {
-                                //find correct panel cell to add component to
-                                if(panels[x].cells[y].id == c.panelCellId)
-                                {
-                                    //add component to correct layout panel cell
-                                    panels[x].cells[y].components.Add(c);
-                                    break;
-                                }
-                            }
+                            //add component to layout panel cell
+                            loadComponent(c, panels[x], panels[x].cells[0]);
+                            break;
                         }
                     }
                 }
             }
+            
             //finally, render each layout panel
             //this will force all components & panels within the hierarchy to render as well
             foreach(var panel in panels)

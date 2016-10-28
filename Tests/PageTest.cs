@@ -18,11 +18,18 @@ namespace Websilk.Services
             //access this test from http://localhost:7770/api/PageTest/GeneratePage?name=home
             
             var response = new WebRequest();
+            var P = new Page(S);
             var page = new Page.structPage();
+            var scaffold = new Scaffold(S, "/Content/themes/default/layout.html");
+            var panels = P.loadLayout(scaffold);
+            var panelHead = panels[0];
+            var panelBody = panels[1];
+            var panelFoot = panels[2];
+
             page.layers = new List<int>();
             page.panels = new List<Panel>();
             page.components = new List<Component>();
-
+            
             if(S.Server.environment != enumEnvironment.development) {
                 //exit function if not in development environment
                 return response;
@@ -38,9 +45,24 @@ namespace Websilk.Services
                 case "login":
                     //generate login page
                     page.pageId = 102;
-
-                    var cLogin = new Components.Login(S);
+                    panelBody = P.loadComponent(new Components.Login(), panelBody, panelBody.cells[0]);
                     break;
+            }
+
+            //add components from head, body, & foot
+            foreach (var component in panelHead.cells[0].components)
+            {
+                page.components.Add(component);
+            }
+
+            foreach (var component in panelBody.cells[0].components)
+            {
+                page.components.Add(component);
+            }
+
+            foreach (var component in panelFoot.cells[0].components)
+            {
+                page.components.Add(component);
             }
 
             //save page to file

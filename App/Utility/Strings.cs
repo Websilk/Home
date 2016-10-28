@@ -495,26 +495,25 @@ namespace Websilk.Utility
         #region "Generation"
         public string CreateID(int length = 3)
         {
-            Random rnd = new Random();
             string result = "";
             for (var x = 0; x <= length - 1; x++)
             {
-                int type = rnd.Next(1, 3);
+                int type = S.Server.Random.Next(1, 3);
                 int num = 0;
                 switch (type)
                 {
                     case 1: //a-z
-                        num = rnd.Next(0, 26);
+                        num = S.Server.Random.Next(0, 26);
                         result += (char)('a' + num);
                         break;
 
                     case 2: //A-Z
-                        num = rnd.Next(0, 26);
+                        num = S.Server.Random.Next(0, 26);
                         result += (char)('A' + num);
                         break;
 
                     case 3: //0-9
-                        num = rnd.Next(0, 9);
+                        num = S.Server.Random.Next(0, 9);
                         result += (char)('1' + num);
                         break;
 

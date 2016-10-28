@@ -1,4 +1,4 @@
-﻿DECLARE @restart bit = 0
+﻿DECLARE @restart bit = 1
 IF @restart = 1 BEGIN
 	/* Clear initial data (if you so desire) */
 	DELETE FROM components
@@ -16,16 +16,13 @@ IF @restart = 1 BEGIN
 	DELETE FROM websitesubdomains
 	DELETE FROM websitesecurity
 
-	ALTER SEQUENCE SequenceUsers
-	RESTART
-
 	ALTER SEQUENCE SequencePages
 	RESTART
 
 	ALTER SEQUENCE SequencePhotoFolders
 	RESTART
-
-	ALTER SEQUENCE SequenceThemes
+	
+	ALTER SEQUENCE SequenceUsers
 	RESTART
 
 	ALTER SEQUENCE SequenceWebsites

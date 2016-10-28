@@ -29,6 +29,7 @@ namespace Websilk
         public float requestTime = 0;
         public string sqlActive = "";
         public string sqlConnection = "";
+        public Random Random = new Random();
 
         private string _path = "";
 

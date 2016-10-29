@@ -27,7 +27,7 @@ namespace Websilk.Pipeline
             page.getPageInfoFromUrl();
 
             //register initial javascript
-            S.javascript.Add("init", "S.init(" + (S.User.useAjax ? "true" : "false") + ", '" + page.pageTitle + "', '" + page.PageTitleForBrowserTab + "');");
+            S.javascript.Add("init", "S.init(" + (S.User.useAjax ? "true" : "false") + ", '" + page.pageTitle + "', '" + page.PageTitleForBrowserTab + "', " + page.websiteId + ", '" + page.websiteTitle + "');");
             
             //render the server response
             S.Response.ContentType = "text/html";

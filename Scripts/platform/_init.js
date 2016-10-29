@@ -1,8 +1,15 @@
 ﻿/*/////////////////////////////////////
 Initialize Websilk Platform
 /////////////////////////////////////*/
+S.init = function (ajax, pageid, title, tabTitle, websiteId, websiteTitle) {
+    S.page.useAjax = ajax;
+    S.page.update(pageid, title, tabTitle);
+    S.website.id = websiteId;
+    S.website.title = websiteTitle;
+    S.viewport.getLevel();
+}
 
-// Window Events ////////////////////////////////////////////////////////////////////////////////////'
+// Window Events ////////////////////////////////////////////////////////////////////////////////////
 $(document).on('ready', function () { S.events.doc.ready(); });
 $(document.body).on('click', function (e) { S.events.doc.click.trigger(e.target); });
 $(window).on('resize', function () { S.events.doc.resize.trigger(); });

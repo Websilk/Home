@@ -1,13 +1,5 @@
 /// Websilk Platform : platform.js ///
 var S = {
-    init: function (ajax, pageid, title, tabTitle, websiteId, websiteTitle) {
-        S.page.useAjax = ajax;
-        S.page.update(id, title, tabTitle);
-        S.website.id = websiteId;
-        S.website.title = websiteTitle;
-        S.viewport.getLevel();
-    },
-
     window: {
         w: 0, h: 0, scrollx: 0, scrolly: 0, z: 0, changed: true,
 

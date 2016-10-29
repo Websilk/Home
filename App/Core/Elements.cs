@@ -23,9 +23,9 @@ namespace Websilk
             Path = path; //path to the theme folder
         }
 
-        public Element.Element Load(ElementType type, string name, string path = "")
+        public Element.Element Load(ElementType type, string name, string themePath = "")
         {
-            string pth = path;
+            string pth = themePath;
             Element.Element elem;
             if(pth == "") { pth = Path; }
 

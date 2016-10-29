@@ -15,7 +15,10 @@ namespace Websilk.Components
 
         public override void Load()
         {
-            base.Load();
+            var txtEmail = (Element.Textbox)Page.Elements.Load(ElementType.Textbox, "");
+            var txtPass = (Element.Textbox)Page.Elements.Load(ElementType.Textbox, "password");
+            scaffold.Data["field-email"] = txtEmail.Render("txt_email", "", "email address", "");
+            scaffold.Data["field-pass"] = txtPass.Render("txt_pass", "","pa$$word","");
         }
     }
 }

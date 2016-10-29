@@ -11,6 +11,7 @@ namespace Websilk
 
         private Core S;
         private SqlQueries.Page sql;
+        public Elements Elements;
 
         public struct structUrl
         {
@@ -158,6 +159,7 @@ namespace Websilk
 
                 //set up page properties
                 pageFolder = "/Content/websites/" + websiteId + "/pages/" + pageId + "/";
+                Elements = new Elements(S, "/Content/themes/" + websiteTheme + "/");
 
                 //set up facebook meta tags
                 pageFacebook = "";
@@ -269,7 +271,7 @@ namespace Websilk
             var compIndex = panel.cells[cellIndex].components.Count;
             panel.cells[cellIndex].components.Add(component);
             panel.cells[cellIndex].componentIds.Add(component.id);
-            panel.cells[cellIndex].components[compIndex].Initialize(S);
+            panel.cells[cellIndex].components[compIndex].Initialize(S, this);
             panel.cells[cellIndex].components[compIndex].Load();
             return panel;
         }

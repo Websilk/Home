@@ -1,8 +1,10 @@
 /// Websilk Platform : platform.js ///
 var S = {
-    init: function (ajax, pageid, title, tabTitle) {
+    init: function (ajax, pageid, title, tabTitle, websiteId, websiteTitle) {
         S.page.useAjax = ajax;
         S.page.update(id, title, tabTitle);
+        S.website.id = websiteId;
+        S.website.title = websiteTitle;
         S.viewport.getLevel();
     },
 
@@ -10,35 +12,34 @@ var S = {
         w: 0, h: 0, scrollx: 0, scrolly: 0, z: 0, changed: true,
 
         pos: function (scrollOnly) {
-            if (this.changed == false && !scrollOnly) { return this; } else {
-                this.changed = false;
-                var w = window;
-                var e = document.documentElement;
-                var b = document.body;
+            if (this.changed == false && !scrollOnly) { return this; }
+            this.changed = false;
+            var w = window;
+            var e = document.documentElement;
+            var b = document.body;
 
-                //get window scroll x & y positions
-                this.scrollx = w.scrollX;
-                this.scrolly = w.scrollY;
+            //get window scroll x & y positions
+            this.scrollx = w.scrollX;
+            this.scrolly = w.scrollY;
+            if (typeof this.scrollx == 'undefined') {
+                this.scrollx = b.scrollLeft;
+                this.scrolly = b.scrollTop;
                 if (typeof this.scrollx == 'undefined') {
-                    this.scrollx = b.scrollLeft;
-                    this.scrolly = b.scrollTop;
+                    this.scrollx = w.pageXOffset;
+                    this.scrolly = w.pageYOffset;
                     if (typeof this.scrollx == 'undefined') {
-                        this.scrollx = w.pageXOffset;
-                        this.scrolly = w.pageYOffset;
-                        if (typeof this.scrollx == 'undefined') {
-                            this.z = GetZoomFactor();
-                            this.scrollx = Math.round(e.scrollLeft / this.z);
-                            this.scrolly = Math.round(e.scrollTop / this.z);
-                        }
+                        this.z = GetZoomFactor();
+                        this.scrollx = Math.round(e.scrollLeft / this.z);
+                        this.scrolly = Math.round(e.scrollTop / this.z);
                     }
                 }
-                if (scrollOnly) { return this; } //no need to update width & height
-
-                //get windows width & height
-                this.w = w.innerWidth || e.clientWidth || b.clientWidth;
-                this.h = w.innerHeight || e.clientHeight || b.clientHeight;
-                return this;
             }
+            if (scrollOnly) { return this; } //no need to update width & height
+
+            //get windows width & height
+            this.w = w.innerWidth || e.clientWidth || b.clientWidth;
+            this.h = w.innerHeight || e.clientHeight || b.clientHeight;
+            return this;
         }
 
     },
@@ -67,10 +68,6 @@ var S = {
     },
 
     elem: {
-        get: function (id) {
-            return document.getElementById(id);
-        },
-
         pos: function (elem) {
             var x = 0, y = 0, w = 0, h = 0;
             if (typeof elem != 'undefined' && elem != null) {
@@ -85,14 +82,6 @@ var S = {
                 if (h == 0) { h = $(elem).height(); }
             }
             return { x: x, y: y, w: w, h: h };
-        },
-
-        innerPos: function (elem) {
-            var p = this.pos(elem);
-            var e = $(elem);
-            p.w = e.width();
-            p.h = e.height();
-            return p;
         },
 
         offset: function (elem) {
@@ -114,13 +103,6 @@ var S = {
 
         height: function (elem) {
             return elem.offsetHeight ? elem.offsetHeight : elem.clientHeight;
-        },
-
-        fromEvent: function (event) {
-            if (S.browser.isIE) {
-                return window.event.srcElement;
-            } else if (S.browser.isNS) { return event.target; }
-            return null;
         }
     },
 
@@ -150,12 +132,12 @@ var S = {
     },
 
     layers: {
-        cache: new Array(),
+        cache: [],
 
-        add: function (pageId, title, pageType) {
+        add: function (id, type, title) {
             for (x = 0; x < this.cache.length; x++) {
-                if (this.cache[x].pageId == pageId) {
-                    this.cache[x] = { pageId: pageId, title: title, pageType: pageType };
+                if (this.cache[x].id == id) {
+                    this.cache[x] = { id:id, type:type, title:title };
                     return;
                 }
             }
@@ -165,37 +147,6 @@ var S = {
 
     editor: {
         selectedLayerId: '', editMode: false, enabled: false
-    },
-
-    browser: {
-        isIE: false, isNS: false, version: null,
-
-        get: function () {
-            var ua, s, i;
-            ua = navigator.userAgent;
-            s = "MSIE";
-            if ((i = ua.indexOf(s)) >= 0) {
-                this.isIE = true;
-                this.version = parseFloat(ua.substr(i + s.length));
-                return;
-            }
-
-            s = "Netscape6/";
-            if ((i = ua.indexOf(s)) >= 0) {
-                this.isNS = true;
-                this.version = parseFloat(ua.substr(i + s.length));
-                return;
-            }
-
-            // Treat any other "Gecko" browser as NS 6.1.
-
-            s = "Gecko";
-            if ((i = ua.indexOf(s)) >= 0) {
-                this.isNS = true;
-                this.version = 6.1;
-                return;
-            }
-        }
     },
 
     lostSession: function () {

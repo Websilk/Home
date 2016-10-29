@@ -48,6 +48,8 @@ namespace Websilk
 
         [JsonIgnore]
         protected Core S;
+        [JsonIgnore]
+        protected Page Page;
 
         public string id = ""; //unique ID
         [JsonIgnore]
@@ -86,9 +88,10 @@ namespace Websilk
         /// <summary>
         /// Executing after creating a new instance of the Component class
         /// </summary>
-        public void Initialize(Core WebsilkCore)
+        public void Initialize(Core WebsilkCore, Page page)
         {
             S = WebsilkCore;
+            Page = page;
             div = new Utility.DOM.Element("div");
             scaffold = new Scaffold(S, Path + "component.html");
         }
@@ -96,10 +99,7 @@ namespace Websilk
         /// <summary>
         /// Executed before the web page is rendered. 
         /// </summary>
-        public virtual void Load()
-        {
-            
-        }
+        public virtual void Load(){}
 
         /// <summary>
         /// Executed when the user adds a new component to their web page when in edit mode.

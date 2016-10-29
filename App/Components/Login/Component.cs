@@ -17,8 +17,8 @@ namespace Websilk.Components
         {
             var txtEmail = (Element.Textbox)Page.Elements.Load(ElementType.Textbox, "");
             var txtPass = (Element.Textbox)Page.Elements.Load(ElementType.Textbox, "password");
-            scaffold.Data["field-email"] = txtEmail.Render("txt_email", "", "email address", "");
-            scaffold.Data["field-pass"] = txtPass.Render("txt_pass", "","pa$$word","");
+            scaffold.Data["field-email"] = txtEmail.Render("email", "", "email address", "");
+            scaffold.Data["field-pass"] = txtPass.Render("password", "","pa$$word","", Element.Textbox.enumTextType.password);
         }
     }
 }

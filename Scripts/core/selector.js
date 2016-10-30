@@ -3,8 +3,8 @@
 //private selector object
 (function(){
     var pxStyles = ['top', 'right', 'bottom', 'left'];
-    var pxStylesSuffix = ['Top', 'Right', 'Bottom', 'Left'];
     var pxStylesPrefix = ['border', 'padding', 'margin'];
+    var pxStylesSuffix = ['Top', 'Right', 'Bottom', 'Left'];
 
     function select(sel) {
         //main function
@@ -110,12 +110,13 @@
 
     function setStyle(e, name, val) {
         //properly set a style for an element
+        if (e.nodeName == '#text') { return;}
         var v = val;
         if (Number.isInteger(val)) {
             //check for numbers that should be using 'px';
             if (Number(val) != 0) {
                 if (pxStyles.indexOf(name) >= 0) {
-
+                    v = val + 'px';
                 } else if (pxStylesPrefix.some(function (a) { name.indexOf(a) == 0 })) {
                     if (pxStylesSuffix.some(function (a) { name.indexOf(a) > 0 })) {
                         v = val + 'px';
@@ -124,6 +125,47 @@
             }
         }
         e.style[name] = v;
+    }
+
+    function getObj(obj) {
+        //get a string from object (either string, number, or function)
+        if (typeof obj == 'function') {
+            //handle object as function (get value from object function execution)
+            return obj();
+        }
+        return obj;
+    }
+
+    function isArray(obj, arrayFunc) {
+        //
+        if (Array.isArray(obj)) {
+            //handle content as array
+            for(var o of obj) {
+                arrayFunc(o);
+            }
+            return true;
+        }
+        return false;
+    }
+
+    function diffArray(arr, remove) {
+        return arr.filter(function (el) {
+            return !remove.includes(el);
+        });
+    }
+
+    function insertContent(obj, elements, stringFunc, objFunc) {
+        //checks type of object and execute callback functions depending on object type
+        if (typeof obj == 'string') {
+            elements.forEach(function (e) {
+                stringFunc(e);
+            });
+        } else if (typeof obj == 'object') {
+            elements.forEach(function (e) {
+                objFunc(e);
+            });
+        }
+        return this;
     }
 
     //functions that are accessable by return object ////////
@@ -158,43 +200,32 @@
                 if (e.className != className) { e.className = className;}
             });
         }
-        
         return this;
     }
 
     select.prototype.after = function(content) {
         //Add content to the DOM after each elements in the collection. 
         //The content can be an HTML string, a DOM node or an array of nodes.
-        var obj;
-        if (typeof content == 'function') {
-            //handle content as function (get value from content function execution)
-            obj = content();
-        } else { obj = content; }
+        var obj = getObj(content);
+        if (isArray(obj, this.after) || obj == null) { return this; }
 
-        if (Array.isArray(obj)) {
-            //handle content as array
-            for(var o of obj) {
-                this.after(o);
-            }
-            return this;
-        }
-        if (obj == null) { return this; }
-        if (typeof obj== 'string') {
-            this.elements.forEach(function (e) {
-                e.insertAdjacentHTML('afterend', content);
-            });
-        } else if (typeof obj == 'object') {
-            this.elements.forEach(function (e) {
-                var parent = e.parentNode;
-                parent.insertBefore(content, e.nextSibling);
-            });
-        }
+        insertContent(obj, this.elements,
+            function (e) { e.insertAdjacentHTML('afterend', content); },
+            function (e) { e.parentNode.insertBefore(content, e.nextSibling); }
+        );
         return this;
     }
 
     select.prototype.append = function (content) {
         //Append content to the DOM inside each individual element in the collection. 
         //The content can be an HTML string, a DOM node or an array of nodes.
+        var obj = getObj(content);
+        if (isArray(obj, this.append) || obj == null) { return this; }
+
+        insertContent(obj, this.elements,
+            function (e) { e.insertAdjacentHTML('beforeend', content); },
+            function (e) { e.insertAfter(content); }
+        );
         return this;
     }
 
@@ -216,30 +247,13 @@
     select.prototype.before = function(content) {
         //Add content to the DOM before each element in the collection. 
         //The content can be an HTML string, a DOM node or an array of nodes.
-        var obj;
-        if (typeof content == 'function') {
-            //handle content as function (get value from content function execution)
-            obj = content();
-        } else { obj = content; }
+        var obj = getObj(content);
+        if(isArray(obj, this.before) || obj == null){return this;}
 
-        if (Array.isArray(obj)) {
-            //handle content as array
-            for(var o of obj) {
-                this.after(o);
-            }
-            return this;
-        }
-        if (obj == null) { return this; }
-        if (typeof obj == 'string') {
-            this.elements.forEach(function (e) {
-                e.insertAdjacentHTML('beforebegin', content);
-            });
-        } else if (typeof obj == 'object') {
-            this.elements.forEach(function (e) {
-                var parent = e.parentNode;
-                parent.insertBefore(content, e);
-            });
-        }
+        insertContent(obj, this.elements,
+            function (e) { e.insertAdjacentHTML('beforebegin', content); },
+            function (e) { e.parentNode.insertBefore(content, e); }
+        );
         return this;
     }
 
@@ -297,10 +311,12 @@
 
         } else if (typeof params == 'string') {
             var name = styleName(params);
-            if (typeof arguments[1] == 'string') {
+            var arg = arguments[1];
+            if (typeof arg == 'string') {
                 //set a single style property if two string arguments are supplied (key, value);
                 this.elements.forEach(function (e) {
-                    setStyle(e, name, arguments[1]);
+                    console.log(name + ', ' + arg);
+                    setStyle(e, name, arg);
                 });
             } else {
                 //if params is a string, return a single style property
@@ -464,7 +480,13 @@
         //returns position of the current element among its siblings. 
         //When an element is given, returns its position in the current collection. 
         //Returns -1 if not found.
-        return this;
+        var i = -1;
+        if (this.elements.length > 0) {
+            elem = this.elements[0];
+            while ((elem = elem.previousSibling) != null) { i++;}
+            return i;
+        }
+        return i;
     }
 
     select.prototype.innerHeight = function (height) {
@@ -475,18 +497,6 @@
     select.prototype.innerWidth = function (width) {
         //Get the current computed inner width (including padding but not border) for the 
         //first element in the set of matched elements or set the inner width of every matched element
-    }
-
-    select.prototype.insertAfter = function(target) {
-        //Insert elements from the current collection after the target element in the DOM. 
-        //This is like after, but with reversed operands.
-        return this;
-    }
-
-    select.prototype.insertBefore = function(target) {
-        //Insert elements from the current collection before each of the target elements in the DOM. 
-        //This is like before, but with reversed operands.
-        return this;
     }
 
     select.prototype.is = function(selector) {
@@ -506,7 +516,7 @@
         return this.elements.length;
     }
 
-    select.prototype.map = function(func) {
+    select.prototype.map = function (func) { //func(index, element)        
         //Iterate through every element of the collection. Inside the iterator function, 
         //this keyword refers to the current item  = function(also passed as the second argument to the function). 
         //If the iterator select.prototype.returns false, iteration stops.
@@ -520,6 +530,24 @@
 
     select.prototype.next = function(selector) {
         //Get the next sibling–optionally filtered by selector–of each element in the collection.
+        var elems = [];
+        if(selector != null){
+            //use selector
+            this.elements.forEach(function (e) {
+                var q = query(e, selector);
+                var n = e.nextSibling; while (n.nodeName == '#text') { n = n.nextSibling; }
+                if (n != null) {
+                    if (q.some(function (s) { s == n })) {elems.push(n);}
+                } else { elems.push(e); }
+            });
+        } else {
+            //no selector
+            this.elements.forEach(function (e) {
+                var n = e.nextSibling; while (n.nodeName == '#text') { n = n.nextSibling; }
+                if (n != null) { elems.push(n); } else { elems.push(e); }
+            });
+        }
+        this.elements = elems;
         return this;
     }
 
@@ -528,6 +556,19 @@
         //If another collection is given instead of selector, return only elements not present in it. 
         //If a select.prototype.is given, return only elements for which the select.prototype.returns a falsy value. 
         //Inside the function, the this keyword refers to the current element.
+        var sel = getObj(selector);
+        var elems = this.elements;
+        //check if selector is an array (of selectors)
+        if (isArray(sel)) {
+            sel.forEach(function (s) {
+                var q = query(document, s);
+                elems = diffArray(elems, q);
+            });
+            this.elements = elems;
+            return this;
+        }
+        var q = query(document, sel);
+        this.elements = diffArray(elems, q);
         return this;
     }
 
@@ -552,6 +593,9 @@
 
     select.prototype.on = function (event, func) {
         //Attach an event handler function for one or more events to the selected elements.
+        this.elements.forEach(function (e) {
+            e.addEventListener(event, func);
+        });
     }
 
     select.prototype.one = function (event, func) {
@@ -598,6 +642,22 @@
 
     select.prototype.prev = function(selector) {
         //Get the previous sibling–optionally filtered by selector–of each element in the collection.
+        var elems = [];
+        if (selector) {
+            //use selector
+            this.elements.forEach(function (e) {
+                var q = query(e, selector);
+                if (q.some(function (s) { s == e.previousSibling })) {
+                    if (e.previousSibling) { elems.push[e.previousSibling]; } else { elems.push[e]; }
+                }
+            });
+        } else {
+            //no selector
+            this.elements.forEach(function (e) {
+                if (e.previousSibling) { elems.push[e.previousSibling]; } else { elems.push[e]; }
+            });
+        }
+        this.elements = elems;
         return this;
     }
 

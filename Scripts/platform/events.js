@@ -2,7 +2,7 @@
 
     doc: {
         load: function () {
-            S.browser.get();
+            
         },
 
         ready: function () {

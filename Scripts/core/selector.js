@@ -2,6 +2,10 @@
 
 //private selector object
 (function(){
+    var pxStyles = ['top', 'right', 'bottom', 'left'];
+    var pxStylesSuffix = ['Top', 'Right', 'Bottom', 'Left'];
+    var pxStylesPrefix = ['border', 'padding', 'margin'];
+
     function select(sel) {
         //main function
         var self = this;
@@ -78,6 +82,50 @@
         return elems;
     }
 
+    function styleName(str) {
+        //gets the proper style name from shorthand string
+        //for example: border-width translates to borderWidth;
+        if (str.indexOf('-') < 0) {
+            return str
+        }else{
+            var name = '';
+            var chr = '';
+            var cap = false;
+            for (var x = 0; x < str.length; x++) {
+                chr = str[x];
+                if (chr == '-') {
+                    cap = true;
+                } else {
+                    if (cap == true) {
+                        cap = false;
+                        name += chr.toUpperCase();
+                    } else {
+                        name += chr;
+                    }
+                }
+            }
+            return name;
+        }
+    }
+
+    function setStyle(e, name, val) {
+        //properly set a style for an element
+        var v = val;
+        if (Number.isInteger(val)) {
+            //check for numbers that should be using 'px';
+            if (Number(val) != 0) {
+                if (pxStyles.indexOf(name) >= 0) {
+
+                } else if (pxStylesPrefix.some(function (a) { name.indexOf(a) == 0 })) {
+                    if (pxStylesSuffix.some(function (a) { name.indexOf(a) > 0 })) {
+                        v = val + 'px';
+                    }
+                }
+            }
+        }
+        e.style[name] = v;
+    }
+
     //functions that are accessable by return object ////////
     select.prototype.add = function (elems) {
         //Add new (unique) elements to the existing elements array
@@ -117,6 +165,30 @@
     select.prototype.after = function(content) {
         //Add content to the DOM after each elements in the collection. 
         //The content can be an HTML string, a DOM node or an array of nodes.
+        var obj;
+        if (typeof content == 'function') {
+            //handle content as function (get value from content function execution)
+            obj = content();
+        } else { obj = content; }
+
+        if (Array.isArray(obj)) {
+            //handle content as array
+            for(var o of obj) {
+                this.after(o);
+            }
+            return this;
+        }
+        if (obj == null) { return this; }
+        if (typeof obj== 'string') {
+            this.elements.forEach(function (e) {
+                e.insertAdjacentHTML('afterend', content);
+            });
+        } else if (typeof obj == 'object') {
+            this.elements.forEach(function (e) {
+                var parent = e.parentNode;
+                parent.insertBefore(content, e.nextSibling);
+            });
+        }
         return this;
     }
 
@@ -144,13 +216,43 @@
     select.prototype.before = function(content) {
         //Add content to the DOM before each element in the collection. 
         //The content can be an HTML string, a DOM node or an array of nodes.
+        var obj;
+        if (typeof content == 'function') {
+            //handle content as function (get value from content function execution)
+            obj = content();
+        } else { obj = content; }
+
+        if (Array.isArray(obj)) {
+            //handle content as array
+            for(var o of obj) {
+                this.after(o);
+            }
+            return this;
+        }
+        if (obj == null) { return this; }
+        if (typeof obj == 'string') {
+            this.elements.forEach(function (e) {
+                e.insertAdjacentHTML('beforebegin', content);
+            });
+        } else if (typeof obj == 'object') {
+            this.elements.forEach(function (e) {
+                var parent = e.parentNode;
+                parent.insertBefore(content, e);
+            });
+        }
         return this;
     }
 
     select.prototype.children = function(selector) {
         //Get immediate children of each element in the current collection. 
         //If selector is given, filter the results to only include ones matching the CSS select.
-        return this;
+        var elems = [];
+        this.elements.forEach(function (e) {
+            for(var child of e.children) {
+                elems.push(child);
+            }
+        });
+        return elems;
     }
 
     select.prototype.closest = function(selector) {
@@ -168,6 +270,59 @@
 
         //When a value for a property is blank  = function(empty string, null, or undefined), that property is removed. 
         //When a unitless number value is given, “px” is appended to it for properties that require units.
+        if (typeof params == "object") {
+            var hasKeys = false;
+            for (var prop in params) {
+                //if params is an object with key/value pairs, apply styling to elements
+                if (!hasKeys) { hasKeys = true; }
+                var name = styleName(prop);
+                this.elements.forEach(function (e) {
+                    setStyle(e, name, params[prop]);
+                });
+            }
+            if (hasKeys) { return this; }
+            if (!hasKeys && Array.isArray(params)) {
+                //if params is an array of style names, return an array of style values
+                var vals = [];
+                this.elements.forEach(function (e) {
+                    var props = new Object();
+                    params.forEach(function (param) {
+                        var prop = e.style[styleName(param)];
+                        if (prop) { props[param] = prop; }
+                    });
+                    vals.push(props);
+                });
+                return vals;
+            }
+
+        } else if (typeof params == 'string') {
+            var name = styleName(params);
+            if (typeof arguments[1] == 'string') {
+                //set a single style property if two string arguments are supplied (key, value);
+                this.elements.forEach(function (e) {
+                    setStyle(e, name, arguments[1]);
+                });
+            } else {
+                //if params is a string, return a single style property
+                if (this.elements.length > 0) {
+                    
+                    if (this.elements.length == 1) {
+                        //return a string value for one element
+                        return this.elements[0].style[name];
+                    } else {
+                        //return an array of strings for multiple elements
+                        var vals = [];
+                        this.elements.forEach(function (e) {
+                            var val = e.style[name];
+                            if (val == null) { val = ''; }
+                            vals.push(val);
+                        });
+                        return vals;
+                    }
+                }
+            }
+            
+        }
         return this;
     }
 

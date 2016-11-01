@@ -971,6 +971,14 @@
         return this;
     }
 
+    select.property.ready = function (callback) {
+        if (document.readyState != 'loading') {
+            callback();
+        } else {
+            document.addEventListener('DOMContentLoaded', callback);
+        }
+    }
+
     select.prototype.remove = function (selector) {
         //Remove the set of matched elements from the DOM
         this.elements.forEach(function (e) {
@@ -1166,8 +1174,62 @@
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // add functionality to the $ object //////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    $.ajax = function(url, settings){
+    $.ajax = function(options){
+        var opt = getObj(options);
+        if(typeof opt == 'string'){
+            if (arguments[1]) {
+                //options is a separate argument from url
+                var url = opt.toString();
+                opt = arguments[1];
+                opt.url = url;
+            } else {
+                //no 2nd argument
+                opt = { url: opt.toString() };
+            }
+        }
+        //set up default options
+        if (!opt.async) { opt.async = true; }
+        if (!opt.cache) { opt.cache = false; }
+        if (!opt.contentType) { opt.contentType = 'application/x-www-form-urlencoded; charset=UTF-8'; }
+        if (!opt.data) { opt.data = ''; }
+        if (!opt.method) { opt.method = "GET"; }
+        if (opt.type) { opt.method = opt.type; }
+        if (!opt.url) { opt.url = ''; }
 
+        //set up AJAX request
+        var req = new XMLHttpRequest();
+        req.open(opt.method, opt.url, opt.async, opt.username, opt.password);
+        req.setRequestHeader('Content-Type', opt.contentType);
+
+        //set up callbacks
+        req.onload = function () {
+            if (req.status >= 200 && req.status < 400) {
+                //request success
+                var resp = request.responseText;
+                if (opt.success) {
+                    opt.success(resp, req.statusText, req);
+                }
+            } else {
+                //connected to server, but returned an error
+                if (opt.error) {
+                    opt.error(req, req.statusText);
+                }
+            }
+        };
+
+        req.onerror = function () {
+            //an error occurred before connecting to server
+            if (opt.error) {
+                opt.error(req, req.statusText);
+            }
+        };
+
+        if (opt.beforeSend) {
+            if (opt.beforeSend(req, opt) == false) { return false; }
+        }
+
+        //finally, send AJAX request
+        req.send(opt.data);
     }
 
 })();

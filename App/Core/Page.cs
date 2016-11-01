@@ -158,6 +158,7 @@ namespace Websilk
                 pageFavIcon = reader.Get("icon");
 
                 //set up page properties
+                PageTitleForBrowserTab = pageTitle + websiteTitleSeparator + websiteTitle;
                 pageFolder = "/Content/websites/" + websiteId + "/pages/" + pageId + "/";
                 Elements = new Elements(S, "/Content/themes/" + websiteTheme + "/");
 

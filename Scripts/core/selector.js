@@ -108,6 +108,29 @@
         }
     }
 
+    function styleShorthand(str) {
+        //gets the shorthand style name from proper string
+        var reg = new RegExp('[A-Z]');
+        if (str.match(reg)) {
+            //has capital letter
+            var name = '';
+            var chr = '';
+            for (var x = 0; x < str.length; x++) {
+                chr = str[x];
+                if (chr.match(reg)) {
+                    name += '-' + chr.toLowerCase();
+                } else {
+                    name += chr;
+                }
+            }
+            return name;
+        }
+    }
+
+    function getStyle(e, name) {
+        return getComputedStyle(e).getPropertyValue(name);
+    }
+
     function setStyle(e, name, val) {
         //properly set a style for an element
         if (e.nodeName == '#text') { return;}
@@ -235,12 +258,38 @@
         return this;
     }
 
-    select.prototype.attr = function(name) {
+    select.prototype.attr = function(name, val) {
         //Read or set DOM attributes. When no value is given, reads 
         //specified attribute from the first element in the collection. 
         //When value is given, sets the attribute to that value on each element 
         //in the collection. When value is null, the attribute is removed  = function(like with removeAttr). 
         //Multiple attributes can be set by passing an object with name-value pairs.
+        var n = getObj(name);
+        var v = getObj(val);
+        if (Array.isArray(n)) {
+            //get array of attribute values from first element
+            if (this.elements.length > 0) {
+                var e = this.elements[0];
+                var attrs = {};
+                n.forEach(function (p) {
+                    attrs[p] = e.getAttribute(p);
+                });
+                return attrs;
+            }
+        } else {
+            if (v != null) {
+                //set single attribute value to all elements in list
+                this.elements.forEach(function (e) {
+                    e.setAttribute(n, v);
+                });
+            } else {
+                //get single attribute value from first element in list
+                if (this.elements.length > 0) {
+                    return this.elements[0].getAttribute(n);
+                }
+                return '';
+            }
+        }
         return this;
     }
 
@@ -412,6 +461,7 @@
     }
 
     select.prototype.first = function () {
+        //the first element found in the selector
         if (this.elements.length > 0) {
             this.elements = [this.elements[0]];
         }
@@ -442,12 +492,58 @@
 
     select.prototype.hasClass = function(classes) {
         //Check if any elements in the collection have the specified class.
-        return this;
+        var classList;
+        if(Array.isArray(classes)){
+            classList = classes;
+        }else if(typeof classes == 'string'){
+            classList = classes.split(' ');
+        }
+        for(e of this.elements) {
+            var classNames = e.className.split(' ');
+            if (classNames.length > 0) {
+                if (classList.every(function (a) { return classNames.some(function (b) { return a == b; }); })) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     select.prototype.height = function(val) {
         //Get the height of the first element in the collection; 
         //or set the height of all elements in the collection.
+        //this function differs from jQuery as it doesn't care
+        //about box-sizing & border when returning the height
+        //of an element (when val is not specified). 
+        //It simply returns vanilla js offsetHeight (as it should);
+        var obj = getObj(val);
+        if (typeof obj == "string") {
+            var n = parseFloat(obj);
+            if (n != NaN) { obj = n; } else {
+                //height is string
+                this.elements.forEach(function (e) {
+                    e.style.height = obj;
+                });
+                return this;
+            }
+        }else if(obj == null){
+            if (this.elements.length > 0) {
+                //get height from first element
+                var elem = this.elements[0];
+                return elem.offsetHeight ? elem.offsetHeight : elem.clientHeight;
+            }
+        } else {
+            //height is a number
+            if (obj == 0) {
+                this.elements.forEach(function (e) {
+                    e.style.height = 0;
+                });
+            } else {
+                this.elements.forEach(function (e) {
+                    e.style.height = obj + 'px';
+                });
+            }
+        }
         return this;
     }
 
@@ -492,16 +588,53 @@
     select.prototype.innerHeight = function (height) {
         //Get the current computed inner height (including padding but not border) for the 
         //first element in the set of matched elements or set the inner height of every matched element
+        var obj = getObj(val);
+        if (obj == null) {
+            //get inner height of first element (minus padding)
+            if (this.elements.length > 0) {
+                var e = this.elements[0];
+                var style = getComputedStyle(e);
+                var padtop = parseFloat(style.paddingTop);
+                var padbot = parseFloat(style.paddingBottom);
+                if (padtop == NaN) { padtop = 0; }
+                if (padbot == NaN) { padbot = 0; }
+                return e.clientHeight - (padtop + padbot);
+            }
+        } else {
+            //set height of elements
+            return this.height(height);
+        }
     }
 
     select.prototype.innerWidth = function (width) {
         //Get the current computed inner width (including padding but not border) for the 
         //first element in the set of matched elements or set the inner width of every matched element
+        var obj = getObj(val);
+        if (obj == null) {
+            //get inner height of first element (minus padding)
+            if (this.elements.length > 0) {
+                var e = this.elements[0];
+                var style = getComputedStyle(e);
+                var padright = parseFloat(style.paddingRight);
+                var padleft = parseFloat(style.paddingLeft);
+                if (padright == NaN) { padright = 0; }
+                if (padleft == NaN) { padleft = 0; }
+                return e.clientWidth - (padright + padleft);
+            }
+        } else {
+            //set height of elements
+            return this.width(width);
+        }
     }
 
     select.prototype.is = function(selector) {
         //Check if the first element of the current collection matches the CSS select.
-        return this;
+        if (this.elements.length > 0) {
+            var obj = getObj(selector);
+            var q = query(document, obj);
+            if (q.some(function (a) { return a == this.elements[0] }));
+        }
+        return false;
     }
 
     select.prototype.last = function() {
@@ -535,7 +668,7 @@
             //use selector
             this.elements.forEach(function (e) {
                 var q = query(e, selector);
-                var n = e.nextSibling; while (n.nodeName == '#text') { n = n.nextSibling; }
+                var n = e.nextSibling; if (n) { while (n.nodeName == '#text') { n = n.nextSibling; if (!n) { break; } } }
                 if (n != null) {
                     if (q.some(function (s) { s == n })) {elems.push(n);}
                 } else { elems.push(e); }
@@ -543,7 +676,7 @@
         } else {
             //no selector
             this.elements.forEach(function (e) {
-                var n = e.nextSibling; while (n.nodeName == '#text') { n = n.nextSibling; }
+                var n = e.nextSibling; if (n) { while (n.nodeName == '#text') { n = n.nextSibling; if (!n) { break; } } }
                 if (n != null) { elems.push(n); } else { elems.push(e); }
             });
         }
@@ -574,6 +707,9 @@
 
     select.prototype.off = function (event, func) {
         //remove an event handler
+        this.elements.forEach(function (e) {
+            e.removeEventListener(event, func);
+        });
     }
 
     select.prototype.offset = function(coordinates) {
@@ -664,26 +800,224 @@
     select.prototype.prop = function(name, val) {
         //Read or set properties of DOM elements. This should be preferred over attr in case of 
         //reading values of properties that change with user interaction over time, such as checked and selected.
+        var n = getObj(name);
+        var v = getObj(val);
+        if (Array.isArray(n)) {
+            //get multiple properties from the first element
+            var props = {};
+            n.forEach(function (p) {
+                props[p] = this.prop(p);
+            });
+            return props;
+        }
+
+        var execAttr = function (a, b) {
+            //get / set / remove DOM attribute
+            if (v != null) {
+                if (v == '--') {
+                    //remove
+                    this.elements.forEach(function (e) {
+                        e.removeAttribute(a);
+                    });
+                } else {
+                    //set
+                    if (v == false) {
+                        this.elements.forEach(function (e) {
+                            e.removeAttribute(a);
+                        });
+                    } else {
+                        this.attr(a, b);
+                    }
+                }
+            } else {
+                //get
+                if (this.elements.length > 0) {
+                    return this.elements[0].getAttribute(a) || '';
+                }
+            }
+        };
+
+        var execStyle = function (a, b) {
+            //get / set / remove DOM style property
+            if (v != null) {
+                if (v == '--') {
+                    //remove
+                    this.elements.forEach(function (e) {
+                        e.style[a] = '';
+                    });
+                } else {
+                    //set
+                    this.elements.forEach(function (e) {
+                        setStyle(e, a, b);
+                    });
+                }
+            } else {
+                //get
+                if (this.elements.length > 0) {
+                    return getStyle(e, a);
+                }
+            }
+        };
+
+        //get, set, or remove (if val == '--') a specific property from element(s)
+        var nn = '';
+        switch (n) {
+            case "defaultChecked":
+                nn = 'checked';
+            case "checked":
+            case "defaultSelected":
+                nn = 'selected';
+            case "selected":
+            case "defaultDisabled":
+                nn = 'disabled';
+            case "disabled":
+                //get/set/remove boolean property that belongs to the DOM element object or is an attribute (default)
+                
+
+                var execProp = function (a) {
+                    if (v != null) {
+                        if (v == '--') {
+                            //remove
+                            this.elements.forEach(function (e) {
+                                if (e[a]) { delete e[a]; }
+                            });
+                        } else {
+                            //set
+                            v = v == false ? false : true;
+                            this.elements.forEach(function (e) {
+                                e[a] = v;
+                            });
+                        }
+                    
+                    } else {
+                        //get
+                        if (this.elements.length > 0) {
+                            var e = this.elements[0];
+                            var b = e[a];
+                            if (b == null) {
+                                b = e.getAttribute(a) != null ? true : false;
+                                e[a] = b;
+                            }
+                            return b;
+                        }
+                    }
+                };
+
+                if (nn != '') {
+                    //get/set/remove default property
+                    var a = execAttr(nn, nn);
+                    if (a != null) { return a;}
+                } else {
+                    //get/set/remove property
+                    var a = execProp(n);
+                    if (a != null) { return a;}
+                }
+                break;
+
+            case "selectedIndex":
+                if (v != null) {
+                    if (Number.isInteger(v)) {
+                        this.elements.forEach(function (e) {
+                            if (e.nodeType == 'SELECT') {
+                                e.selectedIndex = v;
+                            }
+                        });
+                    }
+                }
+                break;
+
+            case "nodeName":
+                if (val != null) {
+                    //set node name
+                    //TODO: replace DOM element with new element of new node name, cloning all attributes & appending all children elements
+                } else {
+                    //get node name
+                    if (this.elements.length > 0) {
+                        return this.elements[0].nodeName;
+                    } else {
+                        return '';
+                    }
+                }
+                break;
+            case "tagName":
+                if (val != null) {
+                    //set node name
+                    //TODO: replace DOM element with new element of new tag name, cloning all attributes & appending all children elements
+                } else {
+                    //get tag name
+                    if (this.elements.length > 0) {
+                        return this.elements[0].tagName;
+                    } else {
+                        return '';
+                    }
+                }
+                break;
+
+            default:
+                // last resort to get/set/remove property value from style or attribute
+                //first, try getting a style
+                var a = execProp(n, v);
+                if (a != null) {
+                    return a;
+                } else {
+                    //next, try getting a attribute
+                    a = execAttr(n, v);
+                    if (a != null) {
+                        return a;
+                    }
+                }
+
+        }
         return this;
     }
 
     select.prototype.remove = function (selector) {
         //Remove the set of matched elements from the DOM
+        this.elements.forEach(function (e) {
+            e.parentNode.remove(e);
+        });
+        this.elements = [];
         return this;
     }
 
     select.prototype.removeAttr = function (attr) {
         //Remove an attribute from each element in the set of matched elements
+        var obj = getObj(attr);
+        if (Array.isArray(obj)) {
+            obj.forEach(function (a) {
+                this.elements.forEach(function (e) {
+                    e.removeAttribute(a);
+                });
+            });
+        } else if(typeof obj == 'string') {
+            this.elements.forEach(function (e) {
+                e.removeAttribute(obj);
+            });
+        }
+        
         return this;
     }
 
     select.prototype.removeClass = function (className) {
         //Remove a single class, multiple classes, or all classes from each element in the set of matched elements
+        var obj = getObj(className);
+        if (Array.isArray(obj)) {
+            obj.forEach(function (a) {
+                this.elements.forEach(function (e) {
+                    e.className = e.className.split(' ').filter(function (b) { return b != '' && b != a; }).join(' ');
+                });
+            });
+        } else if (typeof obj == 'string') {
+            this.elements.forEach(function (e) {
+                e.className = e.className.split(' ').filter(function (b) { return b != '' && b != obj; }).join(' ');
+            });
+        }
         return this;
     }
 
-    select.prototype.removeProp = function (prop) {
+    select.prototype.removeProp = function (name) {
         //Remove a property for the set of matched elements
+        this.prop(name, '--');
         return this;
     }
 
@@ -697,11 +1031,56 @@
 
     select.prototype.siblings = function (selector) {
         //Get the siblings of each element in the set of matched elements, optionally filtered by a selector
+        var elems = [];
+        var sibs = [];
+        var q = [];
+        var sel = getObj(selector);
+        var add = function (e) {
+            if (!elems.some(function (a) { return a == e })) { elems.push(e); }
+        }
+        var find = function (e, s) {
+            //find siblings
+            if (s != null) {
+                q = query(e.parentNode, s);
+            }
+            sibs = e.parentNode.children;
+            for (sib of sibs) {
+                if (sib != e) {
+                    if (s != null) {
+                        if (q.some(function (a) { return a == sib; })) {
+                            add(sib);
+                        }
+                    } else {
+                        add(sib);
+                    }
+                }
+            }
+        };
+        
+        if (sel != null) {
+            if (Array.isArray(sel)) {
+                this.elements.forEach(function (e) {
+                    sel.forEach(function (s) {
+                        find(e, s);
+                    });
+                });
+            } else {
+                this.elements.forEach(function (e) {
+                    find(e, sel);
+                });
+            }
+        } else {
+            this.elements.forEach(function (e) {
+                find(e);
+            });
+        }
+        this.elements = elems;
         return this;
     }
 
-    select.prototype.slice = function (elems) {
+    select.prototype.slice = function (start, end) {
         //Reduce the set of matched elements to a subset specified by a range of indices
+        this.elements = this.elements.slice(start, end);
         return this;
     }
 
@@ -712,12 +1091,43 @@
 
     select.prototype.toggle = function () {
         //Display or hide the matched elements
+        this.elements.forEach(function (e) {
+            if (e.style.display == 'none') {
+                e.style.display = '';
+            } else { e.style.display = 'none'; }
+        });
         return this;
     }
 
     select.prototype.toggleClass = function (className) {
         //Add or remove one or more classes from each element in the set of matched elements, depending on either the class’s presence or the value of the state argument
         return this;
+        var obj = getObj(className);
+        if (typeof obj == 'string') {
+            obj = obj.split(' ');
+        }
+        if (Array.isArray(obj)) {
+            this.elements.forEach(function (e) {
+                var c = e.className;
+                var b = -1;
+                if (c != null && c != '') {
+                    c = c.split(' ');
+                    //array of class names
+                    obj.forEach(function (a){
+                        b = c.indexOf(a);
+                        if (b >= 0) {
+                            //remove class
+                            c = c.slice(b, b + 1);
+                        } else {
+                            //add class
+                            c.push(a);
+                        }
+                    });
+                    //update element className attr
+                    e.className = c.join(' ');
+                }
+            });
+        }
     }
 
     select.prototype.val = function (value) {

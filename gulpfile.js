@@ -6,8 +6,20 @@ var gulp = require('gulp'),
     concat = require('gulp-concat'),
     cssmin = require('gulp-cssmin'),
     uglify = require('gulp-uglify'),
+    util = require('gulp-util'),
     less = require('gulp-less'),
-    merge = require('merge-stream');
+    merge = require('merge-stream'),
+    config = require('./config.json');
+    
+//get config variables from config.json
+var environment = config.environment;
+
+//determine environment
+var prod = false;
+if (environment != 'dev' && environment != 'development' && environment != null) {
+    //using staging or production environment
+    prod = true;
+}
 
 //paths
 var paths = {
@@ -73,9 +85,10 @@ gulp.task('clean', ['clean:js', 'clean:css']);
 
 //tasks for compiling javascript //////////////////////////////////////////////////////////////
 gulp.task('js:platform', function () {
-    return gulp.src(paths.working.js.platform, { base: '.' })
-        .pipe(concat(paths.compiled.platform))
-        .pipe(gulp.dest('.'));
+    var p = gulp.src(paths.working.js.platform, { base: '.' })
+            .pipe(concat(paths.compiled.platform));
+    if (prod == true) { p = p.pipe(uglify()); }
+    return p.pipe(gulp.dest('.'));
 });
 
 gulp.task('min:js:platform', ['js'], function () {

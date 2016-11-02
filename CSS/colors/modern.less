@@ -1,0 +1,394 @@
+﻿/* fonts */
+@import (css) url(https://fonts.googleapis.com/css?family=Jaldi:400,700);
+@import "../tapestry/less/theme.less";
+
+body{font-family: Jaldi;}
+
+///////////////////////////////////////
+// Setup Page Editor Interface Colors
+
+.tapestry-default-colors(){
+    //a function used to set up default values for all the required theme colors
+    //use this function, then override some theme variables to make a unique "box" theme
+    @has-all:false;
+    @has-rainbow:false;
+    @has-rows:false;
+    @has-tabs:false;
+    @has-buttons:false; 
+    @has-inputs:false;
+    @has-ui:false;
+    @has-windows:false;
+    @has-tooltip:false;
+    @has-code:false;
+    @has-graphs:false;
+
+    @box-bg:#eee;
+    @box-border:transparent; 
+    @box-font:#444;
+    @box-a-link:#009B87;
+    @box-a-hover:#00C5C7;
+    @box-a-active:#00C5C7;
+    @box-a-faded-link:#58CABB;
+    @box-a-faded-hover:#61D4D5;
+    @box-a-faded-active:#66FDFF;
+    @box-icon-link:#555;
+    @box-icon-hover:#009B87; 
+    @box-icon-active:#00A46C;
+
+    @box-font-faded:rgba(0,0,0,0.3);
+    @box-font-price:#009B87;
+    @box-font-positive:#4DA400;
+    @box-font-negative:#FF2222;
+    @box-font-time:#376EB2;
+
+    @box-font-red:#FF2222;
+    @box-font-orange:#FF6B22;
+    @box-font-yelloworange:#FF9F22;
+    @box-font-yellow:#FFC822;
+    @box-font-yellowgreen:#B2C700;
+    @box-font-green:#4DA400;
+    @box-font-turqoise:#37B277;
+    @box-font-skyblue:#37B2AB;
+    @box-font-blue:#376EB2;
+    @box-font-purple:#6B37B2;
+    @box-font-pink:#C120B0;
+    @box-font-grey:#6A6A6A;
+
+    @row-bg:transparent;
+    @row-hover:#A7D8DB;
+    @row-selected:#5EC7CE;
+    @row-font:#444;
+    @row-font-hover:#33494C;
+    @row-font-selected:#13474F;
+    @row-a-link:#009B87;
+    @row-a-hover:#00C5C7;
+    @row-a-active:#00C5C7;
+    @row-a-selected:#00B4FF; 
+    @row-icon-link:#555;
+    @row-icon-hover:#009B87;
+    @row-icon-active:#00A46C;
+    @row-icon-selected:#185A64;
+
+    @row-alt-bg:#d0d0d0;
+    @row-alt-hover:#91CBCF;
+    @row-alt-selected:#43B9C1;
+    @row-alt-font:#444;
+    @row-alt-font-hover:#314747;
+    @row-alt-font-selected:#1C4646;
+    @row-alt-a-link:#009B87;
+    @row-alt-a-hover:#00C5C7;
+    @row-alt-a-active:#00C5C7;
+    @row-alt-a-selected:#00B4FF;
+    @row-alt-icon-link:#555;
+    @row-alt-icon-hover:#009B87;
+    @row-alt-icon-active:#00A46C;
+    @row-alt-icon-selected:#185A64;
+
+    @col-input-label:#007A8D;
+
+    @button-bg:#009B87;
+    @button-bg-hover:#00A46C;
+    @button-bg-active:#00C5C7;
+    @button-bg-selected:#00A46C;
+    @button-border:transparent;
+    @button-border-hover:transparent;
+    @button-border-active:transparent;
+    @button-border-selected:transparent;
+    @button-font:#fff;
+    @button-font-hover:#fff;
+    @button-font-active:#fff;
+    @button-font-selected:#fff;
+
+    @button-apply-bg:transparent;
+    @button-apply-bg-hover:transparent;
+    @button-apply-bg-active:transparent;
+    @button-apply-bg-selected:transparent;
+    @button-apply-border:transparent; 
+    @button-apply-border-hover:transparent;
+    @button-apply-border-active:transparent;
+    @button-apply-border-selected:transparent;
+    @button-apply-font:transparent;
+    @button-apply-font-hover:transparent;
+    @button-apply-font-active:transparent;
+    @button-apply-font-selected:transparent;
+
+    @button-cancel-bg:transparent;
+    @button-cancel-bg-hover:transparent;
+    @button-cancel-bg-active:transparent;
+    @button-cancel-bg-selected:transparent;
+    @button-cancel-border:transparent;
+    @button-cancel-border-hover:transparent;
+    @button-cancel-border-active:transparent;
+    @button-cancel-border-selected:transparent;
+    @button-cancel-font:transparent;
+    @button-cancel-font-hover:transparent;
+    @button-cancel-font-active:transparent;
+    @button-cancel-font-selected:transparent;
+
+    @button-delete-bg:transparent;
+    @button-delete-bg-hover:transparent;
+    @button-delete-bg-active:transparent;
+    @button-delete-bg-selected:transparent;
+    @button-delete-border:transparent;
+    @button-delete-border-hover:transparent;
+    @button-delete-border-active:transparent;
+    @button-delete-border-selected:transparent;
+    @button-delete-font:transparent;
+    @button-delete-font-hover:transparent;
+    @button-delete-font-active:transparent;
+    @button-delete-font-selected:transparent;
+
+    @button-special-bg:transparent;
+    @button-special-bg-hover:transparent;
+    @button-special-bg-active:transparent;
+    @button-special-bg-selected:transparent;
+    @button-special-border:transparent;
+    @button-special-border-hover:transparent;
+    @button-special-border-active:transparent;
+    @button-special-border-selected:transparent;
+    @button-special-font:transparent;
+    @button-special-font-hover:transparent;
+    @button-special-font-active:transparent;
+    @button-special-font-selected:transparent;
+
+    @button-disabled-bg:transparent;
+    @button-disabled-bg-hover:transparent;
+    @button-disabled-bg-active:transparent;
+    @button-disabled-bg-selected:transparent;
+    @button-disabled-border:transparent;
+    @button-disabled-border-hover:transparent;
+    @button-disabled-border-active:transparent;
+    @button-disabled-border-selected:transparent;
+    @button-disabled-font:transparent;
+    @button-disabled-font-hover:transparent;
+    @button-disabled-font-active:transparent;
+    @button-disabled-font-selected:transparent;
+
+    @button-outline-bg:transparent;
+    @button-outline-bg-hover:transparent;
+    @button-outline-bg-active:transparent;
+    @button-outline-bg-selected:transparent;
+    @button-outline-border:transparent;
+    @button-outline-border-hover:transparent;
+    @button-outline-border-active:transparent;
+    @button-outline-border-selected:transparent;
+    @button-outline-font:transparent;
+    @button-outline-font-hover:transparent;
+    @button-outline-font-active:transparent;
+    @button-outline-font-selected:transparent;
+
+    @button-outline-apply-bg:transparent;
+    @button-outline-apply-bg-hover:transparent;
+    @button-outline-apply-bg-active:transparent;
+    @button-outline-apply-bg-selected:transparent;
+    @button-outline-apply-border:transparent;
+    @button-outline-apply-border-hover:transparent;
+    @button-outline-apply-border-active:transparent;
+    @button-outline-apply-border-selected:transparent;
+    @button-outline-apply-font:transparent;
+    @button-outline-apply-font-hover:transparent;
+    @button-outline-apply-font-active:transparent;
+    @button-outline-apply-font-selected:transparent;
+
+    @button-outline-cancel-bg:transparent;
+    @button-outline-cancel-bg-hover:transparent;
+    @button-outline-cancel-bg-active:transparent;
+    @button-outline-cancel-bg-selected:transparent;
+    @button-outline-cancel-border:transparent;
+    @button-outline-cancel-border-hover:transparent;
+    @button-outline-cancel-border-active:transparent;
+    @button-outline-cancel-border-selected:transparent;
+    @button-outline-cancel-font:transparent;
+    @button-outline-cancel-font-hover:transparent;
+    @button-outline-cancel-font-active:transparent;
+    @button-outline-cancel-font-selected:transparent;
+
+    @button-outline-delete-bg:transparent;
+    @button-outline-delete-bg-hover:transparent;
+    @button-outline-delete-bg-active:transparent;
+    @button-outline-delete-bg-selected:transparent;
+    @button-outline-delete-border:transparent;
+    @button-outline-delete-border-hover:transparent;
+    @button-outline-delete-border-active:transparent;
+    @button-outline-delete-border-selected:transparent;
+    @button-outline-delete-font:transparent;
+    @button-outline-delete-font-hover:transparent;
+    @button-outline-delete-font-active:transparent;
+    @button-outline-delete-font-selected:transparent;
+
+    @button-outline-special-bg:transparent;
+    @button-outline-special-bg-hover:transparent;
+    @button-outline-special-bg-active:transparent;
+    @button-outline-special-bg-selected:transparent;
+    @button-outline-special-border:transparent;
+    @button-outline-special-border-hover:transparent;
+    @button-outline-special-border-active:transparent;
+    @button-outline-special-border-selected:transparent;
+    @button-outline-special-font:transparent;
+    @button-outline-special-font-hover:transparent;
+    @button-outline-special-font-active:transparent;
+    @button-outline-special-font-selected:transparent;
+
+    @button-outline-disabled-bg:transparent;
+    @button-outline-disabled-bg-hover:transparent;
+    @button-outline-disabled-bg-active:transparent;
+    @button-outline-disabled-bg-selected:transparent;
+    @button-outline-disabled-border:transparent;
+    @button-outline-disabled-border-hover:transparent;
+    @button-outline-disabled-border-active:transparent;
+    @button-outline-disabled-border-selected:transparent;
+    @button-outline-disabled-font:transparent;
+    @button-outline-disabled-font-hover:transparent;
+    @button-outline-disabled-font-active:transparent;
+    @button-outline-disabled-font-selected:transparent;
+
+    @button-icon:#fff;
+    @button-icon-hover:#fff;
+    @button-icon-active:#fff;
+
+    @button-icon-apply:transparent;
+    @button-icon-apply-hover:transparent;
+    @button-icon-apply-active:transparent;
+
+    @button-icon-cancel:transparent;
+    @button-icon-cancel-hover:transparent;
+    @button-icon-cancel-active:transparent;
+
+    @button-icon-delete:transparent;
+    @button-icon-delete-hover:transparent;
+    @button-icon-delete-active:transparent;
+
+    @button-icon-special:transparent;
+    @button-icon-special-hover:transparent;
+    @button-icon-special-active:transparent;
+
+    @button-icon-disabled:transparent;
+    @button-icon-disabled-hover:transparent;
+    @button-icon-disabled-active:transparent;
+}
+
+.box{
+    //box styling
+    .tapestry-default-colors();
+    @has-all:true;
+    @box-bg:#efefef;
+    .tapestry-theme();
+}
+ 
+.box .section{
+    //box section styling
+    .tapestry-default-colors();
+    @has-all:true;
+    @box-bg:#fafafa;
+    @box-border:#dadada;
+    .tapestry-theme(); 
+}
+
+.box .section .row.header{
+    //box section header styling 
+    .tapestry-default-colors();
+    @has-buttons:true;
+    @has-menu:true;
+    @box-bg:transparent;
+    .tapestry-theme();
+}
+
+.dash-menu{
+    //dashboard menu styling
+    .tapestry-default-colors();
+    @has-buttons:true;
+    @has-inputs:true;
+    @box-bg:#71a596;
+    @box-font:#fff;
+    @box-a-link:#FDFFC7;
+    @box-a-hover:#FBFF83;
+    @box-a-active:#FFEF69;
+    @box-a-faded-link:fade(#FDFFC7, 50%);
+    @box-a-faded-hover:fade(#FBFF83, 50%);
+    @box-a-faded-active:fade(#FFEF69, 50%);
+    @box-icon-link:#fff;
+    @box-icon-hover:#FBFF83; 
+    @box-icon-active:#FFEF69;
+    @box-font-faded:fade(#fff, 50%);
+
+    @row-hover:#47947E;
+    @row-selected:#1A9484;
+    @row-font:#D0F3EE;
+    @row-font-hover:#fff;
+    @row-font-selected:#A9F6EC;
+    @row-a-link:#FDFFC7;
+    @row-a-hover:#FBFF83;
+    @row-a-active:#FFEF69;
+    @row-icon-link:#fff;
+    @row-icon-hover:#FBFF83; 
+    @row-icon-active:#FFEF69;
+
+    @row-alt-bg:#689D8E;
+    @row-alt-hover:#3C8C75;
+    @row-alt-selected:#178B7C;
+    @row-alt-font:#D0F3EE;
+    @row-alt-font-hover:#fff;
+    @row-alt-font-selected:#A9F6EC;
+    @row-alt-a-link:#FDFFC7;
+    @row-alt-a-hover:#FBFF83;
+    @row-alt-a-active:#FFEF69;
+    @row-alt-icon-link:#fff;
+    @row-alt-icon-hover:#FBFF83; 
+    @row-alt-icon-active:#FFEF69;
+    .tapestry-theme();
+
+    //custom colors
+    .submenu{
+        background-color:#5B9987;
+        .row.hover:hover{background-color:#338B72;}
+        .submenu{
+            background-color:#49917C;
+            .row.hover:hover{background-color:#29876C;}
+        }
+    }
+}
+
+.dash-menu .row.header{
+    //dashboard menu styling
+    .tapestry-default-colors();
+    @has-buttons:true;
+    @has-inputs:true;
+    @box-bg:#5B9987;
+    @box-font:#fff;
+    @box-a-link:#FDFFC7;
+    @box-a-hover:#FBFF83;
+    @box-a-active:#FFEF69;
+    @box-a-faded-link:fade(#FDFFC7, 50%);
+    @box-a-faded-hover:fade(#FBFF83, 50%);
+    @box-a-faded-active:fade(#FFEF69, 50%);
+    @box-icon-link:#fff;
+    @box-icon-hover:#FBFF83; 
+    @box-icon-active:#FFEF69;
+    @box-font-faded:fade(#fff, 50%);
+
+    @row-hover:#47947E;
+    @row-selected:#1A9484;
+    @row-font:#D0F3EE;
+    @row-font-hover:#fff;
+    @row-font-selected:#A9F6EC;
+    @row-a-link:#FDFFC7;
+    @row-a-hover:#FBFF83;
+    @row-a-active:#FFEF69;
+    @row-icon-link:#fff;
+    @row-icon-hover:#FBFF83; 
+    @row-icon-active:#FFEF69;
+
+    @row-alt-bg:#689D8E;
+    @row-alt-hover:#3C8C75;
+    @row-alt-selected:#178B7C;
+    @row-alt-font:#D0F3EE;
+    @row-alt-font-hover:#fff;
+    @row-alt-font-selected:#A9F6EC;
+    @row-alt-a-link:#FDFFC7;
+    @row-alt-a-hover:#FBFF83;
+    @row-alt-a-active:#FFEF69;
+    @row-alt-icon-link:#fff;
+    @row-alt-icon-hover:#FBFF83; 
+    @row-alt-icon-active:#FFEF69;
+    .tapestry-theme();
+}

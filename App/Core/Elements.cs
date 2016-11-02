@@ -23,7 +23,7 @@ namespace Websilk
             Path = path; //path to the theme folder
         }
 
-        public Element.Element Load(ElementType type, string name, string themePath = "")
+        public Element.Element Load(ElementType type, string name = "", string themePath = "")
         {
             string pth = themePath;
             Element.Element elem;
@@ -32,19 +32,19 @@ namespace Websilk
             switch (type)
             {
                 case ElementType.Button:
-                    elem = new Element.Button(S, pth + "elements/button.html", name);
+                    elem = new Element.Button(S, pth + "elements/button.html", name != "" ? name : "button");
                     break;
 
                 case ElementType.List:
-                    elem = new Element.List(S, pth + "elements/list.html", name);
+                    elem = new Element.List(S, pth + "elements/list.html", name != "" ? name : "list");
                     break;
 
                 case ElementType.Panel:
-                    elem = new Element.Panel(S, pth + "elements/panel.html", name);
+                    elem = new Element.Panel(S, pth + "elements/panel.html", name != "" ? name : "panel");
                     break;
 
                 case ElementType.Textbox:
-                    elem = new Element.Textbox(S, pth + "elements/textbox.html", name);
+                    elem = new Element.Textbox(S, pth + "elements/textbox.html", name != "" ? name : "textbox");
                     break;
 
                 default:

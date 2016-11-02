@@ -227,6 +227,7 @@ namespace Websilk
 
         private void createConfig()
         {
+            //generate a new config.json file
             var configPath = Path.GetFullPath("project.json").Replace("project.json","config.json");
             File.WriteAllText(configPath,
                 "{\n" +

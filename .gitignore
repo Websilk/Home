@@ -5,6 +5,8 @@
 *.suo
 *.user
 *.sln.docstates
+
+/config.json
 /wwwroot/css
 /wwwroot/js
 /wwwroot/content/themes/default

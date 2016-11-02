@@ -54,7 +54,8 @@ namespace Websilk
         public int websiteId = 0;
         public string websiteTitle = "";
         public string websiteTitleSeparator = " - ";
-        public string websiteTheme = "";
+        public string websiteTheme = "default";
+        public string websiteColors = "modern";
         public int websitePageAccessDenied = 0;
         public int websitePage404 = 0;
 
@@ -150,6 +151,7 @@ namespace Websilk
                 pageParentId = reader.GetInt("parentid");
                 parentTitle = reader.Get("parenttitle");
                 websiteTheme = reader.Get("theme");
+                websiteColors = reader.Get("colors");
                 websiteId = reader.GetInt("websiteid");
                 websiteTitle = reader.Get("websitetitle");
                 websitePageAccessDenied = reader.GetInt("pagedenied");
@@ -289,6 +291,7 @@ namespace Websilk
             scaffold.Data["favicon"] = "/images/favicon.gif";
             scaffold.Data["body-class"] = GetBrowserType() + (S.User.isMobile ? (S.User.isTablet ? " s-tablet" : " s-mobile") : " s-hd");
             scaffold.Data["website-css"] = "/content/websites/" + websiteId + "/website.css?v=" + S.Server.Version;
+            scaffold.Data["theme-css"] = "/css/colors/" + websiteColors + ".css";
 
             //setup inline javascript
             string scripts;

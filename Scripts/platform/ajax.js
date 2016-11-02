@@ -7,7 +7,7 @@
         S.events.ajax.start();
         data.pageId = S.page.id;
         var options = {
-            type: "POST",
+            method: "POST",
             data: JSON.stringify(data),
             dataType: "json",
             url: url,

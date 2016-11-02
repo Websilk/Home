@@ -4,18 +4,24 @@ using System.IO;
 
 namespace Websilk
 {
-    public enum enumEnvironment
-    {
-        development = 0,
-        staging = 1,
-        production = 2
-    }
-
     public class Server
     {
         ////////////////////////////////////////////////
         //Server     (for application-wide memory store)
         ////////////////////////////////////////////////
+
+        public enum enumEnvironment
+        {
+            development = 0,
+            staging = 1,
+            production = 2
+        }
+
+        public struct structEncryption
+        {
+            public string salt;
+            public bool reset; //if true, admin is required to reset their password
+        }
 
         public string Version = "";
         // #.#.#.#.#.# =  years since github repo was created (10/22/2016) [#]
@@ -30,6 +36,7 @@ namespace Websilk
         public string sqlActive = "";
         public string sqlConnection = "";
         public Random Random = new Random();
+        public structEncryption encryption = new structEncryption();
 
         private string _path = "";
 
@@ -47,7 +54,7 @@ namespace Websilk
         #region "System.UI.Web.Page.Server methods"
         public string path(string strPath = "")
         {
-            if(_path == "") { _path = Path.GetFullPath("config.json").Replace("config.json", ""); }
+            if(_path == "") { _path = Path.GetFullPath("project.json").Replace("project.json", ""); }
             return _path + strPath.Replace("/", "\\");
         }
 

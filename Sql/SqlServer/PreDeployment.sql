@@ -1,4 +1,4 @@
-﻿DECLARE @restart bit = 1
+﻿DECLARE @restart bit = 0
 IF @restart = 1 BEGIN
 	/* Clear initial data (if you so desire) */
 	DELETE FROM components

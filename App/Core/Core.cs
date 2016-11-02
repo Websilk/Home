@@ -27,8 +27,8 @@ namespace Websilk
             Request = context.Request;
             Response = context.Response;
             Session = context.Session;
-            Sql = new Sql(this);
-            Util = new Utility.Util(this);
+            Util = new Utility.Util();
+            Sql = new Sql(Server, Util);
             User = new User();
 
             //load user session

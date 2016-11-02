@@ -151,6 +151,8 @@
     <Build Include="dbo\Stored Procedures\GetPageInfoFromDomainAndTitle.sql" />
     <Build Include="dbo\Stored Procedures\UpdateWebsitePageModified.sql" />
     <Build Include="dbo\Stored Procedures\GetPageInfoFromSubDomainAndTitle.sql" />
+    <Build Include="dbo\Stored Procedures\ResetAllPasswords.sql" />
+    <Build Include="dbo\Stored Procedures\HasPassword.sql" />
   </ItemGroup>
   <ItemGroup>
     <ArtifactReference Include="$(DacPacRootPath)\Extensions\Microsoft\SQLDB\Extensions\SqlServer\110\SqlSchemas\master.dacpac">

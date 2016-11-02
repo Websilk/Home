@@ -6,11 +6,11 @@ namespace Websilk.Utility
 {
     public class Serializer
     {
-        private Core S;
+        private Util Util;
 
-        public Serializer(Core CollectorCore)
+        public Serializer(Util util)
         {
-            S = CollectorCore;
+            Util = util;
         }
 
         #region "Write"
@@ -26,12 +26,12 @@ namespace Websilk.Utility
 
         public byte[] WriteObject(object obj, Formatting formatting = Formatting.Indented, TypeNameHandling nameHandling = TypeNameHandling.Auto)
         {
-            return S.Util.Str.GetBytes(WriteObjectAsString(obj, formatting, nameHandling));
+            return Util.Str.GetBytes(WriteObjectAsString(obj, formatting, nameHandling));
         }
 
         public void SaveToFile(object obj, string file, Formatting formatting = Formatting.Indented, TypeNameHandling nameHandling = TypeNameHandling.Auto)
         {
-            var path = S.Util.Str.getFolder(file);
+            var path = Util.Str.getFolder(file);
             if (!Directory.Exists(path))
             {
                 Directory.CreateDirectory(path);

@@ -31,10 +31,9 @@ namespace Websilk
         }
 
 
-        public bool LogIn(string authId)
+        public bool LogIn(string email, string pass)
         {
             return false;
-
         }
 
         public void LogOut()

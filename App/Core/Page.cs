@@ -299,7 +299,7 @@ namespace Websilk
             var rawjs = new StringBuilder();
             var rawcss = new StringBuilder();
 
-            if (S.Server.environment != enumEnvironment.development){min = ".min";}
+            if (S.Server.environment != Server.enumEnvironment.development){min = ".min";}
             scripts = "<script type=\"text/javascript\" src=\"/js/platform" + min + ".js\"></script>\n";
             if (isEditable == true)
             {

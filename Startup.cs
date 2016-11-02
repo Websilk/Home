@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Linq;
 using Microsoft.AspNet.Builder;
 using Microsoft.AspNet.Http;
@@ -37,29 +38,56 @@ namespace Websilk
             app.UseSession();
 
             //get server info from config.json
+            if (!File.Exists(Path.GetFullPath("config.json")))
+            {
+                //generate config.json
+                createConfig();
+            }
+
             var configBuilder = new ConfigurationBuilder()
                 .AddJsonFile(server.MapPath("config.json"))
                 .AddEnvironmentVariables();
             IConfiguration config = configBuilder.Build();
 
-            server.Version = config.GetSection("Version").Value;
             server.sqlActive = config.GetSection("Data:Active").Value;
             server.sqlConnection = config.GetSection("Data:" + server.sqlActive).Value;
             server.https = config.GetSection("https").Value.ToLower() == "true" ? true : false;
+            server.encryption.salt = config.GetSection("Encryption:Salt").Value;
 
             var isdev = false;
             switch (config.GetSection("Environment").Value)
             {
                 case "development": case "dev":
-                    server.environment = enumEnvironment.development;
+                    server.environment = Server.enumEnvironment.development;
                     isdev = true;
                     break;
                 case "staging": case "stage":
-                    server.environment = enumEnvironment.staging;
+                    server.environment = Server.enumEnvironment.staging;
                     break;
                 case "production": case "prod":
-                    server.environment = enumEnvironment.production;
+                    server.environment = Server.enumEnvironment.production;
                     break;
+            }
+
+            //configure server security
+            if(server.encryption.salt == "")
+            {
+                //if no salt exists in config.json, create a new one
+                var Util = new Utility.Util();
+                server.encryption.salt = createSalt(Util);
+
+                //reset all passwords in the database
+                var Sql = new Sql(server, Util);
+                Sql.ExecuteNonQuery("EXEC ResetAllPasswords");
+                server.encryption.reset = true;
+            }else
+            {
+                //check to see if admin account has a password
+                var Util = new Utility.Util();
+                var Sql = new Sql(server, Util);
+                if((int)Sql.ExecuteScalar("EXEC HasPassword @userId=1") == 0){
+                    server.encryption.reset = true;
+                }
             }
 
             //run Websilk application
@@ -168,6 +196,52 @@ namespace Websilk
                 if (!p.All(char.IsLetter)) { return false; }
             }
             return true;
+        }
+
+        private string createSalt(Utility.Util Util)
+        {
+            //no salt has been generated yet. generate salt & save to config.json
+            var encryption = new Utility.Encryption(Util);
+            var configPath = Path.GetFullPath("config.json");
+            var salt = encryption.getNewCSPRNG();
+            //open config.json as raw file
+            var f = File.ReadAllText(configPath);
+            if (f != "")
+            {
+                //parse config.json & insert salt manually
+                var i = new int[3];
+                i[0] = f.IndexOf("\"salt\"");
+                if (i[0] > 0)
+                {
+                    i[1] = f.IndexOf("\"\"", i[0] + 6);
+                    if (i[1] > i[0])
+                    {
+                        //inject salt into config.json
+                        f = f.Substring(0, i[1] + 1) + salt + f.Substring(i[1] + 1);
+                        File.WriteAllText(configPath, f);
+                    }
+                }
+            }
+            return salt;
+        }
+
+        private void createConfig()
+        {
+            var configPath = Path.GetFullPath("project.json").Replace("project.json","config.json");
+            File.WriteAllText(configPath,
+                "{\n" +
+                "    \"environment\": \"development\",\n" +
+                "    \"https\": false,\n" +
+                "    \"data\": {\n" +
+                "        \"active\": \"SqlServerTrusted\",\n" +
+                "        \"SqlServerDev\": \"server=.\\\\SQL2014; database=WebsilkDev; user=WebsilkDev; password=development\",\n" +
+                "        \"SqlServerTrusted\": \"server=.\\\\SQL2014; database=WebsilkDev; Trusted_Connection=true\"\n" +
+                "    },\n" +
+                "    \"encryption\": {\n" +
+                "        \"salt\": \"\"\n" +
+                "    }\n" +
+                "}\n"
+                );
         }
     }
 }

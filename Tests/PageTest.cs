@@ -30,7 +30,7 @@ namespace Websilk.Services
             page.panels = new List<Panel>();
             page.components = new List<Component>();
             
-            if(S.Server.environment != enumEnvironment.development) {
+            if(S.Server.environment != Server.enumEnvironment.development) {
                 //exit function if not in development environment
                 return response;
             }
@@ -45,7 +45,7 @@ namespace Websilk.Services
                 case "login":
                     //generate login page
                     page.pageId = 102;
-                    panelBody = P.loadComponent(new Components.Login(), panelBody, panelBody.cells[0]);
+                    panelBody = P.loadComponent(new Websilk.Components.Login(), panelBody, panelBody.cells[0]);
                     break;
             }
 

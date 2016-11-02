@@ -106,7 +106,7 @@ namespace Websilk
                     }
                     elements.Add(scaff);
                 }
-                if(S.Server.environment != enumEnvironment.development){
+                if(S.Server.environment != Server.enumEnvironment.development){
                     //cache the scaffold file
                     var scaffold = new structScaffold();
                     scaffold.Data = Data;

@@ -1,17 +1,17 @@
-﻿namespace Websilk.Utility
+﻿using System;
+
+namespace Websilk.Utility
 {
     public class Util
     {
-        private Core S;
-
         public Str Str;
         public Serializer Serializer;
+        public Random Random = new Random();
 
-        public Util(Core WebsilkCore)
+        public Util()
         {
-            S = WebsilkCore;
-            Str = new Str(S);
-            Serializer = new Serializer(S);
+            Str = new Str(this);
+            Serializer = new Serializer(this);
         }
 
         #region "Validation"

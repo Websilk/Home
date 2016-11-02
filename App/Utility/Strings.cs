@@ -9,11 +9,11 @@ namespace Websilk.Utility
 {
     public class Str
     {
-        private Core S;
+        private Util Util;
 
-        public Str(Core CollectorCore)
+        public Str(Util util)
         {
-            S = CollectorCore;
+            Util = util;
         }
 
         #region "Conversion"
@@ -208,7 +208,7 @@ namespace Websilk.Utility
                     result = u[0].Split('#')[0];
                 }
             }
-            if (S.Util.IsEmpty(removeFromQuery) == false)
+            if (Util.IsEmpty(removeFromQuery) == false)
             {
                 //remove specific query keys from url
                 u = result.Split(new char[] { '?' }, 2);
@@ -456,7 +456,7 @@ namespace Websilk.Utility
             for (var x = 0; x < text.Length; x++)
             {
                 spart = text.Substring(x, 1);
-                if (S.Util.Str.IsNumeric(spart) || spart == ".")
+                if (Util.Str.IsNumeric(spart) || spart == ".")
                 {
                     //found a number
                     if (isnum == false)
@@ -478,7 +478,7 @@ namespace Websilk.Utility
                     //end of number
                     try
                     {
-                        if (S.Util.Str.IsNumeric(numpart))
+                        if (Util.Str.IsNumeric(numpart))
                         {
                             numberlist.Add(double.Parse(numpart));
                         }
@@ -498,22 +498,22 @@ namespace Websilk.Utility
             string result = "";
             for (var x = 0; x <= length - 1; x++)
             {
-                int type = S.Server.Random.Next(1, 3);
+                int type = Util.Random.Next(1, 3);
                 int num = 0;
                 switch (type)
                 {
                     case 1: //a-z
-                        num = S.Server.Random.Next(0, 26);
+                        num = Util.Random.Next(0, 26);
                         result += (char)('a' + num);
                         break;
 
                     case 2: //A-Z
-                        num = S.Server.Random.Next(0, 26);
+                        num = Util.Random.Next(0, 26);
                         result += (char)('A' + num);
                         break;
 
                     case 3: //0-9
-                        num = S.Server.Random.Next(0, 9);
+                        num = Util.Random.Next(0, 9);
                         result += (char)('1' + num);
                         break;
 
@@ -525,7 +525,7 @@ namespace Websilk.Utility
 
         public string CreateMD5Hash(string input)
         {
-            var encryption = new Encryption(S);
+            var encryption = new Encryption(Util);
             return encryption.GetMD5Hash(input);
         }
 
@@ -574,7 +574,7 @@ namespace Websilk.Utility
                 case 13:
                     return "th";
                 default:
-                    switch (int.Parse(S.Util.Str.Right(digit.ToString(), 1)))
+                    switch (int.Parse(Right(digit.ToString(), 1)))
                     {
                         case 1:
                             return "st";
@@ -631,7 +631,7 @@ namespace Websilk.Utility
         public bool IsNumeric(string str)
         {
             double retNum;
-            if (S.Util.IsEmpty(str) == false)
+            if (Util.IsEmpty(str) == false)
             {
                 return Double.TryParse(str, out retNum);
             }

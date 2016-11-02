@@ -11,7 +11,8 @@ namespace Websilk
 
     public class Sql
     {
-        private Core S;
+        private Server Server;
+        private Utility.Util Util;
         private SqlConnection conn = new SqlConnection();
         private SqlCommand cmd = new SqlCommand();
         private bool _started = false;
@@ -20,16 +21,17 @@ namespace Websilk
         public enumSqlDataTypes dataType;
 
         #region "SqlServer Engine"
-        public Sql(Core WebsilkCore)
+        public Sql(Server server, Utility.Util util)
         {
-            S = WebsilkCore;
+            Server = server;
+            Util = util;
         }
 
         private void Start()
         {
             if (_started == true) { return; }
 
-            string active = S.Server.sqlActive;
+            string active = Server.sqlActive;
 
             switch (active)
             {
@@ -43,7 +45,7 @@ namespace Websilk
                     break;
             }
 
-            conn.ConnectionString = S.Server.sqlConnection;
+            conn.ConnectionString = Server.sqlConnection;
             conn.Open();
             cmd.Connection = conn;
             cmd.CommandType = System.Data.CommandType.Text;
@@ -90,7 +92,7 @@ namespace Websilk
         public int GetInt(string key)
         {
             string s = Get(key);
-            if (S.Util.Str.IsNumeric(s)) { 
+            if (Util.Str.IsNumeric(s)) { 
             return int.Parse(reader[key].ToString());
             }
             return 0;
@@ -99,7 +101,7 @@ namespace Websilk
         public Int64 GetInt64(string key)
         {
             string s = Get(key);
-            if (S.Util.Str.IsNumeric(s))
+            if (Util.Str.IsNumeric(s))
             {
                 return Int64.Parse(s);
             }

@@ -11,7 +11,7 @@ namespace Websilk.Element
         public string Render(string id, string url, string label, bool disabled = false)
         {
             string aurl = url;
-            string jsurl = url;
+            string jsurl = "";
             if(disabled == false)
             {
                 if (aurl.IndexOf("javascript:") == 0)
@@ -26,9 +26,15 @@ namespace Websilk.Element
             }
             
             Data["url"] = aurl;
-            Data["jsurl"] = jsurl;
+            if(jsurl != "")
+            {
+                //use onclick attribute
+                Data["jsurl"] = jsurl;
+                Data["click"] = "true";
+            }
             Data["label"] = label;
-            return "<div class=\"button\" id=\"" + id + "\">" + scaffold.Render() + "</div>";
+            Data["id"] = id;
+            return scaffold.Render();
         }
     }
 }

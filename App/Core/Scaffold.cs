@@ -16,7 +16,6 @@ namespace Websilk
     public struct structScaffoldElement
     {
         public string name;
-        public Dictionary<string, string> arguments;
         public string htm;
     }
 
@@ -26,7 +25,6 @@ namespace Websilk
         private Core S;
         
         public Dictionary<string, string> Data;
-        public Dictionary<string, string> arguments;
         public List<structScaffoldElement> elements;
         
         public Scaffold(Core WebsilkCore, string file = "", string html = "", string section = "")
@@ -37,7 +35,6 @@ namespace Websilk
             if (S.Server.Scaffold.ContainsKey(file + '/' + section) == false)
             {
                 elements = new List<structScaffoldElement>();
-                arguments = new Dictionary<string, string>();
 
                 //first, check if html is already provided
                 var htm = html;
@@ -73,26 +70,7 @@ namespace Websilk
                                 case "}":
                                     //found end of tag
                                     break;
-
-                                case " ":
-                                case "(":
-                                    if (s == " ") { e[1] += 1; s = htm.Substring(e[1], 1); }
-                                    if (s == "(")
-                                    {
-                                        //get arguments
-                                        e[2] = htm.IndexOf(")", e[1]);
-                                        string[] args = htm.Substring(e[1] + 1, e[2] - e[1] - 1).Split(',');
-                                        for (int y = 0; y < args.Length; y++)
-                                        {
-                                            string[] kv = args[y].Split(':');
-                                            if (kv.Length == 2)
-                                            {
-                                                arguments.Add(kv[0].Trim().Trim(new char[] { '\'' }), kv[1].Trim().Trim(new char[] { '\'' }));
-                                            }
-                                        }
-                                    }
-                                    break;
-
+                                    
                                 default:
                                     e[0] = -1;
                                     break;
@@ -120,26 +98,6 @@ namespace Websilk
                     {
                         scaff.name = arr[x].Substring(0, i);
                         scaff.htm = arr[x].Substring(i + 2);
-
-                        e[0] = scaff.name.IndexOf("(");
-                        if (e[0] > 0)
-                        {
-                            //has arguments
-                            e[1] = scaff.name.IndexOf(")");
-                            if(e[1] > e[0])
-                            {
-                                string[] args = scaff.name.Substring(e[0] + 1, e[1] - (e[0] + 1)).Split(',');
-                                for (int y = 0; y < args.Length; y++)
-                                {
-                                    string[] kv = args[y].Split(':');
-                                    if (kv.Length == 2)
-                                    {
-                                        scaff.arguments.Add(kv[0].Trim().Trim(new char[] { '\'' }), kv[1].Trim().Trim(new char[] { '\'' }));
-                                    }
-                                }
-                            }
-                            scaff.name = scaff.name.Split(' ')[0];
-                        }
                     }
                     else
                     {
@@ -153,7 +111,6 @@ namespace Websilk
                     var scaffold = new structScaffold();
                     scaffold.Data = Data;
                     scaffold.elements = elements;
-                    scaffold.arguments = arguments;
                     S.Server.Scaffold.Add(file + '/' + section, scaffold);
                 }
             }
@@ -163,7 +120,6 @@ namespace Websilk
                 var scaffold = S.Server.Scaffold[file + '/' + section];
                 Data = scaffold.Data;
                 elements = scaffold.elements;
-                arguments = scaffold.arguments;
             }
         }
 

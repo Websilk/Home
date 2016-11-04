@@ -57,26 +57,43 @@ namespace Websilk
             if (_started == true) { conn.Close(); }
         }
 
-        public SqlDataReader ExecuteReader(String sql)
+        public SqlDataReader ExecuteReader(string sql, List<SqlParameter> parameters = null)
         {
             if (_started == false) { Start(); }
-            cmd.CommandText = sql;
+            cmd.CommandText = GetQuery(sql, parameters);
             reader = cmd.ExecuteReader();
             return reader;
         }
 
-        public void ExecuteNonQuery(String sql)
+        public void ExecuteNonQuery(string sql, List<SqlParameter> parameters = null)
         {
             if (_started == false) { Start(); }
-            cmd.CommandText = sql;
+            cmd.CommandText = GetQuery(sql, parameters);
             cmd.ExecuteNonQuery();
         }
 
-        public object ExecuteScalar(String sql)
+        public object ExecuteScalar(string sql, List<SqlParameter> parameters = null)
         {
             if (_started == false) { Start(); }
-            cmd.CommandText = sql;
+            cmd.CommandText = GetQuery(sql, parameters);
             return cmd.ExecuteScalar();
+        }
+
+        private string GetQuery(string sql, List<SqlParameter> parameters = null)
+        {
+            var q = sql;
+            if(parameters != null)
+            {
+                if (parameters.Count > 0)
+                {
+                    foreach (var p in parameters)
+                    {
+                        q = q.Replace(p.Name, p.Value);
+                    }
+                }
+            }
+            return q;
+
         }
 
         #region "Get"
@@ -154,10 +171,20 @@ namespace Websilk
         private int _i = -1;
         public List<Dictionary<string, object>> Rows = new List<Dictionary<string, object>>();
 
-        public SqlReader(Core WebsilkCore, string query)
+        public SqlReader(Core WebsilkCore, string query, List<SqlParameter> parameters)
         {
             S = WebsilkCore;
-            var reader = S.Sql.ExecuteReader(query);
+            var q = query;
+            //inject values into query (to prevent sql injection attacks)
+            if(parameters.Count > 0)
+            {
+                foreach(var p in parameters)
+                {
+                    q = q.Replace(p.Name, p.Value);
+                }
+            }
+
+            var reader = S.Sql.ExecuteReader(q);
             switch(S.Sql.dataType){
                 case enumSqlDataTypes.SqlClient:
                     ReadFromSqlClient(reader);
@@ -246,6 +273,53 @@ namespace Websilk
             string str = Get(key).ToLower();
             if (str == "") { return new DateTime(); }
             return DateTime.Parse(str);
+        }
+    }
+
+
+    public enum enumSqlParameterType
+    {
+        isString = 0,
+        isNumber = 1
+    }
+
+    public class SqlParameter
+    {
+        public string Name = "";
+        private string _value = "";
+        public int Length;
+        public enumSqlParameterType Type = enumSqlParameterType.isString;
+
+        public SqlParameter(string name, string value, int maxLength, enumSqlParameterType type = enumSqlParameterType.isString)
+        {
+            Name = name;
+            _value = value;
+            Type = type;
+            Length = maxLength;
+        }
+
+        public string Value
+        {
+            get
+            {
+                var quote = Type == enumSqlParameterType.isString ? "'" : "";
+                return quote + CleanValue(_value) + quote;
+            }
+            set
+            {
+                _value = value;
+            }
+        }
+
+        private string CleanValue(string value)
+        {
+            //prevent SQL injection
+            //replace two (or more) single-quotes with a single-quote and then 
+            //replace one single-quote with two single-quotes
+            var v = value.Replace("''", "'").Replace("''","'").Replace("'","''"); 
+            //truncate data if needed
+            if(v.Length > Length && Length > 0) { v = v.Substring(0, Length - 1); }
+            return v;
         }
     }
 

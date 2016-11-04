@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 
-
 namespace Websilk.Services
 {
     public class PageTest: Service
@@ -39,15 +38,22 @@ namespace Websilk.Services
             {
                 case "home":
                     //generate a home page
-                    page.pageId = 101;
+                    P.Url = P.parseUrl("/home");
+                    P.getPageInfoFromUrl();
                     break;
 
                 case "login":
                     //generate login page
-                    page.pageId = 102;
-                    panelBody = P.loadComponent(new Websilk.Components.Login(), panelBody, panelBody.cells[0]);
+                    P.Url = P.parseUrl("/login");
+                    P.getPageInfoFromUrl();
+                    var cLogin = P.loadComponent(new Websilk.Components.Login(), panelBody, panelBody.cells[0], true);
+                    var posLogin = cLogin.position[4];
+                    posLogin.padding.top = 50;
+                    cLogin.position[4] = posLogin;
                     break;
             }
+
+            page.pageId = P.pageId;
 
             //add components from head, body, & foot
             foreach (var component in panelHead.cells[0].components)
@@ -66,7 +72,7 @@ namespace Websilk.Services
             }
 
             //save page to file
-            S.Util.Serializer.SaveToFile(page, S.Server.MapPath("/Content/websites/1/pages/" + page.pageId + "/page.json"));
+            S.Util.Serializer.SaveToFile(page, S.Server.MapPath("/Content/websites/1/pages/" + page.pageId + "/page.json"), Newtonsoft.Json.Formatting.None);
 
             response.contentType = "text/html";
             response.html = "Generated page \"" + name + "\" at " + DateTime.Now.ToString("h:mm:ss") + ".";

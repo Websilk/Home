@@ -971,11 +971,15 @@
         return this;
     }
 
-    select.property.ready = function (callback) {
-        if (document.readyState != 'loading') {
-            callback();
-        } else {
-            document.addEventListener('DOMContentLoaded', callback);
+    select.prototype.ready = function (callback) {
+        if (this.elements.length == 1) {
+            if (this.elements[0] == document) {
+                if (document.readyState != 'loading') {
+                    callback();
+                } else {
+                    document.addEventListener('DOMContentLoaded', callback);
+                }
+            }
         }
     }
 
@@ -1125,7 +1129,7 @@
                         b = c.indexOf(a);
                         if (b >= 0) {
                             //remove class
-                            c = c.slice(b, b + 1);
+                            c = c.splice(b, b + 1);
                         } else {
                             //add class
                             c.push(a);
@@ -1140,6 +1144,9 @@
 
     select.prototype.val = function (value) {
         //Get the current value of the first element in the set of matched elements or set the value of every matched element
+        if (this.elements.length > 0) {
+            return this.elements[0].value;
+        }
         return '';
     }
 

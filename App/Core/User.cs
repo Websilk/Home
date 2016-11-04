@@ -41,5 +41,25 @@ namespace Websilk
             S.Session.Remove("user");
         }
         
+        public bool UpdatePassword(int userId, string password)
+        {
+            var update = false; //security check
+            var emailAddr = email;
+            if(S.Server.encryption.reset == true && userId == 1)
+            {
+                //securely change admin password
+                //get admin email address from database
+                
+                update = true;
+            }
+            if(update == true)
+            {
+                //generate salt
+                var salt = emailAddr + S.Server.encryption.salt;
+                var sqlUser = new SqlQueries.User(S);
+                sqlUser.UpdatePassword(userId, salt);
+            }
+            return false;
+        }
     }
 }

@@ -7,6 +7,14 @@ namespace Websilk.Components
 
         public Login() { }
 
+        public override string Name
+        {
+            get
+            {
+                return "Login";
+            }
+        }
+
         public override string Path
         {
             get
@@ -24,9 +32,11 @@ namespace Websilk.Components
                 var txtPass = (Element.Textbox)Page.Elements.Load(ElementType.Textbox);
                 var txtPass2 = (Element.Textbox)Page.Elements.Load(ElementType.Textbox);
                 var btnLogin = (Element.Button)Page.Elements.Load(ElementType.Button, "button-apply");
+                scaffold.Data["title"] = "Update your administrator password";
                 scaffold.Data["field-pass"] = txtPass.Render("password", "password", "", "password", "", Element.Textbox.enumTextType.password);
                 scaffold.Data["field-pass2"] = txtPass2.Render("password2", "password", "", "retype password", "", Element.Textbox.enumTextType.password);
                 scaffold.Data["button-save"] = btnLogin.Render("btnsave", "javascript:S.login.savepass()", "Save");
+                AddJavascriptFile("new-pass", "/js/components/login/new-pass.js");
             }
             else
             {

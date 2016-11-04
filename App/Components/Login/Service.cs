@@ -28,5 +28,19 @@
 
             return response;
         }
+
+        public Inject SavePass(string pass, string pass2)
+        {
+            //save a new password for an existing user that does not have a password set
+            var response = new Inject();
+            if (S.isSessionLost()) { return lostInject(); }
+
+            if (S.Server.encryption.reset == true)
+            {
+                //update password for administrator
+
+            }
+            return response;
+        }
     }
 }

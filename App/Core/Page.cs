@@ -258,7 +258,7 @@ namespace Websilk
         /// </summary>
         /// <param name="component"></param>
         /// <param name="panelId"></param>
-        public Panel loadComponent(Component component, Panel panel, Panel.structCell cell)
+        public Component loadComponent(Component component, Panel panel, Panel.structCell cell, bool isCreated = false)
         {
             if(component.id == "")
             {
@@ -275,8 +275,9 @@ namespace Websilk
             panel.cells[cellIndex].components.Add(component);
             panel.cells[cellIndex].componentIds.Add(component.id);
             panel.cells[cellIndex].components[compIndex].Initialize(S, this);
+            if(isCreated == true) { panel.cells[cellIndex].components[compIndex].Create(); }
             panel.cells[cellIndex].components[compIndex].Load();
-            return panel;
+            return panel.cells[cellIndex].components[compIndex];
         }
         #endregion
 
@@ -293,28 +294,25 @@ namespace Websilk
             scaffold.Data["website-css"] = "/content/websites/" + websiteId + "/website.css?v=" + S.Server.Version;
             scaffold.Data["theme-css"] = "/css/colors/" + websiteColors + ".css";
 
-            //setup inline javascript
-            string scripts;
+            //setup base javascript files
             string min = "";
-            var rawjs = new StringBuilder();
-            var rawcss = new StringBuilder();
-
-            if (S.Server.environment != Server.enumEnvironment.development){min = ".min";}
-            scripts = "<script type=\"text/javascript\" src=\"/js/platform" + min + ".js\"></script>\n";
+            if (S.Server.environment != Server.enumEnvironment.development) { min = ".min"; }
+            S.javascriptFiles.Add("platform", "/js/platform" + min + ".js");
             if (isEditable == true)
             {
-                scripts += "<script type=\"text/javascript\" src=\"/js/editor" + min + ".js?v=" + S.Server.Version + "\"></script>\n";
+                S.javascriptFiles.Add("platform", "/js/editor" + min + ".js");
             }
 
-            foreach(var item in S.javascript)
-            {
-                rawjs.Append("<script type=\"text/javascript\" id=\"js_" + item.Key.Replace(" ","_") + "\">" + item.Value + "</script>");
-            }
-            scaffold.Data["scripts"] = scripts + "\n" + rawjs.ToString();
-            
-            //render web page
+            //render page layout (panels & components)
             scaffold.Data["body"] = renderLayout();
-            
+
+            //setup inline CSS
+            scaffold.Data["head-css"] = S.css.renderCssWithTags();
+
+            //setup inline javascript
+            scaffold.Data["scripts"] = S.javascriptFiles.renderJavascriptFiles() + "\n" +
+                                       S.javascript.renderJavascript();
+            //finally, render web page
             return scaffold.Render();
         }
 

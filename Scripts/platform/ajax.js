@@ -10,7 +10,7 @@
             method: "POST",
             data: JSON.stringify(data),
             dataType: "json",
-            url: url,
+            url: '/api/' + url,
             contentType: "text/plain; charset=utf-8",
             success: function (d) { S.ajax.runQueue(); S.events.ajax.complete(d); callback(d); },
             error: function (xhr, status, err) { S.events.ajax.error(status, err); S.ajax.runQueue(); }

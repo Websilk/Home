@@ -1,4 +1,6 @@
-﻿namespace Websilk.SqlQueries
+﻿using System.Collections.Generic;
+
+namespace Websilk.SqlQueries
 {
     public class Page : SqlQuery
     {
@@ -9,27 +11,41 @@
         #region "Page Info"
         public SqlReader GetPageInfo(int pageId)
         {
-            return new SqlReader(S, "EXEC GetPageInfoFromPageId @pageId=" + pageId);
+            var parameters = new List<SqlParameter>();
+            parameters.Add(new SqlParameter("$pageId", pageId.ToString(), 0, enumSqlParameterType.isNumber));
+            return new SqlReader(S, "EXEC GetPageInfoFromPageId @pageId=$pageId", parameters);
         }
 
         public SqlReader GetPageInfoFromDomain(string domain)
         {
-            return new SqlReader(S, "EXEC GetPageInfoFromDomain @domain='" + domain + "'");
+            var parameters = new List<SqlParameter>();
+            parameters.Add(new SqlParameter("$domain", domain, 50));
+            return new SqlReader(S, "EXEC GetPageInfoFromDomain @domain=$domain", parameters);
         }
 
         public SqlReader GetPageInfoFromDomainAndTitle(string domain, string title)
         {
-            return new SqlReader(S, "EXEC GetPageInfoFromDomainAndTitle @domain='" + domain + "', @title='" + title + "'");
+            var parameters = new List<SqlParameter>();
+            parameters.Add(new SqlParameter("$domain", domain, 50));
+            parameters.Add(new SqlParameter("$title", title, 250));
+            return new SqlReader(S, "EXEC GetPageInfoFromDomainAndTitle @domain=$domain, @title=$title", parameters);
         }
 
         public SqlReader GetPageInfoFromSubDomain(string domain, string subDomain)
         {
-            return new SqlReader(S, "EXEC GetPageInfoFromSubDomain @domain = '" + domain + "', @subdomain='" + subDomain + "'");
+            var parameters = new List<SqlParameter>();
+            parameters.Add(new SqlParameter("$domain", domain, 50));
+            parameters.Add(new SqlParameter("$subdomain", subDomain, 25));
+            return new SqlReader(S, "EXEC GetPageInfoFromSubDomain @domain=$domain, @subdomain=$subdomain", parameters);
         }
 
         public SqlReader GetPageInfoFromSubDomainAndTitle(string domain, string subDomain, string title)
         {
-            return new SqlReader(S, "EXEC GetPageInfoFromSubDomainAndTitle @domain='" + domain + "', @subdomain='" + subDomain + "', @title='" + title + "'");
+            var parameters = new List<SqlParameter>();
+            parameters.Add(new SqlParameter("$domain", domain, 50));
+            parameters.Add(new SqlParameter("$subdomain", subDomain, 25));
+            parameters.Add(new SqlParameter("$title", title, 250));
+            return new SqlReader(S, "EXEC GetPageInfoFromSubDomainAndTitle @domain=$domain, @subdomain=$subdomain, @title=$title", parameters);
         }
 
         #endregion

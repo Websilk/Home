@@ -8,6 +8,7 @@ var gulp = require('gulp'),
     uglify = require('gulp-uglify'),
     util = require('gulp-util'),
     less = require('gulp-less'),
+    rename = require('gulp-rename'),
     merge = require('merge-stream'),
     config = require('./config.json');
     
@@ -25,6 +26,7 @@ if (environment != 'dev' && environment != 'development' && environment != null)
 var paths = {
     scripts: './Scripts/',
     css: './CSS/',
+    components: './App/Components/',
     vendor: {
         root: './Vendor/**/'
     },
@@ -47,14 +49,15 @@ paths.working = {
             paths.scripts + 'utility/dropzone.js',
             paths.scripts + 'editor/_init.js'
         ],
-        dashboard: paths.scripts + 'dashboard/**.*.js'
+        components: paths.components + '**/*.js'
     },
 
     css: {
         platform: paths.css + 'platform.less',
-        colors: paths.css + 'colors/',
+        colors: paths.css + 'colors/*.less',
         editor: paths.css + 'editor.less',
-        utility: [paths.css + 'utility/**/*.css']
+        utility: paths.css + 'utility/**/*.css',
+        tapestry: paths.css + 'tapestry/tapestry.less'
     },
 
     vendor: {
@@ -69,7 +72,8 @@ paths.compiled = {
     js: paths.webroot + 'js/',
     css: paths.webroot + 'css/',
     platform: paths.webroot + 'js/platform.js',
-    editor: paths.webroot + 'js/editor.js'
+    editor: paths.webroot + 'js/editor.js',
+    components: paths.webroot + 'js/components/'
 };
 
 //tasks for cleaning compiled paths ///////////////////////////////////////////////////////////
@@ -91,18 +95,23 @@ gulp.task('js:platform', function () {
     return p.pipe(gulp.dest('.'));
 });
 
-gulp.task('min:js:platform', ['js'], function () {
-    return gulp.pipe(uglify())
-        .pipe(gulp.dest(paths.compiled.platform));
-});
-
 gulp.task('js:editor', function () {
     return gulp.src(paths.working.js.editor, { base: '.' })
         .pipe(concat(paths.compiled.editor))
         .pipe(gulp.dest('.'));
 });
 
-gulp.task('js', ['js:platform', 'js:editor']);
+gulp.task('js:components', function () {
+    return gulp.src(paths.working.js.components)
+        .pipe(rename(function (path) {
+            path.dirname = path.dirname.toLowerCase();
+            path.basename = path.basename.toLowerCase();
+            path.extname = path.extname.toLowerCase();
+        }))
+        .pipe(gulp.dest(paths.compiled.components));
+});
+
+gulp.task('js', ['clean:js', 'js:platform', 'js:editor', 'js:components']);
 
 //tasks for compiling LESS & CSS /////////////////////////////////////////////////////////////////////
 gulp.task('less:platform', function () {
@@ -112,7 +121,7 @@ gulp.task('less:platform', function () {
 });
 
 gulp.task('less:colors', function () {
-    return gulp.src(paths.working.css.colors + '*.less')
+    return gulp.src(paths.working.css.colors)
         .pipe(less())
         .pipe(gulp.dest(paths.compiled.css + 'colors'));
 });
@@ -123,10 +132,47 @@ gulp.task('less:editor', function () {
     return merge(editor, util).pipe(gulp.dest(paths.compiled.css));
 });
 
-gulp.task('less', ['less:platform', 'less:colors', 'less:editor']);
+gulp.task('less', ['clean:css', 'less:platform', 'less:colors', 'less:editor']);
 
 //tasks for compiling vendor app dependencies /////////////////////////////////////////////////
 
 
 //default task
-gulp.task('default', ['clean', 'js', 'less']);
+gulp.task('default', ['js', 'less']);
+
+//watch task
+gulp.task('watch', function () {
+    //watch platform JS
+    gulp.watch([
+        paths.scripts + 'core/selector.js',
+        paths.scripts + 'core/platform.js',
+        paths.scripts + 'platform/*.js'
+    ], ['js:platform']);
+
+    //watch editor JS
+    gulp.watch([
+        paths.scripts + 'core/editor.js',
+        paths.scripts + 'editor/*.js'
+    ], ['js:editor']);
+
+    //watch components JS
+    gulp.watch([paths.components + '**/*.js'], ['js:components']);
+
+    //watch platform LESS
+    gulp.watch([
+        paths.working.css.platform,
+        paths.working.css.tapestry
+    ], ['less:platform']);
+
+    //watch colors LESS
+    gulp.watch([
+        paths.working.css.colors
+    ], ['less:colors']);
+
+    //watch editor LESS
+    gulp.watch([
+        paths.working.css.editor,
+        paths.working.css.utility
+    ], ['less:editor']);
+
+});

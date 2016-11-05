@@ -1,8 +1,8 @@
 ﻿using System;
 using System.IO;
-using Nine.Imaging;
-using Nine.Imaging.Filtering;
-using Nine.Imaging.Encoding;
+//using Nine.Imaging;
+//using Nine.Imaging.Filtering;
+//using Nine.Imaging.Encoding;
 
 namespace Websilk.Utility
 {
@@ -12,7 +12,7 @@ namespace Websilk.Utility
         public string filename;
         public int width;
         public int height;
-        public Image bitmap;
+        //public Image bitmap;
     }
         
 
@@ -25,6 +25,7 @@ namespace Websilk.Utility
             S = WebsilkCore;
         }
 
+        /*
         public structImage Load(string path, string filename)
         {
             Image image = new Image(File.OpenRead(S.Server.MapPath(path + filename)));
@@ -96,5 +97,6 @@ namespace Websilk.Utility
                 throw new Exception(ex.Message);
             }
         }
+        */
     }
 }

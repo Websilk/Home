@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Newtonsoft.Json;
+using BCrypt.Net;
 
 namespace Websilk
 {
@@ -49,15 +50,20 @@ namespace Websilk
             {
                 //securely change admin password
                 //get admin email address from database
-                
-                update = true;
+                var parameters = new List<SqlParameter>();
+                parameters.Add(new SqlParameter("$userId", userId.ToString(), 0, enumSqlParameterType.isNumber));
+                emailAddr = (string)S.Sql.ExecuteScalar("EXEC GetUserEmail @userId=$userId", parameters);
+                if (emailAddr != "" && emailAddr != null) { update = true; }
             }
             if(update == true)
             {
                 //generate salt
-                var salt = emailAddr + S.Server.encryption.salt;
+                var salt = S.Server.encryption.salt.Substring(0, S.Server.encryption.spliceIndex) + emailAddr +
+                            S.Server.encryption.salt.Substring(S.Server.encryption.spliceIndex);
+                var bCrypt = new BCrypt.Net.BCrypt();
+                var encrypted = "";
                 var sqlUser = new SqlQueries.User(S);
-                sqlUser.UpdatePassword(userId, salt);
+                sqlUser.UpdatePassword(userId, encrypted);
             }
             return false;
         }

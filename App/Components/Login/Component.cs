@@ -35,7 +35,7 @@ namespace Websilk.Components
                 scaffold.Data["title"] = "Update your administrator password";
                 scaffold.Data["field-pass"] = txtPass.Render("password", "password", "", "password", "", Element.Textbox.enumTextType.password);
                 scaffold.Data["field-pass2"] = txtPass2.Render("password2", "password", "", "retype password", "", Element.Textbox.enumTextType.password);
-                scaffold.Data["button-save"] = btnLogin.Render("btnsave", "javascript:S.login.savepass()", "Save");
+                scaffold.Data["button-save"] = btnLogin.Render("btnsave", "javascript:", "Save");
                 AddJavascriptFile("new-pass", "/js/components/login/new-pass.js");
             }
             else

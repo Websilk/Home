@@ -14,7 +14,7 @@ namespace Websilk.SqlQueries
             var parameters = new List<SqlParameter>();
             parameters.Add(new SqlParameter("$userId", userId.ToString(), 0, enumSqlParameterType.isNumber));
             parameters.Add(new SqlParameter("$password", password, 100));
-            return new SqlReader(S, "EXEC UpdatePassword @userId=$userId, @password=$password", parameters);
+            return new SqlReader(S, "EXEC UpdateUserPassword @userId=$userId, @password=$password", parameters);
         }
 
         public string GetEmail(int userId)
@@ -22,6 +22,14 @@ namespace Websilk.SqlQueries
             var parameters = new List<SqlParameter>();
             parameters.Add(new SqlParameter("$userId", userId.ToString(), 0, enumSqlParameterType.isNumber));
             return (string)S.Sql.ExecuteScalar("EXEC GetUserEmail @userId=$userId", parameters);
+        }
+
+        public SqlReader UpdateEmail(int userId, string email)
+        {
+            var parameters = new List<SqlParameter>();
+            parameters.Add(new SqlParameter("$userId", userId.ToString(), 0, enumSqlParameterType.isNumber));
+            parameters.Add(new SqlParameter("$email", email, 75));
+            return new SqlReader(S, "EXEC UpdateUserEmail @userId=$userId, @email=$email", parameters);
         }
         #endregion
 

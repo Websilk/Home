@@ -5,12 +5,7 @@ namespace Websilk.Services
 {
     public class PageTest: Service
     {
-        private Core S;
-
-        public PageTest(Core WebsilkCore) : base(WebsilkCore)
-        {
-            S = WebsilkCore;
-        }
+        public PageTest(Core WebsilkCore) : base(WebsilkCore){}
 
         public WebRequest GeneratePage(string name)
         {

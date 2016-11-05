@@ -29,7 +29,7 @@
             return response;
         }
 
-        public Inject SavePass(string pass, string pass2)
+        public Inject SavePass(string pass)
         {
             //save a new password for an existing user that does not have a password set
             var response = new Inject();
@@ -38,7 +38,7 @@
             if (S.Server.encryption.reset == true)
             {
                 //update password for administrator
-
+                S.User.UpdatePassword(1, pass);
             }
             return response;
         }

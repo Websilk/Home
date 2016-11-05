@@ -3,80 +3,80 @@
   "version": "1.0",
   "authors": [ "Mark Entingh" ],
   "description": "Websilk is a powerful drag & drop web development CMS platform built for Windows, Linux, & Mac OSX",
-  "projectUrl": "http://www.github.com/Websilk/Home",
-
-  "commands": {
-    "web": "Microsoft.AspNet.Server.Kestrel --server.urls=http://localhost:7770;"
+  "packOptions": {
+    "projectUrl": "http://www.github.com/Websilk/Home",
+    "owners": [ "Mark Entingh" ]
   },
 
   "frameworks": {
-    "dnxcore50": {
+    "netcoreapp1.1": {
       "dependencies": {
-        "Microsoft.AspNet.IISPlatformHandler": "1.0.0-rc1-final",
-        "Microsoft.AspNet.Hosting": "1.0.0-rc1-final",
-        "Microsoft.AspNet.Server.Kestrel": "1.0.0-rc1-final",
-        "Microsoft.AspNet.StaticFiles": "1.0.0-rc1-final",
-        "Microsoft.AspNet.Diagnostics": "1.0.0-rc1-final",
-        "Microsoft.AspNet.Session": "1.0.0-rc1-final",
-        "Microsoft.AspNet.WebSockets.Server": "1.0.0-rc1-final",
-        "Microsoft.Extensions.Configuration": "1.0.0-rc1-final",
-        "Microsoft.Extensions.OptionsModel": "1.0.0-rc1-final",
-        "Microsoft.Extensions.Caching.Memory": "1.0.0-rc1-final",
-        "System.Text.Encoding": "4.0.11-beta-23516",
-        "System.Text.Encoding.CodePages": "4.0.1-beta-23516",
-        "System.Text.Encodings.Web": "4.0.0-beta-23516",
-        "System.Text.RegularExpressions": "4.0.11-beta-23516",
-        "System.ComponentModel": "4.0.1-beta-23516",
-        "System.Console": "4.0.0-beta-23516",
-        "System.Runtime": "4.0.21-beta-23516",
-        "System.Runtime.Extensions": "4.0.11-beta-23516",
-        "System.Runtime.InteropServices": "4.0.21-beta-23516",
-        "System.Runtime.Serialization.Xml": "4.1.0-beta-23516",
-        "System.Collections": "4.0.11-beta-23516",
-        "System.Linq": "4.0.1-beta-23516",
-        "System.IO": "4.0.11-beta-23516",
-        "System.Data.Common": "4.0.1-beta-23516",
-        "System.Data.SqlClient": "4.0.0-beta-23516",
-        "System.Diagnostics.Tools": "4.0.1-beta-23516",
-        "System.Diagnostics.Process": "4.1.0-beta-23516",
-        "System.Xml.ReaderWriter": "4.0.11-beta-23516",
-        "System.Xml.XmlDocument": "4.0.1-beta-23516",
-        "System.Xml.XmlSerializer": "4.0.11-beta-23516",
-        "System.Resources.ResourceManager": "4.0.1-beta-23516",
-        "System.Security.Cryptography.Encryption": "4.0.0-beta-23225",
-        "System.Security.Cryptography.RandomNumberGenerator": "4.0.0-beta-23225",
-        "System.Threading": "4.0.11-beta-23516",
-        "System.Threading.Tasks": "4.0.11-beta-23516",
-        "System.Net.Http": "4.0.1-beta-23516",
-        "System.Xml.XPath.XmlDocument": "4.0.1-beta-23516",
-        "Newtonsoft.Json": "8.0.2",
-        "Nine.Imaging": "1.1.0-alpha3"
-
+        "Microsoft.NETCore.App": {
+          "version": "1.1.0-*",
+          "type": "platform"
+        },
+        "Microsoft.AspNetCore.Hosting": "1.1.0-*",
+        "Microsoft.AspNetCore.Server.Kestrel": "1.1.0-*",
+        "Microsoft.AspNetCore.StaticFiles": "1.1.0-*",
+        "Microsoft.AspNetCore.Diagnostics": "1.1.0-*",
+        "Microsoft.AspNetCore.Session": "1.1.0-*",
+        "Microsoft.Extensions.Configuration": "1.1.0-*",
+        "Microsoft.Extensions.Configuration.Json": "1.1.0-*",
+        "Microsoft.Extensions.Caching.Memory": "1.1.0-*",
+        "System.Text.Encoding": "4.3.0-*",
+        "System.Text.Encoding.CodePages": "4.3.0-*",
+        "System.Text.Encodings.Web": "4.3.0-*",
+        "System.Text.RegularExpressions": "4.3.0-*",
+        "System.ComponentModel": "4.3.0-*",
+        "System.Console": "4.3.0-*",
+        "System.Runtime": "4.3.0-*",
+        "System.Runtime.Extensions": "4.3.0-*",
+        "System.Runtime.InteropServices": "4.3.0-*",
+        "System.Runtime.Serialization.Xml": "4.3.0-*",
+        "System.Collections": "4.3.0-*",
+        "System.Linq": "4.3.0-*",
+        "System.IO": "4.3.0-*",
+        "System.Data.Common": "4.3.0-*",
+        "System.Data.SqlClient": "4.3.0-*",
+        "System.Diagnostics.Tools": "4.3.0-*",
+        "System.Diagnostics.Process": "4.3.0-*",
+        "System.Xml.ReaderWriter": "4.3.0-*",
+        "System.Xml.XmlDocument": "4.3.0-*",
+        "System.Xml.XmlSerializer": "4.3.0-*",
+        "System.Resources.ResourceManager": "4.3.0-*",
+        "System.ServiceModel.Security": "4.3.0-*",
+        "System.Threading": "4.3.0-*",
+        "System.Threading.Tasks": "4.3.0-*",
+        "System.Net.Http": "4.3.0-*",
+        "System.Xml.XPath.XmlDocument": "4.3.0-*",
+        "Newtonsoft.Json": "9.0.1",
+        "BCrypt.Net-Core": "1.1.0-CI00003"
       }
     }
   },
+  "buildOptions": {
+    "emitEntryPoint": true,
+    "compile": [
+      "*.cs",
+      "App/**/*.cs"
+    ],
+    "compileExclude": [
+      "wwwroot",
+      "Sql"
+    ],
+    "publishExclude": [
+      "node_modules",
+      "bower_components",
+      "**.xproj",
+      "**.user",
+      "**.vspscc",
+      "Sql"
+    ],
+    "exclude": [
+      "node_modules",
+      "bower_components"
+    ],
+    "optimize": true
+  }
 
-  "compile": [
-    "*.cs",
-    "App/**/*.cs"
-  ],
-
-  "compileExclude": [
-    "wwwroot",
-    "Sql"
-  ],
-
-  "publishExclude": [
-    "node_modules",
-    "bower_components",
-    "**.xproj",
-    "**.user",
-    "**.vspscc",
-    "Sql"
-  ],
-
-  "exclude": [
-    "node_modules",
-    "bower_components"
-  ]
 }

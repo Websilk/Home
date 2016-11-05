@@ -20,6 +20,7 @@ namespace Websilk
         public struct structEncryption
         {
             public string salt;
+            public int spliceIndex; //index within salt to splice and inject a public key (such as email address)
             public bool reset; //if true, admin is required to reset their password
         }
 

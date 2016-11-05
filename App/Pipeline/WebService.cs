@@ -1,5 +1,5 @@
 using System;
-using Microsoft.AspNet.Http;
+using Microsoft.AspNetCore.Http;
 using System.Text;
 using System.IO;
 using System.Collections.Generic;

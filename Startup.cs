@@ -1,25 +1,24 @@
 using System;
 using System.IO;
 using System.Linq;
-using Microsoft.AspNet.Builder;
-using Microsoft.AspNet.Http;
-using Microsoft.AspNet.Diagnostics;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
-using Microsoft.AspNet.StaticFiles;
 
 namespace Websilk
 {
-
     public class Startup
     {
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddCaching();
+            services.AddDistributedMemoryCache();
             services.AddSession();
         }
 
-        public void Configure(IApplicationBuilder app)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
 
             //load application-wide memory store
@@ -30,7 +29,7 @@ namespace Websilk
             app.UseStaticFiles(options);
 
             //exception handling
-            var errOptions = new ErrorPageOptions();
+            var errOptions = new DeveloperExceptionPageOptions();
             errOptions.SourceCodeLineCount = 10;
             app.UseDeveloperExceptionPage();
 
@@ -44,15 +43,15 @@ namespace Websilk
                 createConfig();
             }
 
-            var configBuilder = new ConfigurationBuilder()
+            var config = new ConfigurationBuilder()
                 .AddJsonFile(server.MapPath("config.json"))
-                .AddEnvironmentVariables();
-            IConfiguration config = configBuilder.Build();
+                .AddEnvironmentVariables().Build();
 
             server.sqlActive = config.GetSection("Data:Active").Value;
             server.sqlConnection = config.GetSection("Data:" + server.sqlActive).Value;
             server.https = config.GetSection("https").Value.ToLower() == "true" ? true : false;
             server.encryption.salt = config.GetSection("Encryption:Salt").Value;
+            server.encryption.spliceIndex = int.Parse(config.GetSection("Encryption:Splice").Value);
 
             var isdev = false;
             switch (config.GetSection("Environment").Value)
@@ -239,7 +238,8 @@ namespace Websilk
                 "        \"SqlServerTrusted\": \"server=.\\\\SQL2014; database=WebsilkDev; Trusted_Connection=true\"\n" +
                 "    },\n" +
                 "    \"encryption\": {\n" +
-                "        \"salt\": \"\"\n" +
+                "        \"salt\": \"\",\n" +
+                "        \"splice\": 16\n" +
                 "    }\n" +
                 "}\n"
                 );

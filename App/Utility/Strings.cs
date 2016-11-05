@@ -309,15 +309,10 @@ namespace Websilk.Utility
                         s2 = htm.IndexOf(";", s + 1);
                         if (s2 > 0)
                         {
-                            try
-                            {
-                                str = htm.Substring(s, (s2 + 1) - s);
-                                character = Char.ConvertFromUtf32(int.Parse(str.Replace("&#", "").Replace(";", "")));
-                                htm = htm.Replace(str, character);
-                                i = 0;
-                            }
-                            catch (Exception ex) { }
-
+                            str = htm.Substring(s, (s2 + 1) - s);
+                            character = Char.ConvertFromUtf32(int.Parse(str.Replace("&#", "").Replace(";", "")));
+                            htm = htm.Replace(str, character);
+                            i = 0;
                         }
                     }
                     else { break; }
@@ -476,14 +471,10 @@ namespace Websilk.Utility
                 else if (numpart != "")
                 {
                     //end of number
-                    try
+                    if (Util.Str.IsNumeric(numpart))
                     {
-                        if (Util.Str.IsNumeric(numpart))
-                        {
-                            numberlist.Add(double.Parse(numpart));
-                        }
+                        numberlist.Add(double.Parse(numpart));
                     }
-                    catch (Exception ex) { }
 
                     numpart = "";
                 }

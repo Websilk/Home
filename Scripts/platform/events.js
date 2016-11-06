@@ -357,7 +357,7 @@
                 img.onload = function () { dfnew.resolve(); }
                 img.src = this.src;
             });
-            $.when.apply($, df).done(S.events.images.complete);
+            //$.when.apply($, df).done(S.events.images.complete);
         },
 
         complete: function () {

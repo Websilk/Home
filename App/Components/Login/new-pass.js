@@ -8,11 +8,16 @@
     },
 
     savePass: function () {
-        //send new admin password to server
+        //save new password for user
         var pass = $('#password').val();
         var pass2 = $('#password2').val();
 
         //validate password
+
+        //disable button
+        $('#btnsavepass').prop("disabled", "disabled");
+
+        //send new password to server
         S.ajax.post('Components/Login/SavePass', { pass: pass }, function (data) {
             //callback, replace form with message
             var err = false;
@@ -39,4 +44,4 @@
 
 //add event listeners
 $('#password, #password2').on('input', S.login.watchPass);
-$('#btnsave').on('click', S.login.savePass);
+$('#btnsavepass').on('click', S.login.savePass);

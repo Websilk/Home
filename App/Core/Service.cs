@@ -58,6 +58,7 @@ namespace Websilk
     public class Service
     {
         protected Core S;
+        public string pageId = "";
         public Dictionary<string, string> Form = new Dictionary<string, string>();
         public IFormFileCollection Files;
 

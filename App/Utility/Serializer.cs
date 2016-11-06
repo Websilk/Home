@@ -14,7 +14,7 @@ namespace Websilk.Utility
         }
 
         #region "Write"
-        public string WriteObjectAsString(object obj, Formatting formatting = Formatting.Indented, TypeNameHandling nameHandling = TypeNameHandling.Auto)
+        public string WriteObjectAsString(object obj, Formatting formatting = Formatting.None, TypeNameHandling nameHandling = TypeNameHandling.Auto)
         {
             return JsonConvert.SerializeObject(obj, formatting,
                     new JsonSerializerSettings
@@ -24,7 +24,7 @@ namespace Websilk.Utility
                     });
         }
 
-        public byte[] WriteObject(object obj, Formatting formatting = Formatting.Indented, TypeNameHandling nameHandling = TypeNameHandling.Auto)
+        public byte[] WriteObject(object obj, Formatting formatting = Formatting.None, TypeNameHandling nameHandling = TypeNameHandling.Auto)
         {
             return Util.Str.GetBytes(WriteObjectAsString(obj, formatting, nameHandling));
         }

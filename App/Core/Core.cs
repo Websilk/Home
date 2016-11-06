@@ -25,11 +25,11 @@ namespace Websilk
         public Core(Server server, HttpContext context)
         {
             Server = server;
+            Util = server.Util;
             Context = context;
             Request = context.Request;
             Response = context.Response;
             Session = context.Session;
-            Util = new Utility.Util();
             Sql = new Sql(Server, Util);
             User = new User();
 
@@ -47,6 +47,10 @@ namespace Websilk
 
         public void Unload()
         {
+            if(User.saveSession == true)
+            {
+                Session.Set("user", Util.Serializer.WriteObject(User));
+            }
             Sql.Close();
         }
 

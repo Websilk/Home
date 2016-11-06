@@ -16,7 +16,8 @@
     function query(elem, sel) {
         //gets a list of elements from a CSS selector
         var elems = [];
-        if (sel != null && typeof sel != 'object') {
+        console.log(sel);
+        if (sel != null && typeof sel != 'object' && sel != '') {
             //only use vanilla Javascript to select DOM elements based on a CSS selector (Chrome 1, IE 9, Safari 3.2, Firefox 3.5, Opera 10)
             var sels = sel.split(',').map(Function.prototype.call, String.prototype.trim);
             var el;
@@ -428,15 +429,23 @@
     select.prototype.filter = function(selector) {
         //Filter the collection to contain only items that match the CSS select. 
         //If a select.prototype.is given, return only elements for which the select.prototype.returns a truthy value. 
-        var found = query(document, selector);
         var collect = [];
-        if (found.length > 0) {
+        if (typeof selector == 'function') {
+            //filter a boolean function
             this.elements.forEach(function (e) {
-                if(found.indexOf(e) >= 0){
-                    //make sure no duplicates are being added to the array
-                    if (collect.indexOf(e) < 0) { collect.push(e); }
-                }
+                if (selector.call(e, e) == true) { collect.push(e);}
             });
+        } else {
+            //filter selector string
+            var found = query(document, selector);
+            if (found.length > 0) {
+                this.elements.forEach(function (e) {
+                    if (found.indexOf(e) >= 0) {
+                        //make sure no duplicates are being added to the array
+                        if (collect.indexOf(e) < 0) { collect.push(e); }
+                    }
+                });
+            }
         }
         this.elements = collect;
         return this;
@@ -899,17 +908,17 @@
                                 e[a] = b;
                             }
                             return b;
-                        }
+                        } 
                     }
                 };
 
                 if (nn != '') {
                     //get/set/remove default property
-                    var a = execAttr(nn, nn);
+                    var a = execAttr.call(this, nn, nn);
                     if (a != null) { return a;}
                 } else {
                     //get/set/remove property
-                    var a = execProp(n);
+                    var a = execProp.call(this, n);
                     if (a != null) { return a;}
                 }
                 break;
@@ -956,12 +965,12 @@
             default:
                 // last resort to get/set/remove property value from style or attribute
                 //first, try getting a style
-                var a = execProp(n, v);
+                var a = execProp.call(this, n, v);
                 if (a != null) {
                     return a;
                 } else {
                     //next, try getting a attribute
-                    a = execAttr(n, v);
+                    a = execAttr.call(this, n, v);
                     if (a != null) {
                         return a;
                     }
@@ -1212,7 +1221,7 @@
         req.onload = function () {
             if (req.status >= 200 && req.status < 400) {
                 //request success
-                var resp = request.responseText;
+                var resp = req.responseText;
                 if (opt.success) {
                     opt.success(resp, req.statusText, req);
                 }

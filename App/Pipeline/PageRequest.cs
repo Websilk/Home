@@ -28,13 +28,14 @@ namespace Websilk.Pipeline
 
             //register initial javascript
             S.javascript.Add("init", "S.init(" + (S.User.useAjax ? "true" : "false") + "," + page.pageId + ",'" + page.pageTitle + "','" + page.PageTitleForBrowserTab + "'," + page.websiteId + ",'" + page.websiteTitle + "');");
-            
+
+            //unload the core (before sending response)
+            S.Unload();
+
             //render the server response
             S.Response.ContentType = "text/html";
             S.Response.WriteAsync(page.Render());
 
-            //unload the core
-            S.Unload();
         }
 
         private void getUserAgent(HttpContext context)

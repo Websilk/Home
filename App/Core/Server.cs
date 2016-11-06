@@ -17,18 +17,12 @@ namespace Websilk
             production = 2
         }
 
-        public struct structEncryption
-        {
-            public string salt;
-            public int spliceIndex; //index within salt to splice and inject a public key (such as email address)
-            public bool reset; //if true, admin is required to reset their password
-        }
-
         public string Version = "";
         // #.#.#.#.#.# =  years since github repo was created (10/22/2016) [#]
         //                current year, month, day of release [#.#.#]
         //                revision of the day (optional) [#]
 
+        public Utility.Util Util = new Utility.Util();
         public enumEnvironment environment = enumEnvironment.development;
         public bool https = false;
         public DateTime serverStart = DateTime.Now;
@@ -37,8 +31,8 @@ namespace Websilk
         public string sqlActive = "";
         public string sqlConnection = "";
         public Random Random = new Random();
-        public structEncryption encryption = new structEncryption();
-
+        public bool resetPass = false;
+        public int bcrypt_workfactor = 10;
         private string _path = "";
 
 
@@ -72,6 +66,16 @@ namespace Websilk
         }
         
         #endregion
+
+        public void CheckAdminPassword()
+        {
+            var Sql = new Sql(this, Util);
+            if ((int)Sql.ExecuteScalar("EXEC HasPassword @userId=1", new List<SqlParameter>()) == 0)
+            {
+                resetPass = true;
+            }
+            Sql.Close();
+        }
     }
 
 

@@ -8,21 +8,23 @@
     "owners": [ "Mark Entingh" ]
   },
 
+  "commands": {},
+
   "frameworks": {
-    "netcoreapp1.1": {
+    "netcoreapp1.0": {
       "dependencies": {
         "Microsoft.NETCore.App": {
-          "version": "1.1.0-*",
+          "version": "1.0.0-*",
           "type": "platform"
         },
-        "Microsoft.AspNetCore.Hosting": "1.1.0-*",
-        "Microsoft.AspNetCore.Server.Kestrel": "1.1.0-*",
-        "Microsoft.AspNetCore.StaticFiles": "1.1.0-*",
-        "Microsoft.AspNetCore.Diagnostics": "1.1.0-*",
-        "Microsoft.AspNetCore.Session": "1.1.0-*",
-        "Microsoft.Extensions.Configuration": "1.1.0-*",
-        "Microsoft.Extensions.Configuration.Json": "1.1.0-*",
-        "Microsoft.Extensions.Caching.Memory": "1.1.0-*",
+        "Microsoft.AspNetCore.Hosting": "1.0.0-*",
+        "Microsoft.AspNetCore.Server.Kestrel": "1.0.0-*",
+        "Microsoft.AspNetCore.StaticFiles": "1.0.0-*",
+        "Microsoft.AspNetCore.Diagnostics": "1.0.0-*",
+        "Microsoft.Extensions.Caching.Memory": "1.0.0-*",
+        "Microsoft.AspNetCore.Session": "1.0.0-*",
+        "Microsoft.Extensions.Configuration": "1.0.0-*",
+        "Microsoft.Extensions.Configuration.Json": "1.0.0-*",
         "System.Text.Encoding": "4.3.0-*",
         "System.Text.Encoding.CodePages": "4.3.0-*",
         "System.Text.Encodings.Web": "4.3.0-*",
@@ -50,7 +52,7 @@
         "System.Net.Http": "4.3.0-*",
         "System.Xml.XPath.XmlDocument": "4.3.0-*",
         "Newtonsoft.Json": "9.0.1",
-        "BCrypt.Net-Core": "1.1.0-CI00003"
+        "BCrypt.Net-Core": "1.1.0"
       }
     }
   },
@@ -78,5 +80,4 @@
     ],
     "optimize": true
   }
-
 }

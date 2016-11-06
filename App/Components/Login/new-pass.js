@@ -13,8 +13,6 @@
         var pass2 = $('#password2').val();
 
         //validate password
-
-
         S.ajax.post('Components/Login/SavePass', { pass: pass }, function (data) {
             //callback, replace form with message
             var err = false;
@@ -41,4 +39,4 @@
 
 //add event listeners
 $('#password, #password2').on('input', S.login.watchPass);
-$('.login .btnsave').on('click', S.login.savePass);
+$('#btnsave').on('click', S.login.savePass);

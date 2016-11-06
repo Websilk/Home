@@ -19,6 +19,9 @@ namespace Websilk
         public bool isMobile = false;
         public bool isTablet = false;
 
+        [JsonIgnore]
+        public bool saveSession = false;
+
         public User()
         {
         }
@@ -28,17 +31,19 @@ namespace Websilk
             S = WebsilkCore;
 
             //generate visitor id
-            if (visitorId == "" || visitorId == null) { visitorId = S.Util.Str.CreateID(); }
+            if (visitorId == "" || visitorId == null) { visitorId = S.Util.Str.CreateID(); saveSession = true; }
         }
 
 
         public bool LogIn(string email, string pass)
         {
+            saveSession = true;
             return false;
         }
 
         public void LogOut()
         {
+            saveSession = true;
             S.Session.Remove("user");
         }
         
@@ -46,7 +51,7 @@ namespace Websilk
         {
             var update = false; //security check
             var emailAddr = email;
-            if(S.Server.encryption.reset == true && userId == 1)
+            if(S.Server.resetPass == true && userId == 1)
             {
                 //securely change admin password
                 //get admin email address from database
@@ -57,13 +62,11 @@ namespace Websilk
             }
             if(update == true)
             {
-                //generate salt
-                var salt = S.Server.encryption.salt.Substring(0, S.Server.encryption.spliceIndex) + emailAddr +
-                            S.Server.encryption.salt.Substring(S.Server.encryption.spliceIndex);
                 var bCrypt = new BCrypt.Net.BCrypt();
-                var encrypted = "";
+                var encrypted = BCrypt.Net.BCrypt.HashPassword(password, S.Server.bcrypt_workfactor);
                 var sqlUser = new SqlQueries.User(S);
                 sqlUser.UpdatePassword(userId, encrypted);
+                S.Server.resetPass = false;
             }
             return false;
         }

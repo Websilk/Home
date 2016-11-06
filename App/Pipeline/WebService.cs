@@ -1,9 +1,10 @@
 using System;
-using Microsoft.AspNetCore.Http;
+using System.Linq;
 using System.Text;
 using System.IO;
 using System.Collections.Generic;
 using System.Reflection;
+using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 
 namespace Websilk.Pipeline
@@ -15,14 +16,18 @@ namespace Websilk.Pipeline
         public WebService(Server server, HttpContext context, string[] paths, IFormCollection form = null)
         {
             //get parameters from request body, including page id
-            object[] parms = new object[0];
+            var parms = new Dictionary<string, string>();
+            object[] paramVals;
+            var param = "";
             byte[] bytes = new byte[0];
             string data = "";
-            int dataType = 0; //0 = ajax, 1 = form post, 2 = multi-part form
-            int x = 0;
+            string pageId = "";
+            int dataType = 0; //0 = ajax, 1 = HTML form post, 2 = multi-part form (with file uploads)
 
+            //figure out what kind of data was sent with the request
             if (form == null)
             {
+                //get POST data from request
                 using (MemoryStream ms = new MemoryStream())
                 {
                     context.Request.Body.CopyTo(ms);
@@ -31,6 +36,7 @@ namespace Websilk.Pipeline
                 data = Encoding.UTF8.GetString(bytes, 0, bytes.Length);
             }else
             {
+                //form files exist
                 dataType = 2;
             }
             
@@ -43,35 +49,35 @@ namespace Websilk.Pipeline
                 }
                 else if (data.IndexOf("{") >= 0 && data.IndexOf("}") > 0 && data.IndexOf(":") > 0)
                 {
-                    //get method parameters from JSON POST data
+                    //get method parameters from POST S.ajax.post()
                     Dictionary<string, object> attr = JsonConvert.DeserializeObject<Dictionary<string, object>>(data);
-                    parms = new object[attr.Count];
-                    x = 0;
                     foreach (KeyValuePair<string, object> item in attr)
                     {
-                        parms[x] = item.Value.ToString();
-                        x = x + 1;
+                        if(item.Key == "pageId")
+                        {
+                            pageId = item.Value.ToString();
+                        }else
+                        {
+                            parms.Add(item.Key.ToLower(), item.Value.ToString());
+                        }
                     }
                 }
                 else if (data.IndexOf("=") >= 0)
                 {
-                    //form post data
+                    //HTML form POST data
                     dataType = 1;
                 }
             }
             else
             {
                 //get method parameters from query string
-                parms = new object[context.Request.Query.Count];
-                x = 0;
                 foreach(var key in context.Request.Query.Keys)
                 {
-
-                    parms[x] = context.Request.Query[key].ToString();
-                    x++;
+                    parms.Add(key.ToLower(), context.Request.Query[key].ToString());
                 }
             }
 
+            //start building Web API response (find method to execute & return results)
             S = new Core(server, context);
 
             //load service class from URL path
@@ -80,60 +86,71 @@ namespace Websilk.Pipeline
             if(paths.Length == 4) { className += "." + paths[2]; methodName = paths[3]; }
             Type type =Type.GetType(className);
             Service service = (Service)Activator.CreateInstance(type, new object[] { S });
+            service.pageId = pageId;
 
             if (dataType == 1)
             {
-                //form post data
+                //parse HTML form POST data and send to new Service instance
                 string[] items = S.Server.UrlDecode(data).Split('&');
                 string[] item;
-                for(x = 0; x < items.Length; x++)
+                for(var x = 0; x < items.Length; x++)
                 {
                     item = items[x].Split('=');
                     service.Form.Add(item[0], item[1]);
                 }
             }else if(dataType == 2)
             {
-                //multi-part file upload
+                //send multi-part file upload data to new Service instance
                 service.Files = form.Files;
             }
 
-            //execute method from service class
+            //execute method from new Service instance
             MethodInfo method = type.GetMethod(methodName);
 
             //try to cast params to correct types
             ParameterInfo[] methodParams = method.GetParameters();
-            if(parms.Length < methodParams.Length)
+
+            paramVals = new object[methodParams.Length];
+            for(var x = 0; x < methodParams.Length; x++)
             {
-                //add missing parameters
-                var tlen = parms.Length;
-                Array.Resize(ref parms, methodParams.Length);
-                for(x = tlen; x < methodParams.Length; x++)
+                //find correct key/value pair
+                param = "";
+                foreach(var item in parms)
                 {
-                    parms[x] = "";
+                    if(item.Key == methodParams[x].Name.ToLower())
+                    {
+                        param = item.Value;
+                    }
                 }
-            }
-            for(x = 0; x < methodParams.Length; x++)
-            {
                 //cast params to correct (supported) types
                 switch (methodParams[x].ParameterType.Name.ToLower())
                 {
                     case "int32":
-                        parms[x] = Int32.Parse((string)parms[x]);
+                        paramVals[x] = Int32.Parse(param);
                         break;
 
                     case "boolean":
-                        parms[x] = parms[x].ToString().ToLower() == "true" ? true : false;
+                        paramVals[x] = param.ToLower() == "true" ? true : false;
                         break;
 
                     case "double":
-                        parms[x] = double.Parse((string)parms[x]);
+                        paramVals[x] = double.Parse(param);
+                        break;
+
+                    default:
+                        paramVals[x] = param;
                         break;
                 }
             }
 
-            object result = method.Invoke(service, parms);
+            object result = method.Invoke(service, paramVals);
 
-            if(result != null)
+
+            //finally, unload the Websilk Core:
+            //close SQL connection, save User info, etc (before sending response)
+            S.Unload();
+
+            if (result != null)
             {
                 switch (result.GetType().FullName)
                 {
@@ -156,10 +173,6 @@ namespace Websilk.Pipeline
                 context.Response.ContentType = "text/json";
                 context.Response.WriteAsync("{\"type\":\"Empty\",\"d\":{}}");
             }
-
-            //finally, unload the Websilk Core:
-            //close SQL connection, save User info, etc
-            S.Unload();
         }
 
         private static bool IsNumeric(string s)

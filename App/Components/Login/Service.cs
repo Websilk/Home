@@ -35,7 +35,7 @@
             var response = new Inject();
             if (S.isSessionLost()) { return lostInject(); }
 
-            if (S.Server.encryption.reset == true)
+            if (S.Server.resetPass == true)
             {
                 //update password for administrator
                 S.User.UpdatePassword(1, pass);

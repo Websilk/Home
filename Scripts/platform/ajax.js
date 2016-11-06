@@ -5,10 +5,12 @@
     post: function (url, data, callback) {
         this.expire = new Date();
         S.events.ajax.start();
-        data.pageId = S.page.id;
+        var d = data;
+        d.pageId = S.page.id;
+
         var options = {
             method: "POST",
-            data: JSON.stringify(data),
+            data: JSON.stringify(d),
             dataType: "json",
             url: '/api/' + url,
             contentType: "text/plain; charset=utf-8",

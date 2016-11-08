@@ -1045,7 +1045,11 @@
     select.prototype.show = function () {
         //Display the matched elements
         this.elements.forEach(function (e) {
-            e.style.display = '';
+            if (e.style.display == 'none') {
+                e.style.display = '';
+            } else {
+                e.style.display = 'block';
+            }
         });
         return this;
     }
@@ -1214,14 +1218,15 @@
 
         //set up AJAX request
         var req = new XMLHttpRequest();
-        req.open(opt.method, opt.url, opt.async, opt.username, opt.password);
-        req.setRequestHeader('Content-Type', opt.contentType);
 
         //set up callbacks
         req.onload = function () {
             if (req.status >= 200 && req.status < 400) {
                 //request success
                 var resp = req.responseText;
+                if (opt.dataType.toLowerCase() == "json") {
+                    resp = JSON.parse(resp);
+                }
                 if (opt.success) {
                     opt.success(resp, req.statusText, req);
                 }
@@ -1245,6 +1250,8 @@
         }
 
         //finally, send AJAX request
+        req.open(opt.method, opt.url, opt.async, opt.username, opt.password);
+        req.setRequestHeader('Content-Type', opt.contentType);
         req.send(opt.data);
     }
 

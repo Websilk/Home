@@ -292,7 +292,8 @@ namespace Websilk
             scaffold.Data["favicon"] = "/images/favicon.gif";
             scaffold.Data["body-class"] = GetBrowserType() + (S.User.isMobile ? (S.User.isTablet ? " s-tablet" : " s-mobile") : " s-hd");
             scaffold.Data["website-css"] = "/content/websites/" + websiteId + "/website.css?v=" + S.Server.Version;
-            scaffold.Data["theme-css"] = "/css/colors/" + websiteColors + ".css";
+            scaffold.Data["theme-css"] = "/css/themes/" + websiteTheme + "/theme.css";
+            scaffold.Data["colors-css"] = "/css/colors/" + websiteColors + ".css";
 
             //setup base javascript files
             string min = "";

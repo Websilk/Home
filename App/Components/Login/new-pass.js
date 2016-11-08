@@ -37,7 +37,7 @@
             if (data.d){
                 if (data.d == 'err') { err = true;}
             } else { err = true; }
-            
+             
             if (err == false) {
                 //show success message
                 msg.addClass('error').show();

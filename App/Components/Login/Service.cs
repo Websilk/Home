@@ -34,6 +34,10 @@
             //save a new password for an existing user that does not have a password set
             if (S.isSessionLost()) { return "err"; }
 
+            //validate password
+            if(pass == "") { return "err"; }
+            if(pass.Length < 8) { return "err"; }
+
             if (S.Server.resetPass == true)
             {
                 //update password for administrator

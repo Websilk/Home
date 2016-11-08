@@ -27,6 +27,7 @@ var paths = {
     scripts: './Scripts/',
     css: './CSS/',
     components: './App/Components/',
+    themes: './Content/themes/',
     vendor: {
         root: './Vendor/**/'
     },
@@ -57,7 +58,8 @@ paths.working = {
         colors: paths.css + 'colors/*.less',
         editor: paths.css + 'editor.less',
         utility: paths.css + 'utility/**/*.css',
-        tapestry: paths.css + 'tapestry/tapestry.less'
+        tapestry: paths.css + 'tapestry/tapestry.less',
+        themes: paths.themes + '**/*.css'
     },
 
     vendor: {
@@ -73,7 +75,8 @@ paths.compiled = {
     css: paths.webroot + 'css/',
     platform: paths.webroot + 'js/platform.js',
     editor: paths.webroot + 'js/editor.js',
-    components: paths.webroot + 'js/components/'
+    components: paths.webroot + 'js/components/',
+    themes: paths.webroot + 'css/themes/'
 };
 
 //tasks for cleaning compiled paths ///////////////////////////////////////////////////////////
@@ -132,7 +135,17 @@ gulp.task('less:editor', function () {
     return merge(editor, util).pipe(gulp.dest(paths.compiled.css));
 });
 
-gulp.task('less', ['clean:css', 'less:platform', 'less:colors', 'less:editor']);
+gulp.task('css:themes', function () {
+    return gulp.src(paths.working.css.themes)
+        .pipe(rename(function (path) {
+            path.dirname = path.dirname.toLowerCase();
+            path.basename = path.basename.toLowerCase();
+            path.extname = path.extname.toLowerCase();
+        }))
+        .pipe(gulp.dest(paths.compiled.themes));
+});
+
+gulp.task('less', ['clean:css', 'less:platform', 'less:colors', 'less:editor', 'css:themes']);
 
 //tasks for compiling vendor app dependencies /////////////////////////////////////////////////
 
@@ -163,6 +176,11 @@ gulp.task('watch', function () {
         paths.working.css.platform,
         paths.working.css.tapestry
     ], ['less:platform']);
+
+    //watch themes LESS
+    gulp.watch([
+        paths.working.css.themes
+    ], ['css:themes']);
 
     //watch colors LESS
     gulp.watch([

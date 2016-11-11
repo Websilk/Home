@@ -186,6 +186,9 @@ namespace Websilk
             {
                 //set up each window size breakpoint (cell, mobile, tablet, desktop, HD)
                 pos = position[x];
+
+                if(pos.width == 0) { continue; } //0 width means no position data available
+
                 style = new StringBuilder();
 
                 //horizontal alignment

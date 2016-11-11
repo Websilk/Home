@@ -61,7 +61,7 @@ BEGIN
 	END
 
 	-- create default pages
-	EXEC @dashId = AddWebsitePage @ownerId=@ownerId, @websiteId=@websiteId, @parentId=0, @title='Dashboard', @description=@description, @pagetype=1, @service='Dashboard.Service', @security=1, @enabled=1
+	EXEC @dashId = AddWebsitePage @ownerId=@ownerId, @websiteId=@websiteId, @parentId=0, @title='Dashboard', @description=@description, @pagetype=1, @service='Dashboard', @security=1, @enabled=1
 	EXEC @homeId = AddWebsitePage @ownerId=@ownerId, @websiteId=@websiteId, @parentId=0, @title='Home', @description=@description, @pagetype=0, @security=0, @enabled=1
 	EXEC @loginId = AddWebsitePage @ownerId=@ownerId, @websiteId=@websiteId, @parentId=0, @title='Login', @description=@description, @pagetype=0, @security=0, @enabled=1
 	EXEC @aboutId = AddWebsitePage @ownerId=@ownerId, @websiteId=@websiteId, @parentId=0, @title='About', @description=@description, @pagetype=0, @security=0, @enabled=1

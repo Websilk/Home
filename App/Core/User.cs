@@ -34,10 +34,33 @@ namespace Websilk
             if (visitorId == "" || visitorId == null) { visitorId = S.Util.Str.CreateID(); saveSession = true; }
         }
 
-
-        public bool LogIn(string email, string pass)
+        /// <summary>
+        /// Authenticate user credentials and log into user account
+        /// </summary>
+        /// <param name="email"></param>
+        /// <param name="pass"></param>
+        /// <returns></returns>
+        public bool LogIn(string email, string password)
         {
             saveSession = true;
+            var sqlUser = new SqlQueries.User(S);
+            var dbpass = sqlUser.GetPassword(email);
+            if(dbpass == "") { return false; }
+            if(BCrypt.Net.BCrypt.Verify(password, dbpass))
+            {
+                //password verified by Bcrypt
+                var user = sqlUser.AuthenticateUser(email, dbpass);
+                if (user.Rows.Count > 0)
+                {
+                    user.Read();
+                    userId = user.GetInt("userId");
+                    this.email = email;
+                    photo = user.Get("photo");
+                    displayName = user.Get("displayname");
+                    return true;
+                }
+            }
+            
             return false;
         }
 

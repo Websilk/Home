@@ -27,7 +27,7 @@
             }
         }
         //post page request via Ajax
-        S.ajax.post('/api/App/Url', { url: url }, S.ajax.callback.pageRequest);
+        S.ajax.post('App/Url', { url: url }, S.ajax.callback.pageRequest);
 
         return false;
     },

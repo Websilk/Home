@@ -21,6 +21,7 @@ namespace Websilk
         public WebResources javascript;
         public WebResources javascriptFiles;
         public WebResources css;
+        public WebResources cssFiles;
 
         public Core(Server server, HttpContext context)
         {
@@ -36,6 +37,7 @@ namespace Websilk
             javascript = new WebResources(this);
             javascriptFiles = new WebResources(this);
             css = new WebResources(this);
+            cssFiles = new WebResources(this);
 
             //load user session
             if (Session.Get("user") != null)
@@ -86,6 +88,7 @@ namespace Websilk
 
         public string renderJavascript(bool withTags = true)
         {
+            if(_resources == null) { return ""; }
             var js = new StringBuilder();
             if(withTags == true)
             {
@@ -107,6 +110,7 @@ namespace Websilk
 
         public string renderJavascriptFiles(bool withTags = true)
         {
+            if (_resources == null) { return ""; }
             var js = new StringBuilder();
             if(withTags == true)
             {
@@ -119,19 +123,52 @@ namespace Websilk
             {
                 foreach (var item in _resources)
                 {
-                    js.Append("S.util.js.load('" + item.Value + "');\n");
+                    js.Append("S.util.js.load('" + item.Value + "', 'js_" + item.Key.Replace(" ", "_") + "');\n");
                 }
             }
             return js.ToString();
         }
 
-        public string renderCssWithTags()
+        public string renderCss(bool withTags = true)
         {
+            if (_resources == null) { return ""; }
             var css = new StringBuilder();
-            foreach(var item in _resources)
+            if(withTags == true)
             {
-                css.Append("<style type=\"text/css\" id=\"css_" + item.Key.Replace(" ", "_") + "\">\n" + item.Value + "\n</style>\n");
+                foreach (var item in _resources)
+                {
+                    css.Append("<style type=\"text/css\" id=\"css_" + item.Key.Replace(" ", "_") + "\">\n" + item.Value + "\n</style>\n");
+                }
+            }else
+            {
+                foreach (var item in _resources)
+                {
+                    css.Append(item.Value + "\n");
+                }
             }
+            
+            return css.ToString();
+        }
+
+        public string renderCssFiles(bool withTags = true)
+        {
+            if (_resources == null) { return ""; }
+            var css = new StringBuilder();
+            if (withTags == true)
+            {
+                foreach (var item in _resources)
+                {
+                    css.Append("<link rel=\"stylesheet\" type=\"text/css\" id=\"css_" + item.Key.Replace(" ", "_") + "\" href=\"" + item.Value + "\">\n");
+                }
+            }
+            else
+            {
+                foreach (var item in _resources)
+                {
+                    css.Append("S.util.css.load('" + item.Value + "', 'css_" + item.Key.Replace(" ", "_") + "');\n");
+                }
+            }
+
             return css.ToString();
         }
     }

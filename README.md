@@ -11,3 +11,5 @@ In Visual Studio's Package Manager Console, do the following:
 Then, install the database by opening the `Sql/Sql.sln` Visual Studio solution file and publishing the project to Sql Server 2014 (or higher)
 
 Finally, run `dotnet run` and open the following web page: http://localhost:7770/api/PageTest/GeneratePage?name=init ,which will generate the initial web pages for your default web site.
+
+To access your website dashboard, navigate to http://localhost:7770/login

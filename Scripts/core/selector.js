@@ -9,14 +9,14 @@
     function select(sel) {
         //main function
         var self = this;
-        this.elements = query(document, sel);
+        if (sel) { this.elements = query(document, sel); } else { this.elements = [];}
         return this;
     }
 
     function query(elem, sel) {
         //gets a list of elements from a CSS selector
+        if (elem == null) { return [];}
         var elems = [];
-        console.log(sel);
         if (sel != null && typeof sel != 'object' && sel != '') {
             //only use vanilla Javascript to select DOM elements based on a CSS selector (Chrome 1, IE 9, Safari 3.2, Firefox 3.5, Opera 10)
             var sels = sel.split(',').map(Function.prototype.call, String.prototype.trim);
@@ -40,7 +40,11 @@
                         }
                     } else if (s.indexOf('.') < 0 && s.indexOf(' ') < 0 && s.indexOf(':') < 0) {
                         //get elements by tag name
-                        el = elem.getElementsByTagName(s);
+                        if (elem == document) {
+                            el = document.getElementsByTagName(s);
+                        } else {
+                            el = elem.querySelectorAll(s);
+                        }
                         if (el) {
                             if (el.length > 0) {
                                 for(var e of el) {
@@ -72,15 +76,31 @@
             }
         } else if (typeof sel == 'object') {
             //elements are already defined instead of using a selector /////////////////////////////////////
-            if (sel.length > 1) {
-                elems = sel;
+            if (sel.elements) {
+                elems = sel.elements;
             } else {
-                elems = [sel];
+                if (Array.isArray(sel)) {
+                    elems = sel;
+                } else {
+                    elems = [sel];
+                }
             }
         } else {
             elems.length = 0;
         }
         return elems;
+    }
+
+    function isDescendant(parent, child) {
+        //checks if element is child of another element
+        var node = child.parentNode;
+        while (node != null) {
+            if (node == parent) {
+                return true;
+            }
+            node = node.parentNode;
+        }
+        return false;
     }
 
     function styleName(str) {
@@ -212,16 +232,20 @@
             var classList = classes.split(' ');
             this.elements.forEach(function (e) {
                 //alter classname for each element in selector
-                var className = e.className;
-                var list = className.split(' ');
-                classList.forEach(function (c){
-                    if(!list.indexOf(c)){
-                        //class doesn't exist in element classname list
-                        className += ' ' + c;
-                    }
-                });
-                //finally, change element classname if it was altered
-                if (e.className != className) { e.className = className;}
+                if (e.className) {
+                    var className = e.className;
+                    var list = className.split(' ');
+                    classList.forEach(function (c){
+                        if(list.indexOf(c) < 0){
+                            //class doesn't exist in element classname list
+                            className += ' ' + c;
+                        }
+                    });
+                    //finally, change element classname if it was altered
+                    if (e.className != className) { e.className = className; }
+                } else {
+                    e.className = classes;
+                }
             });
         }
         return this;
@@ -237,6 +261,12 @@
             function (e) { e.insertAdjacentHTML('afterend', content); },
             function (e) { e.parentNode.insertBefore(content, e.nextSibling); }
         );
+        return this;
+    }
+
+    select.prototype.animate = function (props, options) {
+        console.log(props);
+        Velocity(this.elements, props, options);
         return this;
     }
 
@@ -316,7 +346,9 @@
                 elems.push(child);
             }
         });
-        return elems;
+        var clone = new select();
+        clone.elements = elems;
+        return clone;
     }
 
     select.prototype.closest = function(selector) {
@@ -365,7 +397,6 @@
             if (typeof arg == 'string') {
                 //set a single style property if two string arguments are supplied (key, value);
                 this.elements.forEach(function (e) {
-                    console.log(name + ', ' + arg);
                     setStyle(e, name, arg);
                 });
             } else {
@@ -410,20 +441,21 @@
 
     select.prototype.eq = function (index) {
         //Reduce the set of matched elements to the one at the specified index
+        var clone = new select();
         if (eq > this.elements.length - 1) {
             //out of bounds
-            this.elements = [];
+            clone.elements = [];
         } else if (eq < 0) {
             //negetive index
             if (eq * -1 >= this.elements.length) {
-                this.elements = [];
+                clone.elements = [];
             } else {
-                this.elements = [this.elements[(this.elements.length - 1) + eq]];
+                clone.elements = [this.elements[(this.elements.length - 1) + eq]];
             }
         } else {
-            this.elements = [this.elements[index]];
+            clone.elements = [this.elements[index]];
         }
-        return this;
+        return clone;
     }
 
     select.prototype.filter = function(selector) {
@@ -447,12 +479,14 @@
                 });
             }
         }
-        this.elements = collect;
-        return this;
+        var clone = new select();
+        clone.elements = collect;
+        return clone;
     }
 
     select.prototype.find = function(selector) {
         //Find elements that match CSS selector executed in scope of nodes in the current collection.
+        var clone = new select();
         if (this.elements.length > 0) {
             var collect = [];
             this.elements.forEach(function (e) {
@@ -464,17 +498,18 @@
                     });
                 }
             });
-            this.elements = collect;
+            clone.elements = collect;
         }
-        return this;
+        return clone;
     }
 
     select.prototype.first = function () {
         //the first element found in the selector
+        var clone = new select();
         if (this.elements.length > 0) {
-            this.elements = [this.elements[0]];
+            clone.elements = [this.elements[0]];
         }
-        return this;
+        return clone;
     }
 
     select.prototype.get = function(index) {
@@ -487,6 +522,7 @@
     select.prototype.has = function(selector) {
         //Filter the current collection to include only elements that have 
         //any number of descendants that match a selector, or that contain a specific DOM node.
+        var clone = new select();
         if (this.elements.length > 0) {
             var collect = [];
             this.elements.forEach(function (e) {
@@ -494,9 +530,9 @@
                     if (collect.indexOf(e) < 0) { collect.push(e);}
                 }
             });
-            this.elements = collect;
+            clone.elements = collect;
         }
-        return this;
+        return clone;
     }
 
     select.prototype.hasClass = function(classes) {
@@ -648,10 +684,11 @@
 
     select.prototype.last = function() {
         //Get the last element of the current collection.
+        var clone = new select();
         if (this.elements.length > 0) {
-            this.elements = [this.elements[this.elements.length - 1]];
+            clone.elements = [this.elements[this.elements.length - 1]];
         }
-        return this;
+        return clone;
     }
 
     select.prototype.length = function () {
@@ -689,8 +726,9 @@
                 if (n != null) { elems.push(n); } else { elems.push(e); }
             });
         }
-        this.elements = elems;
-        return this;
+        var clone = new select();
+        clone.elements = elems;
+        return clone;
     }
 
     select.prototype.not = function(selector) {
@@ -710,8 +748,9 @@
             return this;
         }
         var q = query(document, sel);
-        this.elements = diffArray(elems, q);
-        return this;
+        var clone = new select();
+        clone.elements = diffArray(elems, q);
+        return clone;
     }
 
     select.prototype.off = function (event, func) {
@@ -758,7 +797,14 @@
     select.prototype.parent = function(selector) {
         //Get immediate parents of each element in the collection. 
         //If CSS selector is given, filter results to include only ones matching the select.
-        return this;
+        var clone = new select();
+        var elems = [];
+        this.elements.forEach(function (e) {
+            var el = e.parentNode;
+            if (el) { elems.push(el);}
+        });
+        clone.elements = elems;
+        return clone;
     }
 
     select.prototype.parents = function(selector) {
@@ -802,8 +848,9 @@
                 if (e.previousSibling) { elems.push[e.previousSibling]; } else { elems.push[e]; }
             });
         }
-        this.elements = elems;
-        return this;
+        var clone = new select();
+        clone.elements = elems;
+        return clone;
     }
 
     select.prototype.prop = function(name, val) {
@@ -1025,12 +1072,16 @@
         if (Array.isArray(obj)) {
             obj.forEach(function (a) {
                 this.elements.forEach(function (e) {
-                    e.className = e.className.split(' ').filter(function (b) { return b != '' && b != a; }).join(' ');
+                    if (e.className) {
+                        e.className = e.className.split(' ').filter(function (b) { return b != '' && b != a; }).join(' ');
+                    }
                 });
             });
         } else if (typeof obj == 'string') {
             this.elements.forEach(function (e) {
-                e.className = e.className.split(' ').filter(function (b) { return b != '' && b != obj; }).join(' ');
+                if (e.className) {
+                    e.className = e.className.split(' ').filter(function (b) { return b != '' && b != obj; }).join(' ');
+                }
             });
         }
         return this;
@@ -1099,14 +1150,16 @@
                 find(e);
             });
         }
-        this.elements = elems;
-        return this;
+        var clone = new select();
+        clone.elements = elems;
+        return clone;
     }
 
     select.prototype.slice = function (start, end) {
         //Reduce the set of matched elements to a subset specified by a range of indices
-        this.elements = this.elements.slice(start, end);
-        return this;
+        var clone = new select();
+        clone.elements = this.elements.slice(start, end);
+        return clone;
     }
 
     select.prototype.text = function () {

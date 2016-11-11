@@ -5,7 +5,6 @@
     [parentId]           INT            NULL,
     [pagetype]			 SMALLINT		NULL, 
 	[service]			 NVARCHAR (100) NOT NULL,
-	[serviceargs]        NVARCHAR (250) NOT NULL,
     [title]              NVARCHAR (250) NOT NULL,
     [path]               NVARCHAR (MAX) NOT NULL,
     [pathIds]            NVARCHAR (MAX) NOT NULL,

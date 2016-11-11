@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Text;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 
 namespace Websilk
 {
@@ -40,8 +38,7 @@ namespace Websilk
         public string pageTitle = "";
         public string PageTitleForBrowserTab = "";
         public string parentTitle = "";
-        public string pageService = ""; //if pageType = 1, the name of the C# service class to execute (Websilk.Service.???)
-        public string pageServiceArgs = ""; //if pageType = 1, arguments to pass to the C# service method
+        public string pageService = ""; //if pageType = 1, the name of the C# StaticPage class to execute (Websilk.Pages.???)
         public string pageDescription = "";
         public string pageFavIcon = "";
         public string pageFolder = "";
@@ -148,6 +145,8 @@ namespace Websilk
                 pageDescription = S.Sql.Decode(reader.Get("description"));
                 pageCreated = reader.GetDateTime("datecreated");
                 pageSecurity = reader.GetInt("security");
+                pageType = reader.GetInt("pagetype");
+                pageService = reader.Get("service");
                 pageParentId = reader.GetInt("parentid");
                 parentTitle = reader.Get("parenttitle");
                 websiteTheme = reader.Get("theme");
@@ -178,15 +177,15 @@ namespace Websilk
         #endregion
 
         #region "Page Content"
-        private List<structPage> loadPage(int pageid)
+        private List<structPage> loadPage(int pageid, string folderType = "pages")
         {
             //get a list of components to load onto the page
             var page = new List<structPage>();
             var filename = "page.json";
-
-            if (pageId > 0 && pageFolder != "")
+            var pagePath = "Content/websites/" + websiteId + "/" + folderType + "/";
+            if (pageid > 0)
             {
-                var folder = S.Server.MapPath(pageFolder.TrimStart('/'));
+                var folder = S.Server.MapPath(pagePath + pageid + "/");
 
                 if (S.Server.Cache.ContainsKey(folder + filename))
                 {
@@ -218,7 +217,7 @@ namespace Websilk
                 foreach(var id in page[0].layers)
                 {
                     //load page layer from cache or file
-                    var layers = loadPage(id);
+                    var layers = loadPage(id, "layers");
                     foreach(var layer in layers)
                     {
                         //check for duplicate page layers
@@ -232,6 +231,14 @@ namespace Websilk
             }
 
             return page;
+        }
+
+        private string loadStaticPage(string pageName)
+        {
+            Type type = Type.GetType("Websilk.Pages." + pageName);
+            StaticPage staticPage = (StaticPage)Activator.CreateInstance(type, new object[] { S, this });
+            staticPage.Load();
+            return staticPage.Render();
         }
 
         public List<Panel> loadLayout(Scaffold scaffold)
@@ -283,6 +290,58 @@ namespace Websilk
 
         #region "Render"
 
+        private string renderLayout()
+        {
+            //render layout, panels, and page
+
+            if (pageType == 1)
+            {
+                //load a Static Page //////////////////
+                return loadStaticPage(pageService);
+            }
+            else
+            {
+                //load a Dynamic Page //////////////////
+
+                var scaffold = new Scaffold(S, "/Content/themes/" + websiteTheme + "/layout.html");
+
+                //load page(s) from file/cache
+                var pages = loadPage(pageId);
+
+                //get a list of panels in the layout HTML
+                var panels = loadLayout(scaffold);
+
+                //add components to layout panels
+                var components = new List<int[,,]>();
+                for (var x = 0; x < panels.Count; x++)
+                {
+                    foreach (var page in pages)
+                    {
+                        //find components in this page & all page layers 
+                        //associated with this page that belong to a layout panel
+                        foreach (var c in page.components)
+                        {
+                            if (c.panelId == panels[x].id)
+                            {
+                                //add component to layout panel cell
+                                loadComponent(c, panels[x], panels[x].cells[0]);
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                //finally, render each layout panel
+                //this will force all components & panels within the hierarchy to render as well
+                foreach (var panel in panels)
+                {
+                    scaffold.Data["panel-" + panel.id] = panel.Render();
+                }
+                return scaffold.Render();
+            }
+
+        }
+
         public string Render()
         {
             //setup page to render layout, panels, and components (and editor UI too if necessary)
@@ -308,53 +367,15 @@ namespace Websilk
             scaffold.Data["body"] = renderLayout();
 
             //setup inline CSS
-            scaffold.Data["head-css"] = S.css.renderCssWithTags();
+            scaffold.Data["head-css"] = S.css.renderCss();
+
+            //setup CSS files
+            scaffold.Data["css-files"] = S.cssFiles.renderCssFiles();
 
             //setup inline javascript
             scaffold.Data["scripts"] = S.javascriptFiles.renderJavascriptFiles() + "\n" +
                                        S.javascript.renderJavascript();
             //finally, render web page
-            return scaffold.Render();
-        }
-
-        private string renderLayout()
-        {
-            //render layout, panels, and page
-            var scaffold = new Scaffold(S, "/Content/themes/" + websiteTheme + "/layout.html");
-
-            //load page(s) from file/cache
-            var pages = loadPage(pageId);
-
-            //get a list of panels in the layout HTML
-            var panels = loadLayout(scaffold);
-
-            //add components to layout panels
-            var components = new List<int[,,]>();
-            for(var x = 0; x < panels.Count; x++)
-            {
-                foreach (var page in pages)
-                {
-                    //find components in this page & all page layers 
-                    //associated with this page that belong to a layout panel
-                    foreach (var c in page.components)
-                    {
-                        if (c.panelId == panels[x].id)
-                        {
-                            //add component to layout panel cell
-                            loadComponent(c, panels[x], panels[x].cells[0]);
-                            break;
-                        }
-                    }
-                }
-            }
-            
-            //finally, render each layout panel
-            //this will force all components & panels within the hierarchy to render as well
-            foreach(var panel in panels)
-            {
-                scaffold.Data["panel-" + panel.id] = panel.Render();
-            } 
-
             return scaffold.Render();
         }
         #endregion
@@ -481,5 +502,28 @@ namespace Websilk
             return "";
         }
         #endregion
+    }
+
+    public class StaticPage
+    {
+        protected Core S;
+        protected Page page;
+        protected Scaffold scaffold;
+
+        public StaticPage(Core WebsilkCore, Page page)
+        {
+            S = WebsilkCore;
+            this.page = page;
+        }
+
+        /// <summary>
+        /// Executed when the page is being loaded
+        /// </summary>
+        public virtual void Load() { }
+
+        public string Render()
+        {
+            return scaffold.Render();
+        }
     }
 }

@@ -4,19 +4,16 @@
     {
         public Login(Core WebsilkCore) : base(WebsilkCore) { }
 
-        public Inject Submit(string email, string pass)
+        public string Authenticate(string email, string pass)
         {
-            var response = new Inject();
-            if (S.isSessionLost()) { return lostInject(); }
+            if (S.isSessionLost()) { return "err"; }
 
             if (S.User.LogIn(email, pass))
             {
                 //logged in
-            }else
-            {
-                //error logging in
+                return "success";
             }
-            return response;
+            return "err";
         }
 
         public Inject ForgotPassword()

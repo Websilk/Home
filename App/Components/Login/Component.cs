@@ -46,7 +46,8 @@ namespace Websilk.Components
                 var btnLogin = (Element.Button)Page.Elements.Load(ElementType.Button, "button-apply");
                 scaffold.Data["field-email"] = txtEmail.Render("email", "email", "", "email address");
                 scaffold.Data["field-pass"] = txtPass.Render("password", "password", "", "password", "", Element.Textbox.enumTextType.password);
-                scaffold.Data["button-login"] = btnLogin.Render("btnlogin", "javascript:S.login.submit()", label);
+                scaffold.Data["button-login"] = btnLogin.Render("btnlogin", "javascript:", label);
+                AddJavascriptFile("component", "/js/components/login/component.js");
             }
             
         }

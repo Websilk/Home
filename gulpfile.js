@@ -26,6 +26,7 @@ if (environment != 'dev' && environment != 'development' && environment != null)
 var paths = {
     scripts: './Scripts/',
     css: './CSS/',
+    app: './App/',
     components: './App/Components/',
     themes: './Content/themes/',
     vendor: {
@@ -39,6 +40,7 @@ paths.working = {
     js: {
         platform: [
             paths.scripts + 'core/selector.js',
+            paths.scripts + 'core/velocity.min.js',
             paths.scripts + 'core/platform.js',
             paths.scripts + 'platform/[^_]*.js',
             paths.scripts + 'platform/_init.js'
@@ -53,13 +55,18 @@ paths.working = {
         components: paths.components + '**/*.js'
     },
 
-    css: {
+    less:{
         platform: paths.css + 'platform.less',
+        app: paths.app + '**/*.less',
         colors: paths.css + 'colors/*.less',
         editor: paths.css + 'editor.less',
-        utility: paths.css + 'utility/**/*.css',
         tapestry: paths.css + 'tapestry/tapestry.less',
-        themes: paths.themes + '**/*.css'
+    },
+
+    css: {
+        utility: paths.css + 'utility/**/*.css',
+        themes: paths.themes + '**/*.css',
+        app: paths.app + '**/*.css'
     },
 
     vendor: {
@@ -76,7 +83,8 @@ paths.compiled = {
     platform: paths.webroot + 'js/platform.js',
     editor: paths.webroot + 'js/editor.js',
     components: paths.webroot + 'js/components/',
-    themes: paths.webroot + 'css/themes/'
+    themes: paths.webroot + 'css/themes/',
+    app: paths.webroot + 'css/'
 };
 
 //tasks for cleaning compiled paths ///////////////////////////////////////////////////////////
@@ -118,19 +126,30 @@ gulp.task('js', ['clean:js', 'js:platform', 'js:editor', 'js:components']);
 
 //tasks for compiling LESS & CSS /////////////////////////////////////////////////////////////////////
 gulp.task('less:platform', function () {
-    return gulp.src(paths.working.css.platform)
+    return gulp.src(paths.working.less.platform)
         .pipe(less())
         .pipe(gulp.dest(paths.compiled.css));
 });
 
+gulp.task('less:app', function () {
+    return gulp.src(paths.working.less.app)
+        .pipe(less())
+        .pipe(rename(function (path) {
+            path.dirname = path.dirname.toLowerCase();
+            path.basename = path.basename.toLowerCase();
+            path.extname = path.extname.toLowerCase();
+        }))
+        .pipe(gulp.dest(paths.compiled.app));
+});
+
 gulp.task('less:colors', function () {
-    return gulp.src(paths.working.css.colors)
+    return gulp.src(paths.working.less.colors)
         .pipe(less())
         .pipe(gulp.dest(paths.compiled.css + 'colors'));
 });
 
 gulp.task('less:editor', function () {
-    var editor = gulp.src(paths.working.css.editor).pipe(less());
+    var editor = gulp.src(paths.working.less.editor).pipe(less());
     var util = gulp.src(paths.working.css.utility);
     return merge(editor, util).pipe(gulp.dest(paths.compiled.css));
 });
@@ -145,7 +164,17 @@ gulp.task('css:themes', function () {
         .pipe(gulp.dest(paths.compiled.themes));
 });
 
-gulp.task('less', ['clean:css', 'less:platform', 'less:colors', 'less:editor', 'css:themes']);
+gulp.task('css:app', function () {
+    return gulp.src(paths.working.css.app)
+        .pipe(rename(function (path) {
+            path.dirname = path.dirname.toLowerCase();
+            path.basename = path.basename.toLowerCase();
+            path.extname = path.extname.toLowerCase();
+        }))
+        .pipe(gulp.dest(paths.compiled.app));
+});
+
+gulp.task('less', ['clean:css', 'less:platform', 'less:app', 'less:colors', 'less:editor', 'css:themes', 'css:app']);
 
 //tasks for compiling vendor app dependencies /////////////////////////////////////////////////
 
@@ -173,24 +202,34 @@ gulp.task('watch', function () {
 
     //watch platform LESS
     gulp.watch([
-        paths.working.css.platform,
-        paths.working.css.tapestry
+        paths.working.less.platform,
+        paths.working.less.tapestry
     ], ['less:platform']);
 
-    //watch themes LESS
+    //watch app LESS
     gulp.watch([
-        paths.working.css.themes
-    ], ['css:themes']);
+        paths.working.less.app
+    ], ['less:app']);
 
     //watch colors LESS
     gulp.watch([
-        paths.working.css.colors
+        paths.working.less.colors
     ], ['less:colors']);
 
     //watch editor LESS
     gulp.watch([
-        paths.working.css.editor,
+        paths.working.less.editor,
         paths.working.css.utility
     ], ['less:editor']);
+
+    //watch app CSS
+    gulp.watch([
+        paths.working.css.app
+    ], ['css:app']);
+
+    //watch themes CSS
+    gulp.watch([
+        paths.working.css.themes
+    ], ['css:themes']);
 
 });

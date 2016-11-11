@@ -7,23 +7,19 @@
         //save new password for user
         var pass = $('#password').val();
         var pass2 = $('#password2').val();
-        var msg = $('.login .message').removeClass('error');
+        var msg = $('.login .message');
         var msglbl = $('.login .message > span');
         //validate password
         if (pass == '' || pass2 == '') {
-            msg.addClass('error').show();
-            msglbl.html('You must type in your password twice');
+            S.message.show(msg, 'error', 'You must type in your password twice');
             return;
         }
         if (pass != pass2) {
-            msg.addClass('error').show();
-            msglbl.html('You must type in your password twice');
-            msg.addClass('error').html('Your passwords do not match').show();
+            S.message.show(msg, 'error', 'Your passwords do not match'); 
             return;
         }
         if (pass.length < 8) {
-            msg.addClass('error').show();
-            msglbl.html('Your password must be at least 8 characters long');
+            S.message.show(msg, 'error', 'Your password must be at least 8 characters long');
             return;
         }
 
@@ -40,12 +36,10 @@
              
             if (err == false) {
                 //show success message
-                msg.addClass('error').show();
-                msglbl.html('Your password has been updated. Go ahead and <a href="javascript:window.location.reload()">Log In</a> with your new password');
+                S.message.show(msg, '', 'Your password has been updated. Go ahead and <a href="javascript:window.location.reload()">Log In</a> with your new password');
             } else {
                 //show error message
-                msg.addClass('error').show();
-                msglbl.html('An error occurred while trying to update your password');
+                S.message.show(msg, 'error', 'An error occurred while trying to update your password');
             }
         });
     },

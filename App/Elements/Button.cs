@@ -17,6 +17,7 @@ namespace Websilk.Element
                 if (aurl.IndexOf("javascript:") == 0)
                 {
                     jsurl = url.Replace("javascript:", "");
+                    aurl = "javascript:";
                 }
             }else
             {

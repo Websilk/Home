@@ -10,7 +10,8 @@ namespace Websilk.Services
         public WebRequest GeneratePage(string name)
         {
             //access this test from http://localhost:7770/api/PageTest/GeneratePage?name=home
-            
+            //                      http://localhost:7770/api/PageTest/GeneratePage?name=login
+
             var response = new WebRequest();
             var P = new Page(S);
             var page = new Page.structPage();
@@ -29,23 +30,22 @@ namespace Websilk.Services
                 return response;
             }
 
-            switch (name)
+            if(name == "home" || name == "init")
             {
-                case "home":
-                    //generate a home page
-                    P.Url = P.parseUrl("/home");
-                    P.getPageInfoFromUrl();
-                    break;
+                //generate a home page
+                P.Url = P.parseUrl("/home");
+                P.getPageInfoFromUrl();
+            }
 
-                case "login":
-                    //generate login page
-                    P.Url = P.parseUrl("/login");
-                    P.getPageInfoFromUrl();
-                    var cLogin = P.loadComponent(new Websilk.Components.Login(), panelBody, panelBody.cells[0], true);
-                    var posLogin = cLogin.position[4];
-                    posLogin.padding.top = 50;
-                    cLogin.position[4] = posLogin;
-                    break;
+            if (name == "login" || name == "init")
+            {
+                //generate login page
+                P.Url = P.parseUrl("/login");
+                P.getPageInfoFromUrl();
+                var cLogin = P.loadComponent(new Websilk.Components.Login(), panelBody, panelBody.cells[0], true);
+                var posLogin = cLogin.position[4];
+                posLogin.padding.top = 50;
+                cLogin.position[4] = posLogin;
             }
 
             page.pageId = P.pageId;

@@ -177,9 +177,9 @@
     <RefactorLog Include="SqlServer.refactorlog" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="SqlServer.publish.xml" />
+    <PreDeploy Include="PreDeployment.sql" />
   </ItemGroup>
   <ItemGroup>
-    <PreDeploy Include="PreDeployment.sql" />
+    <None Include="SqlServer.publish.xml" />
   </ItemGroup>
 </Project>

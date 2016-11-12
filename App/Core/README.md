@@ -13,7 +13,7 @@ Nearly every class within Websilk has access to an instance of `Websilk.Core` as
 #### Elements.cs
 Some components utilize elements such as buttons, text boxes, lists, and panels, which are basically blocks of HTML. 
 
-Instead of hand-writing an HTML button like `<div class="button">Submit</div>` or `<input type="button" text="Submit">` every where the component uses a button for example, developers should let Websilk manage these complex elements within a **theme**, such as */Content/themes/default/elements/button.html*. Then, the component is able to load a button element via `Websilk.Elements.Load(ElementType.Button, 'outline')` for example, which will load an HTML button styled with a CSS *outline*. The `button.html` file may contain many styles of buttons, and in this example, one of them is named *outline*. 
+Instead of hand-writing an HTML button like `<div class="button">Submit</div>` or `<input type="button" text="Submit">` every where the component uses a button for example, developers should let Websilk manage these complex elements within a **theme**, such as */App/Content/themes/default/elements/button.html*. Then, the component is able to load a button element via `Websilk.Elements.Load(ElementType.Button, 'outline')` for example, which will load an HTML button styled with a CSS *outline*. The `button.html` file may contain many styles of buttons, and in this example, one of them is named *outline*. 
 
 Finally, when the user alters the properties for a component (when editing their web page in the web browser), they'll be able to select a button style from a list of styles defined within the *button.html* theme file. This allows the user to truly customize the components on their page without having to write custom CSS to change the style of the various elements on the page. 
 
@@ -21,7 +21,7 @@ Finally, when the user alters the properties for a component (when editing their
 Every page request uses this class to load information about a web page from the database, load the contents of the page, and render the layers of components & panels as HTML.
 
 #### Panel.cs 
-Every component on a web page is loaded into a panel, which is basically a `<div>` element. Web pages load a *layout* from the website's theme, such as */Content/themes/default/theme.html*, and the user is able to drag & drop components into panels defined by the theme layout.
+Every component on a web page is loaded into a panel, which is basically a `<div>` element. Web pages load a *layout* from the website's theme, such as */App/Content/themes/default/theme.html*, and the user is able to drag & drop components into panels defined by the theme layout.
 
 #### Scaffold.cs
 A string parsing class that essentially replaces mustache variables, such as `{{content}}` with data. It can also show or hide blocks of content, such as `{{has-button}}<div>My Button</div>{{/has-button}}`. It is mainly used to load & parse HTML template files. 
@@ -38,7 +38,7 @@ The `Inject` class will load raw HTML into a specified DOM element onto a web pa
 
 The `WebRequest` class will simply return raw text in a specified content type, such as 'text/html'.
 
-*NOTE: The Form property is a Dictionary of key/value pairs that were sent with the request POST. Also, the Files property is a collection of files (if any) that were uploaded with the `multipart/form-data` request POST.
+NOTE: The Form property is a Dictionary of key/value pairs that were sent with the request POST. Also, the Files property is a collection of files (if any) that were uploaded with the `multipart/form-data` request POST.
 
 #### Sql.cs
 One database class to rule them all. This class is used to connect to an Sql database, execute Sql queries and provide a simple an flexible way to access the rows of data returned from Sql queries.

@@ -35,5 +35,5 @@ BEGIN
 	/* update page heirarchy paths for title & ids */
 	UPDATE pages SET path=dbo.GetPagePath(@pageId), pathIds=dbo.GetPagePathIds(@pageId) WHERE pageid=@pageid
 	
-	SELECT TOP 1 p.pageid FROM Pages p WHERE p.ownerId=@websiteOwnerId AND p.websiteId=@websiteId ORDER BY p.datecreated DESC
+	RETURN @pageId
 END

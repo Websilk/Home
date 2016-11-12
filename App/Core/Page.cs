@@ -160,8 +160,8 @@ namespace Websilk
 
                 //set up page properties
                 PageTitleForBrowserTab = pageTitle + websiteTitleSeparator + websiteTitle;
-                pageFolder = "/Content/websites/" + websiteId + "/pages/" + pageId + "/";
-                Elements = new Elements(S, "/Content/themes/" + websiteTheme + "/");
+                pageFolder = "/App/Content/websites/" + websiteId + "/pages/" + pageId + "/";
+                Elements = new Elements(S, "/App/Content/themes/" + websiteTheme + "/");
 
                 //set up facebook meta tags
                 pageFacebook = "";
@@ -182,7 +182,7 @@ namespace Websilk
             //get a list of components to load onto the page
             var page = new List<structPage>();
             var filename = "page.json";
-            var pagePath = "Content/websites/" + websiteId + "/" + folderType + "/";
+            var pagePath = "/App/Content/websites/" + websiteId + "/" + folderType + "/";
             if (pageid > 0)
             {
                 var folder = S.Server.MapPath(pagePath + pageid + "/");
@@ -303,7 +303,7 @@ namespace Websilk
             {
                 //load a Dynamic Page //////////////////
 
-                var scaffold = new Scaffold(S, "/Content/themes/" + websiteTheme + "/layout.html");
+                var scaffold = new Scaffold(S, "/App/Content/themes/" + websiteTheme + "/layout.html");
 
                 //load page(s) from file/cache
                 var pages = loadPage(pageId);
@@ -353,6 +353,7 @@ namespace Websilk
             scaffold.Data["website-css"] = "/content/websites/" + websiteId + "/website.css?v=" + S.Server.Version;
             scaffold.Data["theme-css"] = "/css/themes/" + websiteTheme + "/theme.css";
             scaffold.Data["colors-css"] = "/css/colors/" + websiteColors + ".css";
+            scaffold.Data["svg-icons"] = S.Server.LoadFileFromCache("/App/Content/themes/" + websiteTheme + "/icons.svg");
 
             //setup base javascript files
             string min = "";

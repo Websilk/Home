@@ -2,13 +2,14 @@
 
 //includes
 var gulp = require('gulp'),
-    rimraf = require('rimraf'),
+    rimraf = require('gulp-rimraf'),
     concat = require('gulp-concat'),
     cssmin = require('gulp-cssmin'),
     uglify = require('gulp-uglify'),
     util = require('gulp-util'),
     less = require('gulp-less'),
     rename = require('gulp-rename'),
+    wait = require('gulp-wait'),
     merge = require('merge-stream'),
     config = require('./config.json');
     
@@ -24,11 +25,11 @@ if (environment != 'dev' && environment != 'development' && environment != null)
 
 //paths
 var paths = {
-    scripts: './Scripts/',
-    css: './CSS/',
+    scripts: './App/Scripts/',
+    css: './App/CSS/',
     app: './App/',
     components: './App/Components/',
-    themes: './Content/themes/',
+    themes: './App/Content/themes/',
     vendor: {
         root: './Vendor/**/'
     },
@@ -52,7 +53,7 @@ paths.working = {
             paths.scripts + 'utility/dropzone.js',
             paths.scripts + 'editor/_init.js'
         ],
-        components: paths.components + '**/*.js'
+        app: paths.app + '**/*.js'
     },
 
     less:{
@@ -73,6 +74,14 @@ paths.working = {
         js: paths.vendor.root + 'js/*.js',
         css: paths.vendor.root + 'css/*.css',
         less: paths.vendor.root + 'css/app.less'
+    },
+
+    exclude: {
+        app: [
+            '!' + paths.app + 'Content/**/',
+            '!' + paths.app + 'CSS/**/',
+            '!' + paths.app + 'Scripts/**/'
+        ]
     }
 };
 
@@ -88,17 +97,33 @@ paths.compiled = {
 };
 
 //tasks for cleaning compiled paths ///////////////////////////////////////////////////////////
-gulp.task('clean:js', function (cb) {
-    rimraf(paths.webroot + 'js', cb);
+gulp.task('clean:js', function () {
+    return gulp.src(paths.compiled.js + '**', { read: false })
+    .pipe(rimraf())
+    .pipe(wait(500));
 });
 
-gulp.task('clean:css', function (cb) {
-    rimraf(paths.webroot + 'css', cb);
+gulp.task('clean:css', function () {
+    return gulp.src(paths.compiled.css + '**', { read: false })
+    .pipe(rimraf())
+    .pipe(wait(500));
 });
 
 gulp.task('clean', ['clean:js', 'clean:css']);
 
 //tasks for compiling javascript //////////////////////////////////////////////////////////////
+gulp.task('js:app', function () {
+    var pathlist = paths.working.exclude.app;
+    pathlist.unshift(paths.working.js.app);
+    return gulp.src(pathlist)
+        .pipe(rename(function (path) {
+            path.dirname = path.dirname.toLowerCase();
+            path.basename = path.basename.toLowerCase();
+            path.extname = path.extname.toLowerCase();
+        }))
+        .pipe(gulp.dest(paths.compiled.js));
+});
+
 gulp.task('js:platform', function () {
     var p = gulp.src(paths.working.js.platform, { base: '.' })
             .pipe(concat(paths.compiled.platform));
@@ -112,27 +137,17 @@ gulp.task('js:editor', function () {
         .pipe(gulp.dest('.'));
 });
 
-gulp.task('js:components', function () {
-    return gulp.src(paths.working.js.components)
-        .pipe(rename(function (path) {
-            path.dirname = path.dirname.toLowerCase();
-            path.basename = path.basename.toLowerCase();
-            path.extname = path.extname.toLowerCase();
-        }))
-        .pipe(gulp.dest(paths.compiled.components));
+gulp.task('js', ['clean:js'], function () {
+    gulp.start('js:app');
+    gulp.start('js:platform');
+    gulp.start('js:editor');
 });
-
-gulp.task('js', ['clean:js', 'js:platform', 'js:editor', 'js:components']);
 
 //tasks for compiling LESS & CSS /////////////////////////////////////////////////////////////////////
-gulp.task('less:platform', function () {
-    return gulp.src(paths.working.less.platform)
-        .pipe(less())
-        .pipe(gulp.dest(paths.compiled.css));
-});
-
 gulp.task('less:app', function () {
-    return gulp.src(paths.working.less.app)
+    var pathlist = paths.working.exclude.app;
+    pathlist.unshift(paths.working.less.app);
+    return gulp.src(pathlist)
         .pipe(less())
         .pipe(rename(function (path) {
             path.dirname = path.dirname.toLowerCase();
@@ -140,6 +155,12 @@ gulp.task('less:app', function () {
             path.extname = path.extname.toLowerCase();
         }))
         .pipe(gulp.dest(paths.compiled.app));
+});
+
+gulp.task('less:platform', function () {
+    return gulp.src(paths.working.less.platform)
+        .pipe(less())
+        .pipe(gulp.dest(paths.compiled.css));
 });
 
 gulp.task('less:colors', function () {
@@ -165,7 +186,9 @@ gulp.task('css:themes', function () {
 });
 
 gulp.task('css:app', function () {
-    return gulp.src(paths.working.css.app)
+    var pathlist = paths.working.exclude.app;
+    pathlist.unshift(paths.working.css.app);
+    return gulp.src(pathlist)
         .pipe(rename(function (path) {
             path.dirname = path.dirname.toLowerCase();
             path.basename = path.basename.toLowerCase();
@@ -174,7 +197,14 @@ gulp.task('css:app', function () {
         .pipe(gulp.dest(paths.compiled.app));
 });
 
-gulp.task('less', ['clean:css', 'less:platform', 'less:app', 'less:colors', 'less:editor', 'css:themes', 'css:app']);
+gulp.task('less', ['clean:css'], function () {
+    gulp.start('less:platform');
+    gulp.start('less:app');
+    gulp.start('less:colors');
+    gulp.start('less:editor');
+    gulp.start('css:themes');
+    gulp.start('css:app');
+});
 
 //tasks for compiling vendor app dependencies /////////////////////////////////////////////////
 

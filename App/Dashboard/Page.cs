@@ -28,15 +28,32 @@ namespace Websilk.Pages
             {
                 menuItem("Timeline", "dashboard/timeline", "timeline"),
                 menuItem("Pages", "/dashboard/pages", "pages"),
-                menuItem("Photos", "/dashboard/photos", "photo")
+                menuItem("Photos", "/dashboard/photos", "photos"),
+                menuItem("Downloads", "/dashboard/downloads", "layers"),
+                menuItem("Analytics", "/dashboard/analytics", "analytics"),
+                menuItem("Users", "/dashboard/users", "users"),
+                menuItem("Settings", "/dashboard/settings", "settings",
+                    new List<structMenuItem>{
+                        menuItem("Domains", "/dashboard/settings/domains", "domains"),
+                        menuItem("Themes", "/dashboard/settings/themes", "themes"),
+                        menuItem("Color Schemes", "/dashboard/settings/colors", "colors"),
+                        menuItem("Cache", "/dashboard/settings/cache", "cache")
+                    }
+                )
             };
-            foreach(var item in menus)
-            {
-                menu.Append("<ul class=\"menu\">" + renderMenuItem(scaffMenu, item, 0) + "</ul>");
-            }
-            scaffold.Data["menu"] = menu.ToString();
+
 
             //TODO: get apps available to the user for this website
+
+            //render menu system
+            foreach (var item in menus)
+            {
+                menu.Append(renderMenuItem(scaffMenu, item, 0));
+            }
+            scaffold.Data["menu"] = "<ul class=\"menu\">" + menu.ToString() + "</ul>";
+
+            //add js file
+            S.javascriptFiles.Add("dashboard", "/js/dashboard/page.js");
         }
 
         private structMenuItem menuItem(string label, string href, string icon, List<structMenuItem> submenu = null)
@@ -63,7 +80,7 @@ namespace Websilk.Pages
                 {
                     foreach(var sub in item.submenu)
                     {
-                        subs.Append("<div class=\"row submenu\"><ul class=\"menu\">" + renderMenuItem(scaff, sub, level + 1) + "</ul></div>");
+                        subs.Append(renderMenuItem(scaff, sub, level + 1));
                     }
                 }
             }
@@ -71,7 +88,7 @@ namespace Websilk.Pages
             scaff.Data["href"] = item.href == "" ? "javascript:" : item.href;
             scaff.Data["icon"] = item.icon;
             scaff.Data["gutter"] = gutter;
-            scaff.Data["submenu"] = subs.ToString();
+            scaff.Data["submenu"] = subs.Length > 0 ? "<div class=\"row submenu\"><ul class=\"menu\">" + subs.ToString() + "</ul></div>" : "";
             return scaff.Render();
         }
     }

@@ -76,6 +76,16 @@ namespace Websilk
             }
             Sql.Close();
         }
+
+        #region "Cache"
+        public string LoadFileFromCache(string filename)
+        {
+            if (Cache.ContainsKey(filename)) { return (string)Cache[filename]; }
+            var file = File.ReadAllText(MapPath(filename));
+            Cache.Add(filename, file);
+            return file;
+        }
+        #endregion
     }
 
 

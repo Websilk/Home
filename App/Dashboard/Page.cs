@@ -42,7 +42,6 @@ namespace Websilk.Pages
                 )
             };
 
-
             //TODO: get apps available to the user for this website
 
             //render menu system

@@ -237,9 +237,12 @@ gulp.task('watch', function () {
     ], ['less:platform']);
 
     //watch app LESS
-    gulp.watch([
-        paths.working.less.app
-    ], ['less:app']);
+    var pathless = paths.working.exclude.app;
+    for (var x = 0; x < pathless.length; x++) {
+        pathless[x] += '*.less';
+    }
+    pathless.unshift(paths.working.less.app);
+    gulp.watch(pathless, ['less:app']);
 
     //watch colors LESS
     gulp.watch([
@@ -253,9 +256,12 @@ gulp.task('watch', function () {
     ], ['less:editor']);
 
     //watch app CSS
-    gulp.watch([
-        paths.working.css.app
-    ], ['css:app']);
+    var pathcss = paths.working.exclude.app;
+    for (var x = 0; x < pathcss.length; x++) {
+        pathcss[x] += '*.css';
+    }
+    pathcss.unshift(paths.working.css.app);
+    gulp.watch(pathcss, ['css:app']);
 
     //watch themes CSS
     gulp.watch([

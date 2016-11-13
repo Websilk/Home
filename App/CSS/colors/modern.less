@@ -19,8 +19,8 @@ body{font-family: Jaldi;}
     .button(disabled, #009B87, #00A46C, #00C5C7, #00A46C, transparent, transparent, transparent, transparent, transparent, transparent, transparent, transparent, #fff, #fff, #fff, #fff);
     .message(none, #8ccaef, transparent, #0066ff);
     .message(error, #dc8a8a, transparent, #b30b0b);
-    .message(alert, #dbdb86, transparent, #d79c0c);
-    .message(confirm, #92e061, transparent, #228f4b);
+    .message(alert, #dbdb86, transparent, #d79c0c); 
+    .message(confirm, #92e061, transparent, #228f4b); 
 }
 
 .box .section{
@@ -28,12 +28,13 @@ body{font-family: Jaldi;}
 }
 
 .dash-menu{
-    .box(#71a596, transparent, #fff);
-    .links(#FDFFC7, #FBFF83, #FFEF69, #FDFFC7);
-    .icons(#fff, #FBFF83, #FFEF69, #fff);
-    .fonts(#222, rgba(0,0,0,0.3), #009B87, #4DA400, #FF2222, #376EB2);
-    .row(transparent, #47947E, #1A9484, #D0F3EE, #fff, #A9F6EC, #FDFFC7, #FBFF83, #FFEF69, #FDFFC7, #FDFFC7, #fff, #FBFF83, #FFEF69, #fff);
-    .row-alt(#689D8E, #3C8C75, #178B7C, #D0F3EE, #fff, #A9F6EC, #FDFFC7, #FBFF83, #FFEF69, #FDFFC7, #FDFFC7, #fff, #FBFF83, #FFEF69, #fff);
+    @font:#e0e0e0; @font-hover:#99d8f1; @font-selected:#73d7ff;
+    .box(#171717, transparent, #999);
+    .fonts(#222, rgba(0,0,0,0.3), #009B87, #4DA400, #FF2222, #376EB2); 
+    .row(transparent, #1c2b30, #16323c, @font, @font-hover, @font-selected, @font, @font-hover, @font-selected, @font, @font-selected, @font, @font-hover, @font-selected, @font-selected);
+    .row-alt(#21292c, #1e2f35, #123744, @font, @font-hover, @font-selected, @font, @font-hover, @font-selected, @font, @font-selected, @font, @font-hover, @font-selected, @font-selected);
+    .links(@font, @font-hover, @font-selected, @font);
+    .icons(@font, @font-hover, @font-hover, @font);
 
     .submenu{
         background-color:#5B9987;
@@ -43,8 +44,8 @@ body{font-family: Jaldi;}
             .row.hover:hover{background-color:#29876C;}
         }
     }
-}
 
-.dash-menu .row.header{
-    .box(#5B9987, transparent, #fff);
+    .row.header{
+        .box(#5B9987, transparent, #fff);
+    }
 }

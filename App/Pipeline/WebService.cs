@@ -84,9 +84,11 @@ namespace Websilk.Pipeline
             string className = "Websilk.Services." + paths[1];
             string methodName = paths[2];
             if(paths.Length == 4) { className += "." + paths[2]; methodName = paths[3]; }
-            Type type =Type.GetType(className);
-            Service service = (Service)Activator.CreateInstance(type, new object[] { S });
-            service.pageId = pageId;
+            var service = GetService(className);
+            if (S.Util.Str.IsNumeric(pageId))
+            {
+                service.pageId = int.Parse(pageId);
+            }
 
             if (dataType == 1)
             {
@@ -105,6 +107,7 @@ namespace Websilk.Pipeline
             }
 
             //execute method from new Service instance
+            Type type = Type.GetType(className);
             MethodInfo method = type.GetMethod(methodName);
 
             //try to cast params to correct types
@@ -179,6 +182,20 @@ namespace Websilk.Pipeline
         {
             float output;
             return float.TryParse(s, out output);
+        }
+
+        private Service GetService(string className)
+        {
+            //hard-code all known services to increase server performance
+            switch(className.ToLower()){
+                case "websilk.services.components.login":
+                    return new Services.Components.Login(S);
+
+                default:
+                    //last resort, find service class manually
+                    Type type = Type.GetType(className);
+                    return (Service)Activator.CreateInstance(type, new object[] { S });
+            }
         }
     }
 }

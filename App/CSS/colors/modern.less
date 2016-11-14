@@ -27,14 +27,23 @@ body{font-family: Jaldi;}
     .box(#fafafa, #dadada, #444);
 }
 
-.dash-menu{
-    @font:#e0e0e0; @font-hover:#99d8f1; @font-selected:#73d7ff;
-    .box(#171717, transparent, #999);
-    .fonts(#222, rgba(0,0,0,0.3), #009B87, #4DA400, #FF2222, #376EB2); 
+.dash-side{
+    @font:#e0e0e0; @font-hover:#99d8f1; @font-selected:#73d7ff; //use variables 
+    .box(#1f1f1f, transparent, #999);
+    .fonts(@font, rgba(255,255,255,255.3), #009B87, #4DA400, #FF2222, #376EB2); 
     .row(transparent, #1c2b30, #16323c, @font, @font-hover, @font-selected, @font, @font-hover, @font-selected, @font, @font-selected, @font, @font-hover, @font-selected, @font-selected);
     .row-alt(#21292c, #1e2f35, #123744, @font, @font-hover, @font-selected, @font, @font-hover, @font-selected, @font, @font-selected, @font, @font-hover, @font-selected, @font-selected);
-    .links(@font, @font-hover, @font-selected, @font);
+    .links(@font, @font-hover, @font-selected, @font); 
     .icons(@font, @font-hover, @font-hover, @font);
+
+    > .head{
+        border-bottom-color:#3d3d3d;
+        .box(#bb5000, transparent, #fff); //#00a1ff, #e44600
+        .button(none, #db7200, #f38600, #ff9c00, #ff9c00, transparent, transparent, transparent, transparent, transparent, transparent, transparent, transparent, #ffdbaa, #ffdbaa, #ffdbaa, #ffdbaa);
+        &.row.hover:hover{background-color:#bb3f00;
+            .button(none, #db7200, #f38600, #ff9c00, #ff9c00, transparent, transparent, transparent, transparent, transparent, transparent, transparent, transparent, #ffdbaa, #ffdbaa, #ffdbaa, #ffdbaa);
+        } 
+    }
 
     .submenu{
         background-color:#5B9987;

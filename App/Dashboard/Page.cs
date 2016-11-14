@@ -22,11 +22,26 @@ namespace Websilk.Pages
             S.cssFiles.Add("dashboard", "/css/dashboard/dashboard.css");
             var scaffMenu = new Scaffold(S, "/App/Dashboard/menu-item.html");
 
+            //load user profile
+            scaffold.Data["profile-img"] = "";
+            scaffold.Data["btn-edit-img"] = "";
+            scaffold.Data["profile-name"] = S.User.displayName;
+
+            //load website info
+            var domains = page.getDomainsForWebsite();
+            if(domains.Count > 0)
+            {
+                scaffold.Data["has-domain"] = "true";
+                scaffold.Data["website-name"] = page.websiteTitle;
+                scaffold.Data["website-url"] = "http://www." + domains[0].domain;
+                scaffold.Data["website-url-name"] = "www." + domains[0].domain;
+            }
+
             //generate menu system
             var menu = new StringBuilder();
             var menus = new List<structMenuItem>()
             {
-                menuItem("Timeline", "dashboard/timeline", "timeline"),
+                menuItem("Timeline", "/dashboard/timeline", "timeline"),
                 menuItem("Pages", "/dashboard/pages", "pages"),
                 menuItem("Photos", "/dashboard/photos", "photos"),
                 menuItem("Downloads", "/dashboard/downloads", "layers"),
@@ -53,6 +68,9 @@ namespace Websilk.Pages
 
             //add js file
             S.javascriptFiles.Add("dashboard", "/js/dashboard/page.js");
+
+            //finally, add content of dashboard section
+
         }
 
         private structMenuItem menuItem(string label, string href, string icon, List<structMenuItem> submenu = null)

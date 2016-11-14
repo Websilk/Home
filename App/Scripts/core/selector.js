@@ -265,7 +265,6 @@
     }
 
     select.prototype.animate = function (props, options) {
-        console.log(props);
         Velocity(this.elements, props, options);
         return this;
     }

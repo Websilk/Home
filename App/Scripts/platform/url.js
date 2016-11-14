@@ -77,8 +77,8 @@
                 }
             }
             return false;
-        }).each(function () {
-            this.setAttribute('onclick', 'S.url.fromAnchor(this);return false;');
+        }).each(function (e) {
+            e.setAttribute('onclick', 'S.url.fromAnchor(this);return false;');
         });
     },
 

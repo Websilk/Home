@@ -8,7 +8,10 @@
         {
             if (S.isSessionLost()) { return "err"; }
 
-            if (S.User.LogIn(email, pass))
+            var page = new Page(S);
+            page.getPageInfo(pageId);
+
+            if (S.User.LogIn(email, pass, page.websiteId, page.websiteOwner))
             {
                 //logged in
                 return "success";

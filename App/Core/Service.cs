@@ -58,7 +58,8 @@ namespace Websilk
     public class Service
     {
         protected Core S;
-        public string pageId = "";
+        public int pageId = 0;
+        public Page page;
         public Dictionary<string, string> Form = new Dictionary<string, string>();
         public IFormFileCollection Files;
 
@@ -96,6 +97,18 @@ namespace Websilk
             var response = new Services.PageRequest();
             response.js = "S.lostSession();";
             return response;
+        }
+
+        /// <summary>
+        /// Load an instance of the currently loaded Page
+        /// </summary>
+        protected void GetPage()
+        {
+            if(page == null)
+            {
+                page = new Page(S);
+                page.getPageInfo(pageId);
+            }
         }
     }
 }

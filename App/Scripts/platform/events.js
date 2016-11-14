@@ -2,7 +2,7 @@
 
     doc: {
         load: function () {
-            
+            S.url.checkAnchors();
         },
 
         ready: function () {

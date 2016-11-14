@@ -1,2 +1,12 @@
-﻿<div class="dash-menu size-lg">{{menu}}</div>
-<div class="dash-body"></div>
+﻿<div class="dash-side">
+    <div class="row head hover text-center pad-top">
+        <h5 class="website-name pad-top-sm">{{website-name}}</h5>
+        {{has-domain}}
+        <span class="website-url pad-top"><a class="button" href="{{website-url}}" target="_blank">Live Website</a></span>
+        {{/has-domain}}
+    </div>
+    <div class="dash-menu size-lg">
+        {{menu}}
+    </div>
+</div>
+<div class="dash-body">{{body}}</div>

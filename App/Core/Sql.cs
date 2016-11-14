@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
+using Newtonsoft.Json;
 
 namespace Websilk
 {
@@ -167,9 +168,11 @@ namespace Websilk
 
     public class SqlReader
     {
+        [JsonIgnore]
         private Core S;
+        [JsonIgnore]
         private int _i = -1;
-        public List<Dictionary<string, object>> Rows = new List<Dictionary<string, object>>();
+        public List<Dictionary<string, string>> Rows = new List<Dictionary<string, string>>();
 
         public SqlReader(Core WebsilkCore, string query, List<SqlParameter> parameters)
         {
@@ -199,14 +202,14 @@ namespace Websilk
         {
             if(reader.HasRows == true)
             {
-                Dictionary<string, object> item;
+                Dictionary<string, string> item;
                 string key = "";
                 while (reader.Read() == true)
                 {
-                    item = new Dictionary<string, object>();
+                    item = new Dictionary<string, string>();
                     for (int i= 0; i < reader.FieldCount; i++){
                         key = reader.GetName(i);
-                        item.Add(key.ToLower(), reader[key]);
+                        item.Add(key.ToLower(), reader[key].ToString());
                     }
                     Rows.Add(item);
                 }
@@ -236,7 +239,7 @@ namespace Websilk
 
         public string Get(string key)
         {
-            if(Rows[_i].ContainsKey(key.ToLower()) == true) { return Rows[_i][key.ToLower()].ToString(); }
+            if(Rows[_i].ContainsKey(key.ToLower()) == true) { return Rows[_i][key.ToLower()]; }
             return "";
         }
 
@@ -290,7 +293,7 @@ namespace Websilk
         public int Length;
         public enumSqlParameterType Type = enumSqlParameterType.isString;
 
-        public SqlParameter(string name, string value, int maxLength, enumSqlParameterType type = enumSqlParameterType.isString)
+        public SqlParameter(string name, string value, int maxLength = 0, enumSqlParameterType type = enumSqlParameterType.isString)
         {
             Name = name;
             _value = value;

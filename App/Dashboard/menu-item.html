@@ -1,18 +1,16 @@
 ﻿<li>
     <div class="row hover">
         {{gutter}}
-        <span class="col icon small pad-right-sm">
-            <a href="{{href}}">
-                <svg viewBox="0 0 36 36">
-                    <use xlink:href="#icon-{{icon}}" x="0" y="0" width="36" height="36"></use>
-                </svg>
-            </a>
-        </span>
-        <span class="col label nolinks">
-            <a href="{{href}}">
-                {{label}}
-            </a>
-        </span>
-    </div>
+        <a href="{{href}}">
+            <span class="col icon small pad-right pad-left">
+                <span>    
+                    <svg viewBox="0 0 36 36">
+                        <use xlink:href="#icon-{{icon}}" x="0" y="0" width="36" height="36"></use>
+                    </svg>
+                </span>
+            </span>
+            <span class="col label nolinks"><span>{{label}}</span></span>
+        </a>
+</div>
     {{submenu}}
 </li>

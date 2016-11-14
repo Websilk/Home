@@ -48,6 +48,13 @@ namespace Websilk.SqlQueries
             return new SqlReader(S, "EXEC GetPageInfoFromSubDomainAndTitle @domain=$domain, @subdomain=$subdomain, @title=$title", parameters);
         }
 
+        public SqlReader GetWebsiteDomains(int websiteId)
+        {
+            var parameters = new List<SqlParameter>();
+            parameters.Add(new SqlParameter("$websiteId", websiteId.ToString()));
+            return new SqlReader(S, "EXEC GetWebsiteDomains @websiteId=$websiteId", parameters);
+        }
+
         #endregion
     }
 }

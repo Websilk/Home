@@ -87,13 +87,13 @@ paths.working = {
 
 //compiled paths
 paths.compiled = {
-    js: paths.webroot + 'js/',
-    css: paths.webroot + 'css/',
     platform: paths.webroot + 'js/platform.js',
     editor: paths.webroot + 'js/editor.js',
+    js: paths.webroot + 'js/',
+    css: paths.webroot + 'css/',
+    app: paths.webroot + 'css/',
     components: paths.webroot + 'js/components/',
-    themes: paths.webroot + 'css/themes/',
-    app: paths.webroot + 'css/'
+    themes: paths.webroot + 'css/themes/'
 };
 
 //tasks for cleaning compiled paths ///////////////////////////////////////////////////////////

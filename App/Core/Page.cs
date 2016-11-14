@@ -28,6 +28,19 @@ namespace Websilk
             public List<int> layers;
         }
 
+        public enum enumDomainProtocols
+        {
+            http = 0,
+            https = 1
+        }
+
+        public struct structDomain
+        {
+            public enumDomainProtocols protocol;
+            public string domain;
+            public string subdomain;
+        }
+
         public structUrl Url;
 
         //page info
@@ -49,12 +62,14 @@ namespace Websilk
 
         //website info
         public int websiteId = 0;
+        public int websiteOwner = 0;
         public string websiteTitle = "";
         public string websiteTitleSeparator = " - ";
         public string websiteTheme = "default";
         public string websiteColors = "modern";
         public int websitePageAccessDenied = 0;
         public int websitePage404 = 0;
+        public List<structDomain> domains = new List<structDomain>();
 
         public string googleWebPropertyId = ""; //google Analytics
         public string pageFacebook = ""; //facebook meta tags
@@ -71,7 +86,14 @@ namespace Websilk
         #region "Page Info"
         public void getPageInfo(int pageId)
         {
-            loadPageInfo(sql.GetPageInfo(pageId));
+            if (S.Server.Cache.ContainsKey("pageinfo_" + pageId))
+            {
+                loadPageInfo((SqlReader)S.Server.Cache["pageinfo_" + pageId]);
+            }
+            else
+            {
+                loadPageInfo(sql.GetPageInfo(pageId));
+            }
         }
 
         public void getPageInfoFromUrl()
@@ -152,6 +174,7 @@ namespace Websilk
                 websiteTheme = reader.Get("theme");
                 websiteColors = reader.Get("colors");
                 websiteId = reader.GetInt("websiteid");
+                websiteOwner = reader.GetInt("ownerId");
                 websiteTitle = reader.Get("websitetitle");
                 websitePageAccessDenied = reader.GetInt("pagedenied");
                 websitePage404 = reader.GetInt("page404");
@@ -173,6 +196,20 @@ namespace Websilk
                                 "<meta id=\"metafbsite\" property=\"og:site_name\" content=\"" + websiteTitle + "\" />";
             }
 
+        }
+
+        public List<structDomain> getDomainsForWebsite()
+        {
+            //get a list of available domains for this website
+            var domains = new List<structDomain>();
+            var reader = sql.GetWebsiteDomains(websiteId);
+            if(reader.Rows.Count > 0)
+            {
+                while (reader.Read()) { 
+                    domains.Add(GetDomain(reader.Get("domain")));
+                }
+            }
+            return domains;
         }
         #endregion
 
@@ -451,6 +488,23 @@ namespace Websilk
                 return new string[] { sub, subdomain.Replace(sub, "") };
             }
             return new string[] { "", subdomain };
+        }
+
+        public structDomain GetDomain(string url)
+        {
+            var domain = GetDomainParts(url);
+            var d = new structDomain();
+            d.domain = domain[1];
+            d.subdomain = domain[0];
+            if(url.IndexOf("https://") >= 0)
+            {
+                d.protocol = enumDomainProtocols.https;
+            }
+            else if(url.IndexOf("http://") >= 0)
+            {
+                d.protocol = enumDomainProtocols.http;
+            }
+            return d;
         }
 
         public string GetBrowserType()

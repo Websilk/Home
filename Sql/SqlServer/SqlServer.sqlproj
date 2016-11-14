@@ -76,7 +76,6 @@
     <Build Include="dbo\Tables\Log.sql" />
     <Build Include="dbo\Tables\LogAnalytics.sql" />
     <Build Include="dbo\Tables\PasswordReset.sql" />
-    <Build Include="dbo\Tables\Login.sql" />
     <Build Include="dbo\Tables\WebsiteSecurity.sql" />
     <Build Include="dbo\Tables\Timeline.sql" />
     <Build Include="dbo\Tables\WebsiteDomains.sql" />
@@ -95,10 +94,7 @@
     <Build Include="dbo\Stored Procedures\GetPageList.sql" />
     <Build Include="dbo\Stored Procedures\GetLogAnalytics.sql" />
     <Build Include="dbo\Stored Procedures\LogRequest.sql" />
-    <Build Include="dbo\Stored Procedures\PasswordForgot.sql" />
     <Build Include="dbo\Stored Procedures\UpdateAccountInfo.sql" />
-    <Build Include="dbo\Stored Procedures\PasswordSecureReset.sql" />
-    <Build Include="dbo\Stored Procedures\SaveLogin.sql" />
     <Build Include="dbo\Stored Procedures\AuthenticateLogin.sql" />
     <Build Include="dbo\Stored Procedures\GetSecurityForFeature.sql" />
     <Build Include="dbo\Stored Procedures\UpdateWebsiteSecurity.sql" />
@@ -157,6 +153,8 @@
     <Build Include="dbo\Stored Procedures\UpdateUserPassword.sql" />
     <Build Include="dbo\Stored Procedures\UpdateUserEmail.sql" />
     <Build Include="dbo\Stored Procedures\GetUserPassword.sql" />
+    <Build Include="dbo\Stored Procedures\GetWebsiteDomains.sql" />
+    <Build Include="dbo\Stored Procedures\AddWebsiteSecurity.sql" />
   </ItemGroup>
   <ItemGroup>
     <ArtifactReference Include="$(DacPacRootPath)\Extensions\Microsoft\SQLDB\Extensions\SqlServer\110\SqlSchemas\master.dacpac">

@@ -7,7 +7,7 @@ CREATE PROCEDURE UpdateWebsiteSecurity
 	@websiteId int = 0, 
 	@pageId int = 0,
 	@userId int = 0,
-	@feature nvarchar(25),
+	@feature nvarchar(50),
 	@security nvarchar(200)
 
 AS

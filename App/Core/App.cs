@@ -31,7 +31,6 @@ namespace Websilk.Services
                     //load page content
                     page.Render();
 
-
                     //write to console
                     Console.WriteLine("Load page: " + page.pageTitle);
 
@@ -58,7 +57,6 @@ namespace Websilk.Services
         {
             if (S.isSessionLost()) { return lostInject(); } //check session
 
-            var response = new PageRequest();
             if (!string.IsNullOrEmpty(url))
             {
                 var arrUrl = url.Split('\"');
@@ -77,7 +75,10 @@ namespace Websilk.Services
                     if(page.pageService != "")
                     {
                         var service = page.getStaticPage(page.pageService);
-                        return service.LoadSubPage(page.Url.path.Replace(page.pagePathName + "/", ""));
+                        var response = service.LoadSubPage(page.Url.path.Replace(page.pagePathName + "/", ""));
+                        S.javascript.Add("static-page", "S.url.push('" + page.pageTitle + "','" + url.Replace(" ", "-") + "');");
+                        response.js = S.javascript.renderJavascript(false);
+                        return response;
                     }
                 }
             }

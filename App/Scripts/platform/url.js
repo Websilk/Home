@@ -7,27 +7,14 @@
             location.href = url;
             return;
         }
-        //first, check for a special url
-        var u = url.split('+')[0];;
-        var urls = u.split('/');
-        var words = S.url.special.words;
-        if (words.length > 0) {
-            for (var x in words) {
-                if (urls[0].toLowerCase() == words[x].word.toLowerCase()) {
-                    //found special url, skip ajax post
-                    if (arguments.length == 2) {
-                        S.url.last = url;
-                    }
-                    S.url.push(u, url);
-                    S.url.nopush = true;
-                    words[x].callback(u);
-                    setTimeout(function () { S.url.nopush = false; }, 1000);
-                    return false;
-                }
-            }
-        }
         //post page request via Ajax
-        S.ajax.post('App/Url', { url: url }, S.ajax.callback.pageRequest);
+        if (S.page.type == 1 && url.indexOf(S.page.path) == 0 && S.page.path != '') {
+            //load subpage content for static page
+            S.ajax.post('App/StaticUrl', { url: url }, S.ajax.callback.inject);
+        } else {
+            S.ajax.post('App/Url', { url: url }, S.ajax.callback.pageRequest);
+        }
+        
 
         return false;
     },
@@ -48,16 +35,6 @@
         }
         history.pushState(url, title, '/' + url);
         S.url.last = url;
-    },
-
-    special: {
-        words: [],
-
-        add: function (word, callback) {
-            var words = S.url.special.words;
-            for (x = 0; x < words.length; x++) { if (words[x].word == word) { return false; } }
-            S.url.special.words.push({ word: word, callback: callback });
-        }
     },
 
     fromAnchor: function (e) {

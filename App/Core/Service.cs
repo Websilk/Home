@@ -43,6 +43,7 @@ namespace Websilk.Services
         public string js = "";
         public string css = "";
         public string cssid = "";
+        public string remove = "";
         public enumInjectTypes inject = 0;
     }
 

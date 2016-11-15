@@ -1,5 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Text;
+using Websilk.Services;
+using System.Linq;
 
 namespace Websilk.Pages
 {
@@ -71,6 +74,30 @@ namespace Websilk.Pages
 
             //finally, add content of dashboard section
 
+        }
+
+        public override Inject LoadSubPage(string path)
+        {
+            //get correct sub page from path
+            StaticPage service;
+            var inject = new Inject();
+            var paths = path.Split(new string[] { "/" }, StringSplitOptions.RemoveEmptyEntries);
+            var section = "";
+            switch (path){
+                case "pages":
+                    service = new DashboardPages.Pages(S, page);
+                    inject = service.LoadSubPage(string.Join("/", paths.Skip(1).ToArray()));
+                    section = "pages";
+                    break;
+            }
+            S.javascript.Add("dash-subpage", "S.dashboard.sections.show('" + section + "');");
+            inject.element = ".dash-body";
+            inject.remove = ".dash-body > .section-" + section;
+            inject.html = "<div class=\"dash-section section-" + section + "\">" + inject.html + "</div>";
+
+            inject.inject = enumInjectTypes.append;
+            inject.js = S.javascript.renderJavascript(false);
+            return inject;
         }
 
         private structMenuItem menuItem(string label, string href, string icon, List<structMenuItem> submenu = null)

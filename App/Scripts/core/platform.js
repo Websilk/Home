@@ -114,10 +114,12 @@ var S = {
     },
 
     page: {
-        id: 0, title: '', useAjax: false,
+        id: 0, type:0, path:'', title: '', useAjax: false,
 
-        update: function (id, title, tabTitle) {
+        update: function (id, type, path, title, tabTitle) {
             S.page.id = id;
+            S.page.type = type;
+            S.page.path = path;
             S.page.title = title;
             window.document.title = tabTitle;
         }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace Websilk
 {
@@ -49,6 +50,8 @@ namespace Websilk
         public int pageType = 0; //0 = default, 1 = service, 2 = shadow, 3 = clone
         public int pageParentId = 0;
         public string pageTitle = "";
+        public string pagePathName = "";
+        public string pagePathIds = "";
         public string PageTitleForBrowserTab = "";
         public string parentTitle = "";
         public string pageService = ""; //if pageType = 1, the name of the C# StaticPage class to execute (Websilk.Pages.???)
@@ -116,15 +119,54 @@ namespace Websilk
             //try to get page info based on domain name
             if (!string.IsNullOrEmpty(url.path))
             {
-                if (string.IsNullOrEmpty(subDomain))
+                //get page info from website domain name & page title
+                while (title != "")
                 {
-                    //get page info from website domain name & page title
-                    reader = sql.GetPageInfoFromDomainAndTitle(domain, title);
-                }
-                else
-                {
-                    //get page info from website domain & sub domain & page title
-                    reader = sql.GetPageInfoFromSubDomainAndTitle(domain, subDomain, title);
+                    if (string.IsNullOrEmpty(subDomain))
+                    {
+                        //domain name & page title
+                        var cacheName = "pageinfo_" + url.host + "_" + title;
+                        if (S.Server.Cache.ContainsKey(cacheName))
+                        {
+                            reader = (SqlReader)S.Server.Cache[cacheName];
+                        }
+                        else {
+                            reader = sql.GetPageInfoFromDomainAndTitle(domain, title);
+                            S.Server.Cache.Add(cacheName, reader);
+                        }
+                        if(reader.Rows.Count > 0)
+                        {
+                            loadPageInfo(reader);
+                        }
+                    }
+                    else
+                    {
+                        //domain & sub domain & page title
+                        var cacheName = "pageinfo_" + url.host + "_" + title;
+                        if (S.Server.Cache.ContainsKey(cacheName))
+                        {
+                            reader = (SqlReader)S.Server.Cache[cacheName];
+                            S.Server.Cache.Add(cacheName, reader);
+                        }
+                        else
+                        {
+                            reader = sql.GetPageInfoFromSubDomainAndTitle(domain, subDomain, title);
+                        }
+                        if (reader.Rows.Count > 0)
+                        {
+                            loadPageInfo(reader);
+                        }
+                    }
+                    if (reader.Rows.Count == 0)
+                    {
+                        if (title.IndexOf("/") > 0)
+                        {
+                            //try to get parent page
+                            title = String.Join("/", title.Split('/').Reverse().Skip(1).Reverse().ToArray());
+                        }
+                        else { break; }
+                    }
+                    else { break; }
                 }
             }
             else
@@ -139,10 +181,10 @@ namespace Websilk
                     //get page info from website sub domain home page
                     reader =  sql.GetPageInfoFromSubDomain(domain, subDomain);
                 }
-            }
-            if (!S.Util.IsEmpty(reader))
-            {
-                loadPageInfo(reader);
+                if (reader.Rows.Count > 0)
+                {
+                    loadPageInfo(reader);
+                }
             }
         }
 
@@ -164,6 +206,8 @@ namespace Websilk
                 ownerId = reader.GetInt("ownerId");
                 pageId = reader.GetInt("pageId");
                 pageTitle = reader.Get("title");
+                pagePathName = reader.Get("path").ToLower();
+                pagePathIds = reader.Get("pathIds");
                 pageDescription = S.Sql.Decode(reader.Get("description"));
                 pageCreated = reader.GetDateTime("datecreated");
                 pageSecurity = reader.GetInt("security");
@@ -270,10 +314,15 @@ namespace Websilk
             return page;
         }
 
-        private string loadStaticPage(string pageName)
+        public StaticPage getStaticPage(string pageName)
         {
             Type type = Type.GetType("Websilk.Pages." + pageName);
-            StaticPage staticPage = (StaticPage)Activator.CreateInstance(type, new object[] { S, this });
+            return (StaticPage)Activator.CreateInstance(type, new object[] { S, this });
+        }
+
+        private string loadStaticPage(string pageName)
+        {
+            StaticPage staticPage = getStaticPage(pageName);
             staticPage.Load();
             return staticPage.Render();
         }
@@ -575,6 +624,8 @@ namespace Websilk
         /// Executed when the page is being loaded
         /// </summary>
         public virtual void Load() { }
+
+        public virtual Services.Inject LoadSubPage(string path) { return new Services.Inject(); }
 
         public string Render()
         {

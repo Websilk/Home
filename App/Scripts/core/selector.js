@@ -9,7 +9,8 @@
     function select(sel) {
         //main function
         var self = this;
-        if (sel) { this.elements = query(document, sel); } else { this.elements = [];}
+        if (sel) { this.elements = query(document, sel); } else { this.elements = []; }
+        this.length = this.elements.length;
         return this;
     }
 
@@ -258,8 +259,8 @@
         if (isArray(obj, this.after) || obj == null) { return this; }
 
         insertContent(obj, this.elements,
-            function (e) { e.insertAdjacentHTML('afterend', content); },
-            function (e) { e.parentNode.insertBefore(content, e.nextSibling); }
+            function (e) { e.insertAdjacentHTML('afterend', obj); },
+            function (e) { e.parentNode.insertBefore(obj, e.nextSibling); }
         );
         return this;
     }
@@ -275,9 +276,10 @@
         var obj = getObj(content);
         if (isArray(obj, this.append) || obj == null) { return this; }
 
+
         insertContent(obj, this.elements,
-            function (e) { e.insertAdjacentHTML('beforeend', content); },
-            function (e) { e.insertAfter(content); }
+            function (e) { e.insertAdjacentHTML('beforeend', obj); },
+            function (e) { e.insertAfter(obj); }
         );
         return this;
     }
@@ -330,8 +332,8 @@
         if(isArray(obj, this.before) || obj == null){return this;}
 
         insertContent(obj, this.elements,
-            function (e) { e.insertAdjacentHTML('beforebegin', content); },
-            function (e) { e.parentNode.insertBefore(content, e); }
+            function (e) { e.insertAdjacentHTML('beforebegin', obj); },
+            function (e) { e.parentNode.insertBefore(obj, e); }
         );
         return this;
     }
@@ -603,13 +605,14 @@
         //Get or set HTML contents of elements in the collection. 
         //When no content given, returns innerHTML of the first element. 
         //When content is given, use it to replace contents of each element. 
-        if (content == null) {
+        var obj = getObj(content);
+        if (obj == null) {
             if (this.elements.length > 0) {
                 return this.elements[0].innerHTML;
             }
         } else {
             this.elements.forEach(function (e) {
-                e.innerHTML = content;
+                e.innerHTML = obj;
             });
         }
         return this;
@@ -688,10 +691,6 @@
             clone.elements = [this.elements[this.elements.length - 1]];
         }
         return clone;
-    }
-
-    select.prototype.length = function () {
-        return this.elements.length;
     }
 
     select.prototype.map = function (func) { //func(index, element)        
@@ -1041,7 +1040,7 @@
     select.prototype.remove = function (selector) {
         //Remove the set of matched elements from the DOM
         this.elements.forEach(function (e) {
-            e.parentNode.remove(e);
+            e.parentNode.removeChild(e);
         });
         this.elements = [];
         return this;

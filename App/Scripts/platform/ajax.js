@@ -37,6 +37,9 @@
                 if (data.d.element != '') {
                     var elem = $(data.d.element);
                     if (elem.length > 0 && data.d.html != '') {
+                        if (data.d.remove != '') {
+                            $(data.d.remove).remove();
+                        }
                         switch (data.d.inject) {
                             case 0: //replace
                                 elem.html(data.d.html);

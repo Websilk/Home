@@ -4,6 +4,9 @@ A powerful web development platform built with ASP.net Core
 ### The App/Core Folder
 This folder is reserved for all the core features Websilk requires to maintain a user's session, cache objects on the server, access an SQL database, and render the various components & applications on a web page.
 
+#### App.cs
+A `Websilk.Service` class used to execute Web API calls from a web page, such as `api/App/Url`.
+
 #### Component.cs
 This is the base class used for all content on a web page, such as text, photos, panels, lists, videos, and menus.
 

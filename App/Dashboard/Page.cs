@@ -73,7 +73,15 @@ namespace Websilk.Pages
             S.javascriptFiles.Add("dashboard", "/js/dashboard/page.js");
 
             //finally, add content of dashboard section
-
+            var inject = new Inject();
+            if (page.Url.path != "dashboard")
+            {
+                inject = LoadSubPage(page.Url.path.Replace("dashboard/", ""));
+            }else
+            {
+                inject = LoadSubPage("pages");
+            }
+            scaffold.Data["body"] = inject.html;
         }
 
         public override Inject LoadSubPage(string path)
@@ -83,20 +91,49 @@ namespace Websilk.Pages
             var inject = new Inject();
             var paths = path.Split(new string[] { "/" }, StringSplitOptions.RemoveEmptyEntries);
             var section = "";
-            switch (path){
+            switch (paths[0]){
+                case "analytics":
+                    service = new DashboardPages.Analytics(S, page);
+                    inject = service.LoadSubPage(string.Join("/", paths.Skip(1).ToArray()));
+                    section = "analytics";
+                    break;
+                case "downloads":
+                    service = new DashboardPages.Downloads(S, page);
+                    inject = service.LoadSubPage(string.Join("/", paths.Skip(1).ToArray()));
+                    section = "downloads";
+                    break;
                 case "pages":
                     service = new DashboardPages.Pages(S, page);
                     inject = service.LoadSubPage(string.Join("/", paths.Skip(1).ToArray()));
                     section = "pages";
                     break;
+                case "photos":
+                    service = new DashboardPages.Photos(S, page);
+                    inject = service.LoadSubPage(string.Join("/", paths.Skip(1).ToArray()));
+                    section = "photos";
+                    break;
+                case "settings":
+                    service = new DashboardPages.Settings(S, page);
+                    inject = service.LoadSubPage(string.Join("/", paths.Skip(1).ToArray()));
+                    section = "settings";
+                    break;
+                case "timeline":
+                    service = new DashboardPages.Timeline(S, page);
+                    inject = service.LoadSubPage(string.Join("/", paths.Skip(1).ToArray()));
+                    section = "timeline";
+                    break;
+                case "users":
+                    service = new DashboardPages.Users(S, page);
+                    inject = service.LoadSubPage(string.Join("/", paths.Skip(1).ToArray()));
+                    section = "users";
+                    break;
             }
+
             S.javascript.Add("dash-subpage", "S.dashboard.sections.show('" + section + "');");
             inject.element = ".dash-body";
             inject.remove = ".dash-body > .section-" + section;
             inject.html = "<div class=\"dash-section section-" + section + "\">" + inject.html + "</div>";
-
             inject.inject = enumInjectTypes.append;
-            inject.js = S.javascript.renderJavascript(false);
             return inject;
         }
 

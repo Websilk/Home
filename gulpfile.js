@@ -227,8 +227,13 @@ gulp.task('watch', function () {
         paths.scripts + 'editor/*.js'
     ], ['js:editor']);
 
-    //watch components JS
-    gulp.watch([paths.components + '**/*.js'], ['js:components']);
+    //watch apps JS
+    var pathjs = paths.working.exclude.app;
+    for (var x = 0; x < pathjs.length; x++) {
+        pathjs[x] += '*.js';
+    }
+    pathjs.unshift(paths.working.js.app);
+    gulp.watch(pathjs, ['js:app']);
 
     //watch platform LESS
     gulp.watch([

@@ -2,6 +2,7 @@
     nopush: false, last: '',
 
     load: function (url) {
+        //loads the url either by an AJAX call or by redirecting the user (if History API isn't supported)
         if (!history) {
             //browser doesn't support history API
             location.href = url;
@@ -10,7 +11,10 @@
         //post page request via Ajax
         if (S.page.type == 1 && url.indexOf(S.page.path) == 0 && S.page.path != '') {
             //load subpage content for static page
-            S.ajax.post('App/StaticUrl', { url: url }, S.ajax.callback.inject);
+            S.ajax.post('App/StaticUrl', { url: url }, function (d) {
+                S.ajax.callback.inject(d);
+                S.events.url.callback.execute();
+            });
         } else {
             S.ajax.post('App/Url', { url: url }, S.ajax.callback.pageRequest);
         }
@@ -24,6 +28,7 @@
     },
 
     push: function (title, url) {
+        //push a url into the browser's history (without redirecting the user)
         if (!history) {
             //browser doesn't support history API
             return;
@@ -35,6 +40,7 @@
         }
         history.pushState(url, title, '/' + url);
         S.url.last = url;
+        S.events.url.callback.execute();
     },
 
     fromAnchor: function (e) {

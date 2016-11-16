@@ -317,6 +317,7 @@
             if (typeof e.state == 'string') {
                 S.url.load(e.state, 1);
             }
+            S.events.url.callback.execute();
         },
 
         //register & execute callbacks when the url changes

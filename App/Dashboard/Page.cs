@@ -80,6 +80,7 @@ namespace Websilk.Pages
             }else
             {
                 inject = LoadSubPage("pages");
+                S.javascript.Add("url", "S.url.push(S.page.title, 'dashboard/pages');");
             }
             scaffold.Data["body"] = inject.html;
         }

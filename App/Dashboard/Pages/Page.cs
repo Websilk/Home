@@ -24,7 +24,11 @@ namespace Websilk.Pages.DashboardPages
             }else
             {
                 //load pages list
+                var servePage = new Services.Dashboard.Pages(S);
+                servePage.page = page;
                 scaffold = new Scaffold(S, "/App/Dashboard/Pages/pages.html");
+                scaffold.Data["page-list"] = servePage.View(0, 1, 1000, 4, 0, "").html;
+                S.javascriptFiles.Add("dash-pages", "/js/dashboard/pages/pages.js");
             }
             
             inject.html = scaffold.Render();

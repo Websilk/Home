@@ -48,6 +48,25 @@ namespace Websilk.SqlQueries
             return new SqlReader(S, "EXEC GetPageInfoFromSubDomainAndTitle @domain=$domain, @subdomain=$subdomain, @title=$title", parameters);
         }
 
+        public SqlReader GetPageTitle(int pageId)
+        {
+            var parameters = new List<SqlParameter>();
+            parameters.Add(new SqlParameter("$pageId", pageId.ToString(), 0, enumSqlParameterType.isNumber));
+            return new SqlReader(S, "EXEC GetPageTitle @pageId=$pageId", parameters);
+        }
+
+        public SqlReader GetPagesForWebsite(int websiteId, int parentId = 0, int start = 1, int length = 100, int orderby = 4, string search = "")
+        {
+            var parameters = new List<SqlParameter>();
+            parameters.Add(new SqlParameter("$websiteId", websiteId.ToString(), 0, enumSqlParameterType.isNumber));
+            parameters.Add(new SqlParameter("$parentId", parentId.ToString(), 0, enumSqlParameterType.isNumber));
+            parameters.Add(new SqlParameter("$start", start.ToString(), 0, enumSqlParameterType.isNumber));
+            parameters.Add(new SqlParameter("$length", length.ToString(), 0, enumSqlParameterType.isNumber));
+            parameters.Add(new SqlParameter("$orderby", orderby.ToString(), 0, enumSqlParameterType.isNumber));
+            parameters.Add(new SqlParameter("$search", search, 50));
+            return new SqlReader(S, "EXEC GetPagesForWebsite @websiteId=$websiteId, @parentId=$parentId, @start=$start, @length=$length, @orderby=$orderby, @search=$search", parameters);
+        }
+
         public SqlReader GetWebsiteDomains(int websiteId)
         {
             var parameters = new List<SqlParameter>();

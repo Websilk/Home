@@ -7,6 +7,7 @@ S.init = function (ajax, pageid, pagetype, pagepath, title, tabTitle, websiteId,
     S.website.id = websiteId;
     S.website.title = websiteTitle;
     S.viewport.getLevel();
+    S.events.url.callback.execute();
 }
 
 // Window Events ////////////////////////////////////////////////////////////////////////////////////

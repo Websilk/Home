@@ -213,7 +213,14 @@
         return this;
     }
 
-    //functions that are accessable by return object ////////
+    function clone(elems) {
+        var s = new select();
+        s.elements = elems;
+        s.length = elems.length;
+        return s;
+    }
+
+    //prototype functions that are accessable by return object //////////////////////////////////////////////////////////////////////////////////////
     select.prototype.add = function (elems) {
         //Add new (unique) elements to the existing elements array
         elems.forEach(function (e) {
@@ -227,7 +234,7 @@
     }
 
     select.prototype.addClass = function(classes) {
-        //Add class name to each of the elements in the collection. 
+        //Add class name to each of the elements in the elemsion. 
         //Multiple class names can be given in a space-separated string.
         if (this.elements.length > 0) {
             var classList = classes.split(' ');
@@ -253,7 +260,7 @@
     }
 
     select.prototype.after = function(content) {
-        //Add content to the DOM after each elements in the collection. 
+        //Add content to the DOM after each elements in the elemsion. 
         //The content can be an HTML string, a DOM node or an array of nodes.
         var obj = getObj(content);
         if (isArray(obj, this.after) || obj == null) { return this; }
@@ -271,7 +278,7 @@
     }
 
     select.prototype.append = function (content) {
-        //Append content to the DOM inside each individual element in the collection. 
+        //Append content to the DOM inside each individual element in the elemsion. 
         //The content can be an HTML string, a DOM node or an array of nodes.
         var obj = getObj(content);
         if (isArray(obj, this.append) || obj == null) { return this; }
@@ -285,16 +292,16 @@
     }
 
     select.prototype.appendTo = function(target) {
-        //Append elements from the current collection to the target element. 
+        //Append elements from the current elemsion to the target element. 
         //This is like append, but with reversed operands.
         return this;
     }
 
     select.prototype.attr = function(name, val) {
         //Read or set DOM attributes. When no value is given, reads 
-        //specified attribute from the first element in the collection. 
+        //specified attribute from the first element in the elemsion. 
         //When value is given, sets the attribute to that value on each element 
-        //in the collection. When value is null, the attribute is removed  = function(like with removeAttr). 
+        //in the elemsion. When value is null, the attribute is removed  = function(like with removeAttr). 
         //Multiple attributes can be set by passing an object with name-value pairs.
         var n = getObj(name);
         var v = getObj(val);
@@ -326,7 +333,7 @@
     }
 
     select.prototype.before = function(content) {
-        //Add content to the DOM before each element in the collection. 
+        //Add content to the DOM before each element in the elemsion. 
         //The content can be an HTML string, a DOM node or an array of nodes.
         var obj = getObj(content);
         if(isArray(obj, this.before) || obj == null){return this;}
@@ -339,7 +346,7 @@
     }
 
     select.prototype.children = function(selector) {
-        //Get immediate children of each element in the current collection. 
+        //Get immediate children of each element in the current elemsion. 
         //If selector is given, filter the results to only include ones matching the CSS select.
         var elems = [];
         this.elements.forEach(function (e) {
@@ -347,9 +354,7 @@
                 elems.push(child);
             }
         });
-        var clone = new select();
-        clone.elements = elems;
-        return clone;
+        return clone(elems);
     }
 
     select.prototype.closest = function(selector) {
@@ -359,8 +364,8 @@
 
     select.prototype.css = function(params) {
         //Read or set CSS properties on DOM elements. When no value is given, 
-        //returns the CSS property from the first element in the collection. 
-        //When a value is given, sets the property to that value on each element of the collection.
+        //returns the CSS property from the first element in the elemsion. 
+        //When a value is given, sets the property to that value on each element of the elemsion.
 
         //Multiple properties can be retrieved at once by passing an array of property names. 
         //Multiple properties can be set by passing an object to the method.
@@ -425,7 +430,7 @@
     }
 
     select.prototype.each = function(func) {
-        //Iterate through every element of the collection. Inside the iterator function, 
+        //Iterate through every element of the elemsion. Inside the iterator function, 
         //this keyword refers to the current item  = function(also passed as the second argument to the function). 
         //If the iterator select.prototype.returns false, iteration stops.
         this.elements.forEach(func);
@@ -433,7 +438,7 @@
     }
 
     select.prototype.empty = function(func) {
-        //Clear DOM contents of each element in the collection.
+        //Clear DOM contents of each element in the elemsion.
         this.elements.forEach(function (e) {
             e.innerHTML = '';
         });
@@ -442,31 +447,31 @@
 
     select.prototype.eq = function (index) {
         //Reduce the set of matched elements to the one at the specified index
-        var clone = new select();
+        var elems = [];
         if (eq > this.elements.length - 1) {
             //out of bounds
-            clone.elements = [];
+            elems = [];
         } else if (eq < 0) {
             //negetive index
             if (eq * -1 >= this.elements.length) {
-                clone.elements = [];
+                elems = [];
             } else {
-                clone.elements = [this.elements[(this.elements.length - 1) + eq]];
+                elems = [this.elements[(this.elements.length - 1) + eq]];
             }
         } else {
-            clone.elements = [this.elements[index]];
+            elems = [this.elements[index]];
         }
-        return clone;
+        return clone(elems);
     }
 
     select.prototype.filter = function(selector) {
-        //Filter the collection to contain only items that match the CSS select. 
+        //Filter the elemsion to contain only items that match the CSS select. 
         //If a select.prototype.is given, return only elements for which the select.prototype.returns a truthy value. 
-        var collect = [];
+        var elems = [];
         if (typeof selector == 'function') {
             //filter a boolean function
             this.elements.forEach(function (e) {
-                if (selector.call(e, e) == true) { collect.push(e);}
+                if (selector.call(e, e) == true) { elems.push(e);}
             });
         } else {
             //filter selector string
@@ -475,69 +480,63 @@
                 this.elements.forEach(function (e) {
                     if (found.indexOf(e) >= 0) {
                         //make sure no duplicates are being added to the array
-                        if (collect.indexOf(e) < 0) { collect.push(e); }
+                        if (elems.indexOf(e) < 0) { elems.push(e); }
                     }
                 });
             }
         }
-        var clone = new select();
-        clone.elements = collect;
-        return clone;
+        return clone(elems);
     }
 
     select.prototype.find = function(selector) {
-        //Find elements that match CSS selector executed in scope of nodes in the current collection.
-        var clone = new select();
+        //Find elements that match CSS selector executed in scope of nodes in the current elemsion.
+        var elems = [];
         if (this.elements.length > 0) {
-            var collect = [];
             this.elements.forEach(function (e) {
                 var found = query(e, selector);
                 if (found.length > 0) {
                     found.forEach(function (a) {
                         //make sure no duplicates are being added to the array
-                        if (collect.indexOf(a) < 0) { collect.push(a); }
+                        if (elems.indexOf(a) < 0) { elems.push(a); }
                     });
                 }
             });
-            clone.elements = collect;
         }
-        return clone;
+        return clone(elems);
     }
 
     select.prototype.first = function () {
         //the first element found in the selector
-        var clone = new select();
+        var elems = [];
         if (this.elements.length > 0) {
-            clone.elements = [this.elements[0]];
+            elems = [this.elements[0]];
         }
-        return clone;
+        return clone(elems);
     }
 
     select.prototype.get = function(index) {
-        //Get all elements or a single element from the current collection. 
+        //Get all elements or a single element from the current elemsion. 
         //When no index is given, returns all elements in an ordinary array. 
         //When index is specified, return only the element at that position. 
         return this.elements[index];
     }
 
     select.prototype.has = function(selector) {
-        //Filter the current collection to include only elements that have 
+        //Filter the current elemsion to include only elements that have 
         //any number of descendants that match a selector, or that contain a specific DOM node.
-        var clone = new select();
+        var elems = [];
         if (this.elements.length > 0) {
-            var collect = [];
             this.elements.forEach(function (e) {
                 if (query(e, slector).length > 0) {
-                    if (collect.indexOf(e) < 0) { collect.push(e);}
+                    if (elems.indexOf(e) < 0) { elems.push(e);}
                 }
             });
-            clone.elements = collect;
         }
-        return clone;
+        return clone(elems);
     }
 
     select.prototype.hasClass = function(classes) {
-        //Check if any elements in the collection have the specified class.
+        //Check if any elements in the elemsion have the specified class.
         var classList;
         if(Array.isArray(classes)){
             classList = classes;
@@ -556,8 +555,8 @@
     }
 
     select.prototype.height = function(val) {
-        //Get the height of the first element in the collection; 
-        //or set the height of all elements in the collection.
+        //Get the height of the first element in the elemsion; 
+        //or set the height of all elements in the elemsion.
         //this function differs from jQuery as it doesn't care
         //about box-sizing & border when returning the height
         //of an element (when val is not specified). 
@@ -594,7 +593,7 @@
     }
 
     select.prototype.hide = function() {
-        //Hide elements in this collection by setting their display CSS property to none.
+        //Hide elements in this elemsion by setting their display CSS property to none.
         this.elements.forEach(function (e) {
             e.style.display = 'none';
         });
@@ -602,7 +601,7 @@
     }
 
     select.prototype.html = function(content) {
-        //Get or set HTML contents of elements in the collection. 
+        //Get or set HTML contents of elements in the elemsion. 
         //When no content given, returns innerHTML of the first element. 
         //When content is given, use it to replace contents of each element. 
         var obj = getObj(content);
@@ -621,7 +620,7 @@
     select.prototype.index = function() {
         //Get the position of an element. When no element is given, 
         //returns position of the current element among its siblings. 
-        //When an element is given, returns its position in the current collection. 
+        //When an element is given, returns its position in the current elemsion. 
         //Returns -1 if not found.
         var i = -1;
         if (this.elements.length > 0) {
@@ -675,7 +674,7 @@
     }
 
     select.prototype.is = function(selector) {
-        //Check if the first element of the current collection matches the CSS select.
+        //Check if the first element of the current elemsion matches the CSS select.
         if (this.elements.length > 0) {
             var obj = getObj(selector);
             var q = query(document, obj);
@@ -685,16 +684,16 @@
     }
 
     select.prototype.last = function() {
-        //Get the last element of the current collection.
-        var clone = new select();
+        //Get the last element of the current elemsion.
+        var elems = [];
         if (this.elements.length > 0) {
-            clone.elements = [this.elements[this.elements.length - 1]];
+            elems = [this.elements[this.elements.length - 1]];
         }
-        return clone;
+        return clone(elems);
     }
 
     select.prototype.map = function (func) { //func(index, element)        
-        //Iterate through every element of the collection. Inside the iterator function, 
+        //Iterate through every element of the elemsion. Inside the iterator function, 
         //this keyword refers to the current item  = function(also passed as the second argument to the function). 
         //If the iterator select.prototype.returns false, iteration stops.
         for (var x = 0; x < this.elements.length; x++) {
@@ -706,7 +705,7 @@
     }
 
     select.prototype.next = function(selector) {
-        //Get the next sibling–optionally filtered by selector–of each element in the collection.
+        //Get the next sibling–optionally filtered by selector–of each element in the elemsion.
         var elems = [];
         if(selector != null){
             //use selector
@@ -724,14 +723,12 @@
                 if (n != null) { elems.push(n); } else { elems.push(e); }
             });
         }
-        var clone = new select();
-        clone.elements = elems;
-        return clone;
+        return clone(elems);
     }
 
     select.prototype.not = function(selector) {
-        //Filter the current collection to get a new collection of elements that don’t match the CSS select. 
-        //If another collection is given instead of selector, return only elements not present in it. 
+        //Filter the current elemsion to get a new elemsion of elements that don’t match the CSS select. 
+        //If another elemsion is given instead of selector, return only elements not present in it. 
         //If a select.prototype.is given, return only elements for which the select.prototype.returns a falsy value. 
         //Inside the function, the this keyword refers to the current element.
         var sel = getObj(selector);
@@ -746,9 +743,7 @@
             return this;
         }
         var q = query(document, sel);
-        var clone = new select();
-        clone.elements = diffArray(elems, q);
-        return clone;
+        return clone(diffArray(elems, q));
     }
 
     select.prototype.off = function (event, func) {
@@ -763,7 +758,7 @@
         //Returns an object with properties: top, left, width and height.
 
         //When given an object with properties left and top, use those values to 
-        //position each element in the collection relative to the document.
+        //position each element in the elemsion relative to the document.
         return this;
     }
 
@@ -793,44 +788,42 @@
     }
 
     select.prototype.parent = function(selector) {
-        //Get immediate parents of each element in the collection. 
+        //Get immediate parents of each element in the elemsion. 
         //If CSS selector is given, filter results to include only ones matching the select.
-        var clone = new select();
         var elems = [];
         this.elements.forEach(function (e) {
             var el = e.parentNode;
             if (el) { elems.push(el);}
         });
-        clone.elements = elems;
-        return clone;
+        return clone(elems);
     }
 
     select.prototype.parents = function(selector) {
-        //Get all ancestors of each element in the collection. 
+        //Get all ancestors of each element in the elemsion. 
         //If CSS selector is given, filter results to include only ones matching the select.
         return this;
     }
 
     select.prototype.position = function() {
-        //Get the position of the first element in the collection, relative to the offsetParent. 
+        //Get the position of the first element in the elemsion, relative to the offsetParent. 
         //This information is useful when absolutely positioning an element to appear aligned with another.
         return this;
     }
 
     select.prototype.prepend = function(content) {
-        //Prepend content to the DOM inside each element in the collection. 
+        //Prepend content to the DOM inside each element in the elemsion. 
         //The content can be an HTML string, a DOM node or an array of nodes.
         return this;
     }
 
     select.prototype.prependTo = function(target) {
-        //Prepend elements of the current collection inside each of the target elements. 
+        //Prepend elements of the current elemsion inside each of the target elements. 
         //This is like prepend, only with reversed operands.
         return this;
     }
 
     select.prototype.prev = function(selector) {
-        //Get the previous sibling–optionally filtered by selector–of each element in the collection.
+        //Get the previous sibling–optionally filtered by selector–of each element in the elemsion.
         var elems = [];
         if (selector) {
             //use selector
@@ -846,9 +839,7 @@
                 if (e.previousSibling) { elems.push[e.previousSibling]; } else { elems.push[e]; }
             });
         }
-        var clone = new select();
-        clone.elements = elems;
-        return clone;
+        return clone(elems);
     }
 
     select.prototype.prop = function(name, val) {
@@ -1148,16 +1139,12 @@
                 find(e);
             });
         }
-        var clone = new select();
-        clone.elements = elems;
-        return clone;
+        return clone(elems);
     }
 
     select.prototype.slice = function (start, end) {
         //Reduce the set of matched elements to a subset specified by a range of indices
-        var clone = new select();
-        clone.elements = this.elements.slice(start, end);
-        return clone;
+        return clone(elems);
     }
 
     select.prototype.text = function () {

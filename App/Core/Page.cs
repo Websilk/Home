@@ -9,7 +9,7 @@ namespace Websilk
     {
 
         private Core S;
-        private SqlQueries.Page sql;
+        public SqlQueries.Page sql;
         public Elements Elements;
 
         public struct structUrl

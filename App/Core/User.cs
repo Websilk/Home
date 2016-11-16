@@ -147,6 +147,7 @@ namespace Websilk
             if(i >= 0)
             {
                 var website = security[i];
+                if(website.ownerId == userId) { return true; } //website owner
                 if (website.security.ContainsKey(feature))
                 {
                     var data = website.security[feature];

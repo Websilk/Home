@@ -1,10 +1,31 @@
-﻿<div class="section pages-options">
-    <div class="row header">
-        <div class="col title pad-left current-folder">/</div>
-        <div class="col buttons right">
-            <a href="javascript:" class="button" id="btnaddpage">New Page</a>
+﻿<div class="row pad-width-lg">
+    <div class="section pages-options">
+        <div class="row header">
+            <div class="col title pad-left current-folder">/</div>
+            <div class="col buttons right">
+                <a href="javascript:" class="button" id="btnaddpage">New Page</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="section pages-info">
+        <div class="slider">
+            <div class="pages-list">{{page-list}}</div>
         </div>
     </div>
 </div>
 
-<div class="section pages-list">{{page-list}}</div>
+<script id="page_details" type="text/html">
+    <div class="row page-details pad">
+        <div class="row title"><h4>#title#</h4></div>
+        <div class="row faded sub-title">#sub-title#</div>
+        <p class="summary">#summary#</p>
+
+        <div class="buttons pad-top">
+            <div class="row btn-page-view"><a class="button apply" href="javascript:">View Page</a></div>
+            <div class="row btn-page-create"><a class="button" href="javascript:">Create Sub Page</a></div>
+            <div class="row btn-page-settings"><a class="button" href="javascript:">Page Settings</a></div>
+            <div class="row btn-page-delete"><a class="button cancel" href="javascript:">Delete Page</a></div>
+        </div>
+    </div>
+</script>

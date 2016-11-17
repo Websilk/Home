@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace Websilk.Pages.DashboardPages
+﻿namespace Websilk.Pages.DashboardPages
 {
     public class Pages: StaticPage
     {
@@ -29,6 +24,8 @@ namespace Websilk.Pages.DashboardPages
                 scaffold = new Scaffold(S, "/App/Dashboard/Pages/pages.html");
                 scaffold.Data["page-list"] = servePage.View(0, 1, 1000, 4, 0, "").html;
                 S.javascriptFiles.Add("dash-pages", "/js/dashboard/pages/pages.js");
+                S.javascript.Add("dash-pages", "S.dashboard.pages.current_page=0;");
+                S.cssFiles.Add("dash-pages", "/css/dashboard/pages/pages.css");
             }
             
             inject.html = scaffold.Render();

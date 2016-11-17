@@ -8,7 +8,7 @@ CREATE PROCEDURE [dbo].[AddWebsite]
 	@title nvarchar(100) = '',
 	@theme nvarchar(25) = '',
 	@colors nvarchar(25) = '',
-	@description nvarchar(100) = '',
+	@description nvarchar(160) = '',
 	@status int = 1,
 	@icon bit = 0,
 	@security bit = 0,

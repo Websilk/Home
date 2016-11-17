@@ -8,7 +8,7 @@ CREATE PROCEDURE [dbo].[AddWebsitePage]
 	@websiteId int = 0,
 	@parentid int = 0,
 	@title nvarchar(250) = '',
-	@description nvarchar(MAX) = '',
+	@description nvarchar(160) = '',
 	@pagetype int = 0,
 	@service nvarchar(100) = '',
 	@security bit = 0,

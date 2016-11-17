@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System;
+using System.Text;
 
 namespace Websilk.Services.Dashboard
 {
@@ -53,38 +54,30 @@ namespace Websilk.Services.Dashboard
             var secureCreate = S.User.checkSecurity(page.websiteId, "dashboard/pages", 1);
             var secureDelete = S.User.checkSecurity(page.websiteId, "dashboard/pages", 2);
             var secureSettings = S.User.checkSecurity(page.websiteId, "dashboard/pages", 3);
-
-            var row = "";
-            var hasDelete = false;
+            
             var subpageTitle = "";
             var pagePath = "";
             var pageLink = "";
+            var pageSummary = "";
+            var pageCreated = "";
             var subpageId = 0;
-            var options = "";
-            var hasCreate = false;
             var hasChildren = 0;
             var color = "";
+            var options = new bool[] { false, false, false, false };
 
             htm.Append("<ul class=\"columns-list\">");
 
-            if(parentId > 0)
-            {
-                //render parent folder item
-                htm.Append(RenderListItem(row, "empty", parentPageId, parentTitle, "..", "", true, "Go back to the parent folder"));
-            }
-
             while (reader.Read())
             {
-                row = "";
                 color = "empty";
                 subpageTitle = reader.Get("title");
                 pagePath = reader.Get("path");
+                pageSummary = reader.Get("description");
+                pageCreated = DateTime.Parse(reader.Get("datecreated")).ToString("MMMM dd, yyyy");
                 subpageId = reader.GetInt("pageid");
                 hasChildren = reader.GetInt("haschildren");
-                hasDelete = true;
-                hasCreate = true;
-                pageLink = "";
-                options = "";
+                pageLink = "/" + (pagePath).Replace(" ", "-");
+                options = new bool[] { true, true, true, true }; //edit, create, settings, delete
 
                 //disable delete button
                 switch (subpageTitle.ToLower())
@@ -95,7 +88,7 @@ namespace Websilk.Services.Dashboard
                     case "access denied":
                     case "about":
                     case "contact":
-                        hasDelete = false;
+                        options[3] = false;
                         break;
                 }
 
@@ -105,7 +98,7 @@ namespace Websilk.Services.Dashboard
                     case "login":
                     case "error 404":
                     case "access denied":
-                        hasCreate = false;
+                        options[1] = false;
                         break;
                 }
 
@@ -126,51 +119,41 @@ namespace Websilk.Services.Dashboard
                         break;
                 }
 
-                //setup page link
-
-                pageLink = "/" + (pagePath).Replace(" ", "-");
-
                 //setup options
-                if (secureDelete == true & hasDelete == true)
+                if (secureDelete == false)
                 {
-                    //remove link
-                    options += "<div class=\"col icon small right pad-right\"><a href=\"javascript:\" onclick=\"S.editor.pages.remove('" + subpageId + "');return false\" title=\"Permanently delete the page '" + subpageTitle + "' and all of its sub-pages\"><svg viewBox=\"0 0 15 15\"><use xlink:href=\"#icon-close\" x=\"0\" y=\"0\" width=\"36\" height=\"36\" /></svg></a></div>";
+                    //delete
+                    options[3] = false;
                 }
-                if (secureSettings == true)
+                if (secureSettings == false)
                 {
-                    //settings link
-                    options += "<div class=\"col icon small right pad-right\"><a href=\"javascript:\" onclick=\"S.editor.pages.settings.show('" + subpageId + "');return false\" title=\"Page Settings for '" + subpageTitle + "'\"><svg viewBox=\"0 0 36 36\"><use xlink:href=\"#icon-settings\" x=\"0\" y=\"0\" width=\"36\" height=\"36\" /></svg></a></div>";
+                    //settings
+                    options[2] = false;
                 }
-                if (secureCreate == true & hasCreate == true)
+                if (secureCreate == false)
                 {
-                    //add sub-page link
-                    options += "<div class=\"col icon small right pad-right\"><a href=\"javascript:\" onclick=\"S.editor.pages.add.show('" + subpageId + "','" + pagePath + "');return false\" title=\"Create a new Sub-Page for '" + subpageTitle + "'\"><svg viewBox=\"0 0 15 15\"><use xlink:href=\"#icon-add\" x=\"0\" y=\"0\" width=\"15\" height=\"15\" /></svg></a></div>";
+                    //create
+                    options[1] = false;
                 }
-
-                //page link
-                options += "<div class=\"col icon small right pad-right\"><a href=\"" + pageLink + "\" title=\"View Web Page\"><svg viewBox=\"0 0 15 15\"><use xlink:href=\"#icon-openwindow\" x=\"0\" y=\"0\" width=\"15\" height=\"15\" /></svg></a></div>";
-
-                htm.Append("<li>" + RenderListItem(row, color, subpageId, subpageTitle, subpageTitle, options, hasChildren > 0, "View a list of sub-pages for '" + subpageTitle + "'") + "</li>");
+                htm.Append("<li>" + RenderListItem(color, subpageId, subpageTitle, pageLink, pageSummary, pageCreated, options, hasChildren > 0) + "</li>");
             }
 
             htm.Append("</ul>");
             return htm.ToString();
         }
 
-        private string RenderListItem(string columnName, string color, int pageId, string pageTitle, string label, string options, bool onclick = false, string folderTooltip = "")
+        private string RenderListItem(string color, int pageId, string pageTitle, string pageLink, string pageSummary, string createdate, bool[] options, bool isfolder = false)
         {
-            return "<div class=\"row hover" + columnName + " item page-" + pageId + "\">" +
-                        "<div class=\"color-tag " + color + "\"><div class=\"bg dark\">&nbsp;</div></div><div class=\"col color-contents pad-sm clear\">" +
-                            "<div class=\"col" + (onclick == true ? " has-folder\" onclick=\"S.editor.pages.load(" + pageId + ",'" + pageTitle + "','down')\" style=\"cursor:pointer\"" : "\"") + ">" +
-                                "<div class=\"col icon small\">" +
-                                    (onclick == true ?
-                                    "<a href=\"javascript:\" title=\"" + folderTooltip + "\">" +
-                                        "<svg viewBox=\"0 0 15 15\"><use xlink:href=\"#icon-folder\" x=\"0\" y=\"0\" width=\"15\" height=\"15\" /></svg>" +
-                                    "</a>" : " ") +
-                                "</div>" +
-                                "<div class=\"col label\">" + label + "</div>" +
+            return "<div class=\"row hover item\" onclick=\"S.dashboard.pages.details(this)\"" + 
+                    (isfolder == true ? " data-folder=\"true\"" : "") + "\" data-pageid=\"" + pageId + "\" data-title=\"" + pageTitle + "\" data-link=\"" + pageLink + "\" data-summary=\"" + pageSummary.Replace("\"", "&quot;") + "\" data-created=\"" + createdate + "\">" +
+                        "<div class=\"color-tag " + color + "\"><div class=\"bg dark\">&nbsp;</div></div>" + 
+                        "<div class=\"col color-contents pad-sm clear\">" +
+                            "<div class=\"col icon small\">" +
+                                (isfolder == true ?
+                                    "<svg viewBox=\"0 0 15 15\"><use xlink:href=\"#icon-folder\" x=\"0\" y=\"0\" width=\"15\" height=\"15\" /></svg>" 
+                                : "") +
                             "</div>" +
-                            "<div class=\"col hover-only right\">" + options + "</div>" +
+                            "<div class=\"col label\">" + pageTitle + "</div>" +
                         "</div>" +
                     "</div>";
         }

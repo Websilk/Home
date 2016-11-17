@@ -25,7 +25,6 @@
                 scaffold.Data["page-list"] = servePage.View(0, 1, 1000, 4, 0, "").html;
                 S.javascriptFiles.Add("dash-pages", "/js/dashboard/pages/pages.js");
                 S.javascript.Add("dash-pages", "S.dashboard.pages.current_page=0;");
-                S.cssFiles.Add("dash-pages", "/css/dashboard/pages/pages.css");
             }
             
             inject.html = scaffold.Render();

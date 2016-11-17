@@ -1,5 +1,10 @@
 ﻿S.dashboard.pages = {
-    container: null, current_page:0,
+    current_page: 0,
+
+    goback: function(count){
+        S.dashboard.pages.current_page += count * -1;
+        $('.pages-info > .slider').get(0).style.left = (S.dashboard.pages.current_page * 100 * -1) + "%";
+    },
 
     details: function (e) {
         //show page details after clicking on a page in the page list
@@ -16,20 +21,39 @@
         details = details.replace(/\#link\#/g, link);
         details = details.replace(/\#pageid\#/g, pageid);
         details = details.replace(/\#summary\#/g, summary);
+
+        //remove all siblings to the right 
+        var slide = $(e).parents('.page-details').get(0);
+        var found = false;
+        console.log(slide);
+        $('.pages-info > .slider > div').each(function (e) {
+            console.log(e);
+            if (found == true) { $(e).remove(); return;}
+            if (e == slide) { found = true; console.log('found');}
+        });
+
         $('.pages-info > .slider').append(details);
+
+        //load sub pages list
+        if (isfolder == true) {
+            var list = $('.pages-info > .slider .pages-list').last();
+            S.ajax.post("/Dashboard/Pages/View", { parentId: pageid, start: 1, length: 1000, orderby: 4, viewType: 0, search: '' },
+                function (d) {
+                    console.log(d);
+                }
+            );
+        }
+
         S.dashboard.pages.current_page++;
         $('.pages-info > .slider').get(0).style.left = (S.dashboard.pages.current_page * 100 * -1) + "%";
 
     },
 
     resize: function () {
-        var el;
-        if (S.dashboard.pages.container == null) {
-            el = $('.pages-list ul.columns-list').get(0);
-            S.dashboard.pages.container = el;
-        } else { el = S.dashboard.pages.container; }
-        var y = S.elem.top(el);
-        el.style.maxHeight = (window.innerHeight - y - 40) + 'px';
+        $('.pages-info .pages-list ul.columns-list').each(function (e) {
+            var y = S.elem.top(e);
+            e.style.maxHeight = (window.innerHeight - y - 40) + 'px';
+        });
     }
 }
 

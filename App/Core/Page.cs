@@ -460,8 +460,8 @@ namespace Websilk
             scaffold.Data["css-files"] = S.cssFiles.renderCssFiles();
 
             //setup inline javascript
-            scaffold.Data["scripts"] = S.javascriptFiles.renderJavascriptFiles() + "\n" +
-                                       S.javascript.renderJavascript();
+            scaffold.Data["scripts"] = S.javascriptFiles.renderJavascriptFiles(true, S.javascript.renderJavascript());
+                                       ;
             //finally, render web page
             return scaffold.Render();
         }

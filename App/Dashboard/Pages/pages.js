@@ -1,8 +1,22 @@
 ﻿S.dashboard.pages = {
     current_page: 0,
 
+    cleanSlideshow: function(e){
+        var slide = $(e).parents('.page-details').get(0);
+        var found = false;
+        $('.pages-info > .slider > div').each(function (e) {
+            if (found == true) { $(e).remove(); return; }
+            if (e == slide) { found = true; }
+        });
+    },
+
     goback: function(count){
         S.dashboard.pages.current_page += count * -1;
+        $('.pages-info > .slider').get(0).style.left = (S.dashboard.pages.current_page * 100 * -1) + "%";
+    },
+
+    gonext: function(){
+        S.dashboard.pages.current_page++;
         $('.pages-info > .slider').get(0).style.left = (S.dashboard.pages.current_page * 100 * -1) + "%";
     },
 
@@ -21,17 +35,12 @@
         details = details.replace(/\#link\#/g, link);
         details = details.replace(/\#pageid\#/g, pageid);
         details = details.replace(/\#summary\#/g, summary);
+        details = details.replace(/\#link\-create\#/g, 'S.dashboard.pages.create(this, ' + pageid + ')');
 
         //remove all siblings to the right 
-        var slide = $(e).parents('.page-details').get(0);
-        var found = false;
-        console.log(slide);
-        $('.pages-info > .slider > div').each(function (e) {
-            console.log(e);
-            if (found == true) { $(e).remove(); return;}
-            if (e == slide) { found = true; console.log('found');}
-        });
+        S.dashboard.pages.cleanSlideshow(e);
 
+        //add new slide to slideshow
         $('.pages-info > .slider').append(details);
 
         //load sub pages list
@@ -43,9 +52,19 @@
                 }
             );
         }
+        S.dashboard.pages.gonext();
+    },
 
-        S.dashboard.pages.current_page++;
-        $('.pages-info > .slider').get(0).style.left = (S.dashboard.pages.current_page * 100 * -1) + "%";
+    create: function(e, pageid){
+        var details = document.getElementById('page_create').innerHTML;
+        //details = details.replace(/\#title\#/g, title);
+
+        //remove all siblings to the right 
+        S.dashboard.pages.cleanSlideshow(e);
+
+        //add new slide to slideshow
+        $('.pages-info > .slider').append(details);
+        S.dashboard.pages.gonext();
 
     },
 

@@ -1,4 +1,11 @@
-﻿<div class="row pad-width-lg">
+﻿<style type="text/css">
+    .pages-list{width:100%;}
+    .pages-info .sub-title{white-space:normal;}
+    .pages-info .btn-goback{width:50px;}
+    .pages-info .page-title{width:calc(100% - 50px);}
+</style>
+
+<div class="row pad-width-lg">
     <div class="section pages-options">
         <div class="row header">
             <div class="col title pad-left current-folder">/</div>
@@ -9,44 +16,70 @@
     </div>
 
     <div class="section pages-info slideshow">
-        <div class="slider">
-            <div class="row pad page-details">
-                <div class="pages-list">{{page-list}}</div>
+        <div class="slides">
+            <div class="row page-details">
+                <div class="pages-list pad">{{page-list}}</div>
             </div>
         </div>
     </div>
 </div>
 
 <script id="page_details" type="text/html">
-    <div class="row pad page-details">
-        <div class="col five page-details">
-            <div class="row title">
-                <div class="col"><a href="javascript:" onclick="S.dashboard.pages.goback(1)" class="button circle"></a></div>
-                <h4>#title#</h4>
+    <div class="row page-details">
+        <div class="col pad five box-dark">
+            <div class="row title pad-height-sm">
+                <div class="col btn-goback pad-right">
+                    <a href="javascript:" onclick="S.dashboard.pages.goback(1)" class="button circle dots">
+                        <div class="medium">...</div>
+                    </a>
+                </div>
+                <div class="col page-title">
+                    <h4>#title#</h4>
+                    <span class="faded sub-title pad-top">#sub-title#</span>
+                </div>
             </div>
-            <div class="row faded sub-title">#sub-title#</div>
-            <p class="summary">#summary#</p>
+            
+            <div class="row pad-height"><div class="col pad-width-sm"><a href="#url#" class="button special" target="_blank">#url-name#</a></div></div>
+            <p class="summary pad-width">#summary#</p>
 
-            <div class="buttons pad-top">
-                <div class="row btn-page-view"><a class="button apply" href="javascript:">View Page</a></div>
-                <div class="row btn-page-create"><a class="button" href="javascript:" onclick="#link-create#">Create Sub Page</a></div>
-                <div class="row btn-page-settings"><a class="button" href="javascript:">Page Settings</a></div>
-                <div class="row btn-page-delete"><a class="button cancel" href="javascript:">Delete Page</a></div>
+            <div class="absolute bottom buttons pad-bottom pad-left">
+                <div class="col btn-page-create pad-right">
+                    <a class="button circle" href="javascript:" onclick="#link-create#">
+                        <svg viewBox="0 0 25 25" class="medium">
+                            <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#icon-plus" x="0" y="0" width="25" height="25"></use>
+                        </svg>
+                    </a>
+                </div>
+                <div class="col btn-page-settings pad-right"><a class="button" href="javascript:">Settings</a></div>
+                <div class="col btn-page-delete pad-right"><a class="button cancel" href="javascript:">Delete</a></div>
             </div>
         </div>
-        <div class="col seven pages-list">&nbsp;</div>
+        <div class="col seven slideshow">
+            <div class="slides">
+                <div class="row pages-list">&nbsp;</div>
+                <div class="row page-create box-dark"></div>
+            </div>
+        </div>
     </div>
 </script>
 
 <script id="page_create" type="text/html">
-    <div class="row pad page-create">
-        <div class="row">
+    <div class="row pad">
+        <div class="row page-title">
+            <h4>Create Sub Page</h4>
+            <span class="faded sub-title pad-top">For #parent-title#</span>
+        </div>
+        <div class="row hover">
             <div class="col field-label">Title</div>
-            <div class="col field-input">{{field-create-title}}</div>
+            <div class="col field-input expand">{{field-create-title}}</div>
         </div>
-        <div class="row">
+        <div class="row hover">
             <div class="col field-label">Summary</div>
-            <div class="col field-input">{{field-create-summary}}</div>
+            <div class="col field-input expand">{{field-create-summary}}</div>
         </div>
+    </div>
+    <div class="absolute bottom buttons pad-bottom pad-left">
+        <div class="col btn-page-settings pad-right"><a class="button" href="javascript:" onclick="S.dashboard.pages.subpage.create.submit(this)">Create New Sub-Page</a></div>
+        <div class="col btn-page-delete pad-right"><a class="button cancel" href="javascript:" onclick="S.dashboard.pages.subpage.create.cancel(this)">Cancel</a></div>
     </div>
 </script>

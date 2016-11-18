@@ -30,8 +30,10 @@
                 } else if (s.indexOf('.') == 0 && s.indexOf(' ') < 0 && s.indexOf(':') < 0) {
                 }else{optimize = false; break;}
             }
+            console.log('optimize? ' + optimize);
             if (optimize == true) {
                 //query is optimized, so don't use getQuerySelectorAll
+                console.log(sels);
                 sels.forEach(function (s) {
                     if (s.indexOf('#') == 0) {
                         if (s.indexOf(' ') < 0 && elem == document && s.indexOf(':') < 0) {
@@ -54,9 +56,10 @@
                                 }
                             }
                         }
-                    } else if (s.indexOf('.') == 0 && s.indexOf(' ') < 0 && s.indexOf(':') < 0) {
+                    } else if (s.split('.').length == 2 && s.indexOf(' ') < 0 && s.indexOf(':') < 0) {
+                        console.log('byClassName');
                         //get elements by class name(s)
-                        el = elem.getElementsByClassName(s.replace(/\./g, ' ').trim());
+                        el = elem.getElementsByClassName(s.replace('.', ''));
                         if (el) {
                             if (el.length > 0) {
                                 for(var e of el) {
@@ -494,6 +497,7 @@
         if (this.elements.length > 0) {
             this.elements.forEach(function (e) {
                 var found = query(e, selector);
+                console.log(found);
                 if (found.length > 0) {
                     found.forEach(function (a) {
                         //make sure no duplicates are being added to the array
@@ -1190,7 +1194,6 @@
 
     select.prototype.toggleClass = function (className) {
         //Add or remove one or more classes from each element in the set of matched elements, depending on either the class’s presence or the value of the state argument
-        return this;
         var obj = getObj(className);
         if (typeof obj == 'string') {
             obj = obj.split(' ');
@@ -1206,7 +1209,7 @@
                         b = c.indexOf(a);
                         if (b >= 0) {
                             //remove class
-                            c = c.splice(b, b + 1);
+                            c.splice(b, 1);
                         } else {
                             //add class
                             c.push(a);
@@ -1214,6 +1217,8 @@
                     });
                     //update element className attr
                     e.className = c.join(' ');
+                } else {
+                    e.className = className;
                 }
             });
         }

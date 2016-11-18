@@ -1,10 +1,8 @@
 ﻿S.menu = {
     click: function (e) {
-        var sub = this.querySelector('ul.menu');
+        var sub = this.parentNode.parentNode.querySelector('ul.menu');
         if (sub) {
-            if (sub.length > 0) {
-                sub.toggleClass('expanded');
-            }
+            $(sub).toggleClass('expanded');
         }
         e.preventDefault();
         return false;
@@ -12,7 +10,7 @@
 
     addListener: function (name, selector) {
         //listen for menu clicks
-        $(selector + ' li').on('click', S.menu.click);
+        $(selector + ' li a').on('click', S.menu.click);
 
         //listen for url changes
         S.events.url.callback.add(name, null, function () {

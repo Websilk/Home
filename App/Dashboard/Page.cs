@@ -88,53 +88,64 @@ namespace Websilk.Pages
         public override Inject LoadSubPage(string path)
         {
             //get correct sub page from path
-            StaticPage service;
+            StaticPage service = null;
             var inject = new Inject();
             var paths = path.Split(new string[] { "/" }, StringSplitOptions.RemoveEmptyEntries);
             var section = "";
-            switch (paths[0]){
-                case "analytics":
-                    service = new DashboardPages.Analytics(S, page);
-                    inject = service.LoadSubPage(string.Join("/", paths.Skip(1).ToArray()));
-                    section = "analytics";
-                    break;
-                case "downloads":
-                    service = new DashboardPages.Downloads(S, page);
-                    inject = service.LoadSubPage(string.Join("/", paths.Skip(1).ToArray()));
-                    section = "downloads";
-                    break;
-                case "pages":
-                    service = new DashboardPages.Pages(S, page);
-                    inject = service.LoadSubPage(string.Join("/", paths.Skip(1).ToArray()));
-                    section = "pages";
-                    break;
-                case "photos":
-                    service = new DashboardPages.Photos(S, page);
-                    inject = service.LoadSubPage(string.Join("/", paths.Skip(1).ToArray()));
-                    section = "photos";
-                    break;
-                case "settings":
-                    service = new DashboardPages.Settings(S, page);
-                    inject = service.LoadSubPage(string.Join("/", paths.Skip(1).ToArray()));
-                    section = "settings";
-                    break;
-                case "timeline":
-                    service = new DashboardPages.Timeline(S, page);
-                    inject = service.LoadSubPage(string.Join("/", paths.Skip(1).ToArray()));
-                    section = "timeline";
-                    break;
-                case "users":
-                    service = new DashboardPages.Users(S, page);
-                    inject = service.LoadSubPage(string.Join("/", paths.Skip(1).ToArray()));
-                    section = "users";
-                    break;
+            if (paths[0] == "analytics") { 
+                service = new DashboardPages.Analytics(S, page);
+                inject = service.LoadSubPage(string.Join("/", paths.Skip(1).ToArray()));
+                section = "analytics";
             }
-
-            S.javascript.Add("dash-subpage", "S.dashboard.sections.show('" + section + "');");
-            inject.element = ".dash-body";
-            inject.remove = ".dash-body > .section-" + section;
-            inject.html = "<div class=\"dash-section section-" + section + "\">" + inject.html + "</div>";
-            inject.inject = enumInjectTypes.append;
+            else if(paths[0] == "downloads") { 
+                service = new DashboardPages.Downloads(S, page);
+                inject = service.LoadSubPage(string.Join("/", paths.Skip(1).ToArray()));
+                section = "downloads";
+            }
+            else if (paths[0] == "pages")
+            {
+                service = new DashboardPages.Pages(S, page);
+                inject = service.LoadSubPage(string.Join("/", paths.Skip(1).ToArray()));
+                section = "pages";
+            }
+            else if (paths[0] == "photos")
+            {
+                service = new DashboardPages.Photos(S, page);
+                inject = service.LoadSubPage(string.Join("/", paths.Skip(1).ToArray()));
+                section = "photos";
+            }
+            else if (paths[0] == "settings")
+            {
+                if(paths.Length > 1)
+                {
+                    if(paths[1] == "themes")
+                    {
+                        service = new DashboardPages.Settings.Themes(S, page);
+                        inject = service.LoadSubPage(string.Join("/", paths.Skip(2).ToArray()));
+                        section = "settings-themes";
+                    }
+                }
+            }
+            else if (paths[0] == "timeline")
+            {
+                service = new DashboardPages.Timeline(S, page);
+                inject = service.LoadSubPage(string.Join("/", paths.Skip(1).ToArray()));
+                section = "timeline";
+            }
+            else if (paths[0] == "users")
+            {
+                service = new DashboardPages.Users(S, page);
+                inject = service.LoadSubPage(string.Join("/", paths.Skip(1).ToArray()));
+                section = "users";
+            }
+            if (service != null)
+            {
+                S.javascript.Add("dash-subpage", "S.dashboard.sections.show('" + section + "');");
+                inject.element = ".dash-body";
+                inject.remove = ".dash-body > .section-" + section;
+                inject.html = "<div class=\"dash-section section-" + section + "\">" + inject.html + "</div>";
+                inject.inject = enumInjectTypes.append;
+            }
             return inject;
         }
 
@@ -170,7 +181,16 @@ namespace Websilk.Pages
             scaff.Data["href"] = item.href == "" ? "javascript:" : item.href;
             scaff.Data["icon"] = item.icon;
             scaff.Data["gutter"] = gutter;
-            scaff.Data["submenu"] = subs.Length > 0 ? "<div class=\"row submenu\"><ul class=\"menu\">" + subs.ToString() + "</ul></div>" : "";
+            if(subs.Length > 0)
+            {
+                scaff.Data["target"] = " target=\"_self\"";
+                scaff.Data["submenu"] = "<div class=\"row submenu\"><ul class=\"menu\">" + subs.ToString() + "</ul></div>";
+            }
+            else
+            {
+                scaff.Data["submenu"] = "";
+            }
+            
             return scaff.Render();
         }
     }

@@ -1,0 +1,196 @@
+﻿
+@import 'util.less';
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Tapestry //////// a CSS framework ////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// developed by Mark Entingh www.markentingh.com ////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// theme.less : a set of functions used to generate a color theme for your web pages ////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+//global variables //////////////
+@fade-perc:50%;
+/////////////////////////////////
+
+// box : the outer-most container
+.box(@box-bg, @box-border, @box-font){
+    background:@box-bg;
+    & when not (@box-border = transparent){border-color:@box-border;}
+    color:@box-font;
+}
+
+// links : all types of anchor links, including svg icon links & faded links
+.links(@a-link, @a-hover, @a-active, @a-visited){
+    a{
+        .link(@a-link, @a-hover, @a-active, @a-link);
+        .svglink(@a-link, @a-hover, @a-active, @a-link);
+    }
+    a.faded{
+        .link(fade(@a-link, @fade-perc), fade(@a-hover, @fade-perc), fade(@a-active, @fade-perc), fade(@a-link, @fade-perc));
+        .svglink(fade(@a-link, @fade-perc), fade(@a-hover, @fade-perc), fade(@a-active, @fade-perc), fade(@a-link, @fade-perc));
+    }    
+}
+
+// icons : anchor link icons (that use the .icon or .nolinks classes)
+.icons(@a-link, @a-hover, @a-active, @a-visited){
+    .icon a, .nolinks a{
+        .link(@a-link, @a-hover, @a-active, @a-link, true);
+        .svglink(@a-link, @a-hover, @a-active, @a-link, true);
+    }
+}
+
+// fonts : miscellaneous font colors
+.fonts(@header, @faded, @price, @positive, @negative, @time){
+    h1, h2, h3, h4, h5, h6{color:@header;}
+    .font-faded{color:@faded;}
+    .font-price{color:@price;}
+    .font-positive{color:@positive;}
+    .font-negative{color:@negative;}
+    .font-time{color:@time;}
+}
+ 
+// row : grid styling for a row & alternate row   
+.get-row(@bg, @hover, @selected, @font, @font-hover, @font-selected, @a-link, @a-hover, @a-active, @a-visited, @a-selected, @icon-link, @icon-hover, @icon-active, @icon-selected, @is-hover-alt:false){
+    &{
+        //row defaults
+        background:@bg; 
+        color:@font;
+        a{
+            .link(@a-link, @a-hover, @a-active, @a-visited);
+            .svglink(@icon-link, @icon-hover, @icon-active, @icon-link);
+        }
+        .icon a, .nolinks a{
+            .link(@icon-link, @icon-hover, @icon-active, @icon-link);
+            .svglink(@icon-link, @icon-hover, @icon-active, @icon-link);
+        }
+    }
+    & when not (@hover = transparent){
+        //row hover (optional)
+        & when (@is-hover-alt = false){
+            &.hover:hover{
+                background:@hover;
+                color:@font-hover;
+            }
+        }
+        & when (@is-hover-alt = true){
+            &.hover.alt:hover{
+                background:@hover;
+                color:@font-hover;
+            }
+        }
+    }
+        
+    & when not (@selected = transparent){
+        //row selected (optional)
+        &.selected{
+            background:@selected;
+            color:@font-selected;
+            a{
+                .link(@a-selected, @a-hover, @a-active, @a-selected);
+                .svglink(@icon-selected, @icon-hover, @icon-active, @icon-selected);
+            }
+        }
+    }
+}
+.row(@bg, @hover, @selected, @font, @font-hover, @font-selected, @a-link, @a-hover, @a-active, @a-visited, @a-selected, @icon-link, @icon-hover, @icon-active, @icon-selected){
+    .row{.get-row(@bg, @hover, @selected, @font, @font-hover, @font-selected, @a-link, @a-hover, @a-active, @a-visited, @a-selected, @icon-link, @icon-hover, @icon-active, @icon-selected, false);}
+}
+.row-alt(@bg, @hover, @selected, @font, @font-hover, @font-selected, @a-link, @a-hover, @a-active, @a-visited, @a-selected, @icon-link, @icon-hover, @icon-active, @icon-selected){
+    .row.alt{.get-row(@bg, @hover, @selected, @font, @font-hover, @font-selected, @a-link, @a-hover, @a-active, @a-visited, @a-selected, @icon-link, @icon-hover, @icon-active, @icon-selected, true);}
+}
+
+// col : grid styling for a column (within a row)
+.col(@input-label){
+    &.input-label{color:@input-label}
+}
+
+
+// button : a simple button, distinguished by a unique @name (default @name is '')
+.button(@name, @bg, @bg-hover, @bg-active, @bg-selected, @border, @border-hover, @border-active, @border-selected, @outline, @outline-hover, @outline-active, @outline-selected, @font, @font-hover, @font-active, @font-selected){
+    
+    .check-button-name() when (@name = none){
+        .button, a.button{
+            .get-button();
+        }
+    }
+
+    .check-button-name() when not (@name = none){
+        .button.@{name}, a.button.@{name}{
+            .get-button();
+        }
+    }
+
+    .check-button-name();
+
+    .get-button(){
+        background:@bg;
+        border:@border;
+        outline:@outline;
+        color:@font !important;
+        &:hover{
+            background:@bg-hover;
+            border:@border-hover;
+            outline:@outline-hover;
+            color:@font-hover !important;
+        }
+        &:active{
+            background:@bg-active;
+            border:@border-active;
+            outline:@outline-active;
+            color:@font-active !important;
+        }
+        &.selected{
+            background:@bg-selected;
+            border:@border-selected;
+            outline:@outline-selected;
+            color:@font-selected !important;
+        }
+        &{.link(@font, @font-hover, @font-active, @font, true);}
+        &{.svglink(@font, @font-hover, @font-active, @font, true);}
+    }
+}
+
+// button-icon : a clickable icon
+.button-icon(@name, @default, @hover, @active, @important:false){
+    .check-button-name() when (@name = ''){
+        .button{
+            .get-button();
+        }
+    }
+
+    .check-button-name() when not (@name = ''){
+        .button.@{name}{
+            .get-button();
+        }
+    }
+
+    .check-button-name();
+
+    .get-button(){
+        .svglink(@default, @hover, @active, @default, @important);
+    }
+}
+
+// message : colors for all message types
+.message(@name, @bg, @border, @font){
+    .msg() when (@name = none){
+        .message{
+            .get-msg();
+        }
+    }
+
+    .msg() when not (@name = none){
+        .message.@{name}{
+            .get-msg();
+        }
+    }
+
+    .msg();
+
+    .get-msg(){
+        background:@bg;
+        border-color:@border;
+        color:@font;
+    }
+}

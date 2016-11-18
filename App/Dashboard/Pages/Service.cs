@@ -90,6 +90,8 @@ namespace Websilk.Services.Dashboard
                     case "contact":
                         options[3] = false;
                         break;
+                    case "dashboard":
+                        continue;
                 }
 
                 //disable sub-page creation

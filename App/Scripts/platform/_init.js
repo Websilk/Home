@@ -1,18 +1,21 @@
 ﻿/*/////////////////////////////////////
 Initialize Websilk Platform
 /////////////////////////////////////*/
-S.init = function (ajax, pageid, pagetype, pagepath, title, tabTitle, websiteId, websiteTitle) {
+S.init = function (ajax, pageid, pagetype, pagepath, title, tabTitle, websiteId, websiteTitle, websiteProtocol, websiteHost) {
     S.page.useAjax = ajax;
     S.page.update(pageid, pagetype, pagepath, title, tabTitle);
     S.website.id = websiteId;
     S.website.title = websiteTitle;
+    S.website.protocol = websiteProtocol;
+    S.website.host = websiteHost;
     S.viewport.getLevel();
     S.events.url.callback.execute();
+    console.log(arguments);
 }
 
 // Window Events ////////////////////////////////////////////////////////////////////////////////////
 $(document).on('ready', function () { S.events.doc.ready(); });
-$(document.body).on('click', function (e) { S.events.doc.click.trigger(e.target); });
+//$(document.body).on('click', function (e) { S.events.doc.click.trigger(e.target); });
 $(window).on('resize', function () { S.events.doc.resize.trigger(); });
 $(window).on('scroll', function () { S.events.doc.scroll.trigger(); });
 $(window).on('popstate', S.events.url.change);

@@ -122,7 +122,7 @@ namespace Websilk
             {
                 foreach (var item in _resources)
                 {
-                    js.Append("<script type=\"text/javascript\" id=\"js_" + item.Key.Replace(" ", "_") + "\" src=\"" + item.Value + "?v=" + S.Server.Version + "\"></script>\n");
+                    js.Append("<script type=\"text/javascript\" id=\"jsf_" + item.Key.Replace(" ", "_") + "\" src=\"" + item.Value + "?v=" + S.Server.Version + "\"></script>\n");
                 }
                 if (syncJs != "") { js.Append(syncJs); }
             }
@@ -130,7 +130,7 @@ namespace Websilk
             {
                 foreach (var item in _resources)
                 {
-                    js.Append("S.util.js.load('" + item.Value + "', 'js_" + item.Key.Replace(" ", "_") + "',function(){");
+                    js.Append("S.util.js.load('" + item.Value + "', 'jsf_" + item.Key.Replace(" ", "_") + "',function(){");
                 }
                 for(var x = 0; x < _resources.Count - 1; x++)
                 {

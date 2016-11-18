@@ -4,7 +4,7 @@
     cleanSlideshow: function(e){
         var slide = $(e).parents('.page-details').get(0);
         var found = false;
-        $('.pages-info > .slider > div').each(function (e) {
+        $('.pages-info > .slides > div').each(function (e) {
             if (found == true) { $(e).remove(); return; }
             if (e == slide) { found = true; }
         });
@@ -12,12 +12,12 @@
 
     goback: function(count){
         S.dashboard.pages.current_page += count * -1;
-        $('.pages-info > .slider').get(0).style.left = (S.dashboard.pages.current_page * 100 * -1) + "%";
+        $('.pages-info > .slides').get(0).style.left = (S.dashboard.pages.current_page * 100 * -1) + "%";
     },
 
     gonext: function(){
         S.dashboard.pages.current_page++;
-        $('.pages-info > .slider').get(0).style.left = (S.dashboard.pages.current_page * 100 * -1) + "%";
+        $('.pages-info > .slides').css({left:(S.dashboard.pages.current_page * 100 * -1) + '%', width:(100 * (S.dashboard.pages.current_page + 1)) + '%'});
     },
 
     details: function (e) {
@@ -29,8 +29,12 @@
         var createdate = e.getAttribute('data-created');
         var summary = e.getAttribute('data-summary');
         var subtitle = 'created on ' + createdate;
+        var url = S.website.protocol + S.website.host + link.substr(1);
+        var urlname = S.website.host + link.substr(1);
         var details = document.getElementById('page_details').innerHTML;
         details = details.replace(/\#title\#/g, title);
+        details = details.replace(/\#url\#/g, url);
+        details = details.replace(/\#url\-name\#/g, urlname);
         details = details.replace(/\#sub-title\#/g, subtitle);
         details = details.replace(/\#link\#/g, link);
         details = details.replace(/\#pageid\#/g, pageid);
@@ -41,11 +45,11 @@
         S.dashboard.pages.cleanSlideshow(e);
 
         //add new slide to slideshow
-        $('.pages-info > .slider').append(details);
+        $('.pages-info > .slides').append(details);
 
         //load sub pages list
         if (isfolder == true) {
-            var list = $('.pages-info > .slider .pages-list').last();
+            var list = $('.pages-info > .slides .pages-list').last();
             S.ajax.post("/Dashboard/Pages/View", { parentId: pageid, start: 1, length: 1000, orderby: 4, viewType: 0, search: '' },
                 function (d) {
                     console.log(d);
@@ -59,13 +63,31 @@
         var details = document.getElementById('page_create').innerHTML;
         //details = details.replace(/\#title\#/g, title);
 
-        //remove all siblings to the right 
-        S.dashboard.pages.cleanSlideshow(e);
-
         //add new slide to slideshow
-        $('.pages-info > .slider').append(details);
-        S.dashboard.pages.gonext();
+        var slides = $(e).parents('.page-details').find('.slides');
+        if (slides.find('.page-create .page-title').length == 0) {
+            slides.find('.page-create').append(details);
+        }
+        slides.css({ width: '200%' });
+        S.dashboard.pages.subpage.goto(slides.get(0), 1);
 
+    },
+
+    subpage: {
+        //sub page functions /////////////////////////////////////
+        goto: function (slides, index) {
+            slides.style.left = (index * 100 * -1) + "%";
+        },
+
+        create: {
+            cancel: function (e) {
+
+            },
+
+            submit: function (e) {
+
+            }
+        }
     },
 
     resize: function () {

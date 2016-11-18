@@ -110,7 +110,7 @@ var S = {
     },
 
     website: {
-        id: 0, title: ''
+        id: 0, title: '', protocol:'', host:''
     },
 
     page: {

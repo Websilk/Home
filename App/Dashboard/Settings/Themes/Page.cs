@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Websilk.Pages.DashboardPages
+namespace Websilk.Pages.DashboardPages.Settings
 {
-    public class Settings: StaticPage
+    public class Themes: StaticPage
     {
-        public Settings(Core WebsilkCore, Page page): base(WebsilkCore, page) { }
+        public Themes(Core WebsilkCore, Page page): base(WebsilkCore, page) { }
 
         public override Services.Inject LoadSubPage(string path)
         {
@@ -17,14 +17,14 @@ namespace Websilk.Pages.DashboardPages
                 //load sub page
                 switch (path)
                 {
-                    case "domains":
+                    case "???":
 
                         break;
                 }
             }else
             {
                 //load settings interface
-                scaffold = new Scaffold(S, "/App/Dashboard/Settings/settings.html");
+                scaffold = new Scaffold(S, "/App/Dashboard/Settings/Themes/themes.html");
             }
             
             inject.html = scaffold.Render();

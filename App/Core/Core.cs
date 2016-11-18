@@ -108,9 +108,15 @@ namespace Websilk
             return js.ToString();
         }
 
-        public string renderJavascriptFiles(bool withTags = true)
+        /// <summary>
+        /// render javascript files along with any asynchronous javascript after all files are finished loading
+        /// </summary>
+        /// <param name="withTags"></param>
+        /// <param name="syncJs">the raw Javascript (with or without tags) to execute after all JS files are loaded</param>
+        /// <returns></returns>
+        public string renderJavascriptFiles(bool withTags = true, string syncJs = "")
         {
-            if (_resources == null) { return ""; }
+            if (_resources == null) { return syncJs; }
             var js = new StringBuilder();
             if(withTags == true)
             {
@@ -118,12 +124,24 @@ namespace Websilk
                 {
                     js.Append("<script type=\"text/javascript\" id=\"js_" + item.Key.Replace(" ", "_") + "\" src=\"" + item.Value + "?v=" + S.Server.Version + "\"></script>\n");
                 }
+                if (syncJs != "") { js.Append(syncJs); }
             }
             else
             {
                 foreach (var item in _resources)
                 {
-                    js.Append("S.util.js.load('" + item.Value + "', 'js_" + item.Key.Replace(" ", "_") + "');\n");
+                    js.Append("S.util.js.load('" + item.Value + "', 'js_" + item.Key.Replace(" ", "_") + "',function(){");
+                }
+                for(var x = 0; x < _resources.Count - 1; x++)
+                {
+                    js.Append("});");
+                }
+                if(_resources.Count > 0)
+                {
+                    js.Append(syncJs + "});");
+                }else
+                {
+                    js.Append(syncJs);
                 }
             }
             return js.ToString();

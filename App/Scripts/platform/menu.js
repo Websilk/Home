@@ -8,5 +8,27 @@
         }
         e.preventDefault();
         return false;
+    },
+
+    addListener: function (name, selector) {
+        //listen for menu clicks
+        $(selector + ' li').on('click', S.menu.click);
+
+        //listen for url changes
+        S.events.url.callback.add(name, null, function () {
+            $(selector + ' li > .row.hover.selected').removeClass('selected');
+            //find the correct menu item to select
+            var items = $(selector + ' li > .row.hover');
+            for (var x = 0; x < items.elements.length; x++) {
+                var e = items.get(x);
+                var a = $(e).find('a');
+                if (a.length > 0) {
+                    if (window.location.href.indexOf(a.get(0).href) >= 0) {
+                        $(e).addClass('selected');
+                        break;
+                    }
+                }
+            }
+        });
     }
 } 

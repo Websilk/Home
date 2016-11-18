@@ -29,12 +29,24 @@
 
             <div class="buttons pad-top">
                 <div class="row btn-page-view"><a class="button apply" href="javascript:">View Page</a></div>
-                <div class="row btn-page-create"><a class="button" href="javascript:">Create Sub Page</a></div>
+                <div class="row btn-page-create"><a class="button" href="javascript:" onclick="#link-create#">Create Sub Page</a></div>
                 <div class="row btn-page-settings"><a class="button" href="javascript:">Page Settings</a></div>
                 <div class="row btn-page-delete"><a class="button cancel" href="javascript:">Delete Page</a></div>
             </div>
         </div>
-        <div class="col seven pages-list"></div>
+        <div class="col seven pages-list">&nbsp;</div>
+    </div>
+</script>
+
+<script id="page_create" type="text/html">
+    <div class="row pad page-create">
+        <div class="row">
+            <div class="col field-label">Title</div>
+            <div class="col field-input">{{field-create-title}}</div>
+        </div>
+        <div class="row">
+            <div class="col field-label">Summary</div>
+            <div class="col field-input">{{field-create-summary}}</div>
         </div>
     </div>
 </script>

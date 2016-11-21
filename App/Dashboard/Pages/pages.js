@@ -4,7 +4,7 @@
     cleanSlideshow: function(e){
         var slide = $(e).parents('.page-details').get(0);
         var found = false;
-        $('.pages-info > .slides > div').each(function (e) {
+        $('.pages-info > .slideshow > .slides > div').each(function (e) {
             if (found == true) { $(e).remove(); return; }
             if (e == slide) { found = true; }
         });
@@ -12,12 +12,12 @@
 
     goback: function(count){
         S.dashboard.pages.current_page += count * -1;
-        $('.pages-info > .slides').get(0).style.left = (S.dashboard.pages.current_page * 100 * -1) + "%";
+        $('.pages-info > .slideshow > .slides').get(0).style.left = (S.dashboard.pages.current_page * 100 * -1) + "%";
     },
 
     gonext: function(){
         S.dashboard.pages.current_page++;
-        $('.pages-info > .slides').css({left:(S.dashboard.pages.current_page * 100 * -1) + '%', width:(100 * (S.dashboard.pages.current_page + 1)) + '%'});
+        $('.pages-info > .slideshow > .slides').css({ left: (S.dashboard.pages.current_page * 100 * -1) + '%', width: (100 * (S.dashboard.pages.current_page + 1)) + '%' });
     },
 
     details: function (e) {
@@ -45,11 +45,11 @@
         S.dashboard.pages.cleanSlideshow(e);
 
         //add new slide to slideshow
-        $('.pages-info > .slides').append(details);
+        $('.pages-info > .slideshow > .slides').append(details);
 
         //load sub pages list
         if (isfolder == true) {
-            var list = $('.pages-info > .slides .pages-list').last();
+            var list = $('.pages-info > .slideshow > .slides .pages-list').last();
             S.ajax.post("/Dashboard/Pages/View", { parentId: pageid, start: 1, length: 1000, orderby: 4, viewType: 0, search: '' },
                 function (d) {
                     console.log(d);

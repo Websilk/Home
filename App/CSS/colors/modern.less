@@ -8,18 +8,18 @@ body{font-family: Jaldi;}
     .box(#eee, transparent, #444);
     .links(#009B87, #00C5C7, #00C5C7, #009B87);
     .icons(#555, #009B87, #00A46C, #555);
-    .fonts(#222, rgba(0,0,0,0.3), #009B87, #4DA400, #FF2222, #376EB2);
+    .fonts(#222, fade(#222, 30%), #009B87, #4DA400, #FF2222, #376EB2);
     .row(transparent, #A7D8D8, #5EC7CE, #444, #33494C, #13474F, #009B87, #00C5C7, #00C5C7, #009B87, #00B4FF, #555, #009B87, #00A46C, #185A64);
     .row-alt(#d0d0d0, #91CBCF, #43B9C1, #444, #314747, #1C4646, #009B87, #00C5C7, #00C5C7, #009B87, #00B4FF, #555, #009B87, #00A46C, #185A64);
     .col(#007A8D);
-    .button(none, #009B87, #00A46C, #00C5C7, #00A46C, transparent, transparent, transparent, transparent, transparent, transparent, transparent, transparent, #fff, #fff, #fff, #fff);
-    .button(apply, #009B87, #00A46C, #00C5C7, #00A46C, transparent, transparent, transparent, transparent, transparent, transparent, transparent, transparent, #fff, #fff, #fff, #fff);
-    .button(special, #009B87, #00A46C, #00C5C7, #00A46C, transparent, transparent, transparent, transparent, transparent, transparent, transparent, transparent, #fff, #fff, #fff, #fff);
-    .button(cancel, #009B87, #00A46C, #00C5C7, #00A46C, transparent, transparent, transparent, transparent, transparent, transparent, transparent, transparent, #fff, #fff, #fff, #fff);
+    .button(default,  #009B87, #00A46C, #00C5C7, #00A46C, transparent, transparent, transparent, transparent, transparent, transparent, transparent, transparent, #fff, #fff, #fff, #fff);
+    .button(apply,    #009B87, #00A46C, #00C5C7, #00A46C, transparent, transparent, transparent, transparent, transparent, transparent, transparent, transparent, #fff, #fff, #fff, #fff);
+    .button(special,  #009B87, #00A46C, #00C5C7, #00A46C, transparent, transparent, transparent, transparent, transparent, transparent, transparent, transparent, #fff, #fff, #fff, #fff);
+    .button(cancel,   #009B87, #00A46C, #00C5C7, #00A46C, transparent, transparent, transparent, transparent, transparent, transparent, transparent, transparent, #fff, #fff, #fff, #fff);
     .button(disabled, #009B87, #00A46C, #00C5C7, #00A46C, transparent, transparent, transparent, transparent, transparent, transparent, transparent, transparent, #fff, #fff, #fff, #fff);
-    .message(none, #8ccaef, transparent, #0066ff);
-    .message(error, #dc8a8a, transparent, #b30b0b);
-    .message(alert, #dbdb86, transparent, #d79c0c); 
+    .message(default, #8ccaef, transparent, #0066ff);
+    .message(error,   #dc8a8a, transparent, #b30b0b);
+    .message(alert,   #dbdb86, transparent, #d79c0c); 
     .message(confirm, #92e061, transparent, #228f4b); 
 }
 
@@ -29,15 +29,22 @@ body{font-family: Jaldi;}
 
 .box-dark{
     .box(#c3e1ee, transparent, #265f87); 
-    .row(transparent, #c3e1ee, #c3e1ee, #444, #33494C, #13474F, #009B87, #00C5C7, #00C5C7, #009B87, #00B4FF, #555, #009B87, #00A46C, #185A64);
-    .row-alt(#c3e1ee, #c3e1ee, #c3e1ee, #444, #314747, #1C4646, #009B87, #00C5C7, #00C5C7, #009B87, #00B4FF, #555, #009B87, #00A46C, #185A64);
+    .fonts(#265f87, fade(#265f87, 30%), #009B87, #4DA400, #FF2222, #376EB2);
+    .row(transparent, #c3e1ee, #c3e1ee, #265f87, #33494C, #13474F, #009B87, #00C5C7, #00C5C7, #009B87, #00B4FF, #555, #009B87, #00A46C, #185A64);
+    .row-alt(#c3e1ee, #c3e1ee, #c3e1ee, #265f87, #314747, #1C4646, #009B87, #00C5C7, #00C5C7, #009B87, #00B4FF, #555, #009B87, #00A46C, #185A64);
+    .button(default,  #35a8da, #01a0e5, #01a0e5, #01a0e5, transparent, transparent, transparent, transparent, transparent, transparent, transparent, transparent, #fff, #fff, #fff, #fff);
+    .button(apply,    #35a8da, #01a0e5, #01a0e5, #01a0e5, transparent, transparent, transparent, transparent, transparent, transparent, transparent, transparent, #fff, #fff, #fff, #fff);
+    .button(special,  #9b56ab, #9938b0, #9938b0, #a70acd, transparent, transparent, transparent, transparent, transparent, transparent, transparent, transparent, #fff, #fff, #fff, #fff);
+    .button(cancel,   #7fc7e7, #59bce8, #59bce8, #59bce8, transparent, transparent, transparent, transparent, transparent, transparent, transparent, transparent, #fff, #fff, #fff, #fff);
+    .button(disabled, #a9d7ec, #a9d7ec, #a9d7ec, #a9d7ec, transparent, transparent, transparent, transparent, transparent, transparent, transparent, transparent, #fff, #fff, #fff, #fff);
+    
 } 
 
 .dash-side{
-    @font:#e0e0e0; @font-hover:#99d8f1; @font-selected:#73d7ff; //use variables 
+    @font:#e0e0e0; @font-hover:#99d8f1; @font-selected:#56dbff; //use variables 
     .box(#1f1f1f, transparent, #999);
     .fonts(@font, rgba(255,255,255,255.3), #009B87, #4DA400, #FF2222, #376EB2); 
-    .row(transparent, #1c2b30, #16323c, @font, @font-hover, @font-selected, @font, @font-hover, @font-selected, @font, @font-selected, @font, @font-hover, @font-selected, @font-selected);
+    .row(transparent, #1c2b30, #133a48, @font, @font-hover, @font-selected, @font, @font-hover, @font-selected, @font, @font-selected, @font, @font-hover, @font-selected, @font-selected);
     .row-alt(#21292c, #1e2f35, #123744, @font, @font-hover, @font-selected, @font, @font-hover, @font-selected, @font, @font-selected, @font, @font-hover, @font-selected, @font-selected);
     .links(@font, @font-hover, @font-selected, @font); 
     .icons(@font, @font-hover, @font-hover, @font);
@@ -45,18 +52,18 @@ body{font-family: Jaldi;}
     > .head{
         border-bottom-color:#3d3d3d;
         .box(#bb5000, transparent, #fff); //#00a1ff, #e44600
-        .button(none, #db7200, #f38600, #ff9c00, #ff9c00, transparent, transparent, transparent, transparent, transparent, transparent, transparent, transparent, #ffdbaa, #ffdbaa, #ffdbaa, #ffdbaa);
+        .button(default, #db7200, #f38600, #ff9c00, #ff9c00, transparent, transparent, transparent, transparent, transparent, transparent, transparent, transparent, #ffdbaa, #ffdbaa, #ffdbaa, #ffdbaa);
         &.row.hover:hover{background-color:#bb3f00;
-            .button(none, #db7200, #f38600, #ff9c00, #ff9c00, transparent, transparent, transparent, transparent, transparent, transparent, transparent, transparent, #ffdbaa, #ffdbaa, #ffdbaa, #ffdbaa);
+            .button(default, #db7200, #f38600, #ff9c00, #ff9c00, transparent, transparent, transparent, transparent, transparent, transparent, transparent, transparent, #ffdbaa, #ffdbaa, #ffdbaa, #ffdbaa);
         } 
     }
 
     .submenu{
-        background-color:#5B9987;
-        .row.hover:hover{background-color:#338B72;}
+        background-color:#242424;
+        .row.hover:hover{background-color:#15333d;}
         .submenu{
-            background-color:#49917C;
-            .row.hover:hover{background-color:#29876C;}
+            background-color:#2b2b2b;
+            .row.hover:hover{background-color:#173f4c;}
         }
     }
 

@@ -30,10 +30,8 @@
                 } else if (s.indexOf('.') == 0 && s.indexOf(' ') < 0 && s.indexOf(':') < 0) {
                 }else{optimize = false; break;}
             }
-            console.log('optimize? ' + optimize);
             if (optimize == true) {
                 //query is optimized, so don't use getQuerySelectorAll
-                console.log(sels);
                 sels.forEach(function (s) {
                     if (s.indexOf('#') == 0) {
                         if (s.indexOf(' ') < 0 && elem == document && s.indexOf(':') < 0) {
@@ -50,21 +48,20 @@
                         }
                         if (el) {
                             if (el.length > 0) {
-                                for(var e of el) {
+                                for (var x = 0; x < el.length; x++) {
                                     //convert node list into array
-                                    elems.push(e);
+                                    elems.push(el[x]);
                                 }
                             }
                         }
                     } else if (s.split('.').length == 2 && s.indexOf(' ') < 0 && s.indexOf(':') < 0) {
-                        console.log('byClassName');
                         //get elements by class name(s)
                         el = elem.getElementsByClassName(s.replace('.', ''));
                         if (el) {
                             if (el.length > 0) {
-                                for(var e of el) {
+                                for (var x = 0; x < el.length; x++) {
                                     //convert node list into array
-                                    elems.push(e);
+                                    elems.push(el[x]);
                                 }
                             }
                         }
@@ -72,10 +69,10 @@
                 });
             } else {
                 //query is not optimized, last resort is to use querySelectorAll
-                var q = elem.querySelectorAll(sel);
-                for(var e of q) {
+                el = elem.querySelectorAll(sel);
+                for (var x = 0; x < el.length; x++) {
                     //convert node list into array
-                    elems.push(e);
+                    elems.push(el[x]);
                 }
             }
         } else if (typeof sel == 'object') {
@@ -497,7 +494,6 @@
         if (this.elements.length > 0) {
             this.elements.forEach(function (e) {
                 var found = query(e, selector);
-                console.log(found);
                 if (found.length > 0) {
                     found.forEach(function (a) {
                         //make sure no duplicates are being added to the array

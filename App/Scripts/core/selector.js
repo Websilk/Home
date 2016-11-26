@@ -1084,9 +1084,20 @@
     select.prototype.removeClass = function (className) {
         //Remove a single class, multiple classes, or all classes from each element in the set of matched elements
         var obj = getObj(className);
+        if (typeof obj == 'string') {
+            //check for class name array
+            obj = obj.replace(/\,/g, ' ').replace(/\s\s/g, ' ');
+            if (obj.indexOf(' ') > 0) {
+                obj = obj.split(' ');
+            }
+        }
+        console.log('select.prototype.removeClass //////////////');
+        console.log(obj);
+        console.log(this);
+        console.log(this.elements);
         if (Array.isArray(obj)) {
-            obj.forEach(function (a) {
-                this.elements.forEach(function (e) {
+            this.elements.forEach(function (e) {
+                obj.forEach(function (a) {
                     if (e.className) {
                         e.className = e.className.split(' ').filter(function (b) { return b != '' && b != a; }).join(' ');
                     }

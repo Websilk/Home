@@ -61,15 +61,11 @@
 
     create: function(e, pageid){
         var details = document.getElementById('page_create').innerHTML;
-        //details = details.replace(/\#title\#/g, title);
-
-        //add new slide to slideshow
-        var slides = $(e).parents('.page-details').find('.slides');
-        if (slides.find('.page-create .page-title').length == 0) {
-            slides.find('.page-create').append(details);
+        var container = $(e).parents('.page-details').find('.page-create');
+        if (container.find('.page-title').length == 0) {
+            container.append(details);
         }
-        slides.css({ width: '200%' });
-        S.dashboard.pages.subpage.goto(slides.get(0), 1);
+        container.addClass('seven laptop-one-total');
 
     },
 
@@ -81,7 +77,10 @@
 
         create: {
             cancel: function (e) {
-
+                var container = $(e).parents('.page-create');
+                console.log(container);
+                container.removeClass('seven laptop-one-total');
+                setTimeout(function () { container.html(''); }, 500);
             },
 
             submit: function (e) {

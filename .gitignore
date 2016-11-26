@@ -15,7 +15,7 @@
 /wwwroot/images/workflow
 /Vendor
 
-/Content/websites
+/App/Content/websites
 
 *.bak
 *.jfm

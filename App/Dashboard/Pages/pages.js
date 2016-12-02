@@ -1,5 +1,5 @@
 ﻿S.dashboard.pages = {
-    current_page: 0,
+    current_page: 0, slides: new S.slides('.pages-info > .slideshow'),
 
     cleanSlideshow: function(e){
         var slide = $(e).parents('.page-details').get(0);
@@ -11,41 +11,32 @@
     },
 
     goback: function(count){
-        S.dashboard.pages.current_page += count * -1;
-        $('.pages-info > .slideshow > .slides').get(0).style.left = (S.dashboard.pages.current_page * 100 * -1) + "%";
-    },
-
-    gonext: function(){
-        S.dashboard.pages.current_page++;
-        $('.pages-info > .slideshow > .slides').css({ left: (S.dashboard.pages.current_page * 100 * -1) + '%', width: (100 * (S.dashboard.pages.current_page + 1)) + '%' });
+        var slides = S.dashboard.pages.slides;
+        slides.previous(count);
     },
 
     details: function (e) {
         //show page details after clicking on a page in the page list
         var isfolder = e.getAttribute('data-folder') == "true" ? true : false;
         var pageid = e.getAttribute('data-pageid');
-        var title = e.getAttribute('data-title');
         var link = e.getAttribute('data-link');
-        var createdate = e.getAttribute('data-created');
-        var summary = e.getAttribute('data-summary');
-        var subtitle = 'created on ' + createdate;
-        var url = S.website.protocol + S.website.host + link.substr(1);
-        var urlname = S.website.host + link.substr(1);
-        var details = document.getElementById('page_details').innerHTML;
-        details = details.replace(/\#title\#/g, title);
-        details = details.replace(/\#url\#/g, url);
-        details = details.replace(/\#url\-name\#/g, urlname);
-        details = details.replace(/\#sub-title\#/g, subtitle);
-        details = details.replace(/\#link\#/g, link);
-        details = details.replace(/\#pageid\#/g, pageid);
-        details = details.replace(/\#summary\#/g, summary);
-        details = details.replace(/\#link\-create\#/g, 'S.dashboard.pages.create(this, ' + pageid + ')');
+        var data = {
+            'title': e.getAttribute('data-title'),
+            'link': link,
+            'date-created': e.getAttribute('data-created'),
+            'summary': e.getAttribute('data-summary'),
+            'sub-title': 'created on ' + e.getAttribute('data-created'),
+            'url': S.website.protocol + S.website.host + link.substr(1),
+            'url-name': S.website.host + link.substr(1),
+            'link-create': 'S.dashboard.pages.create(this, ' + pageid + ')'
+        }
+        var slides = S.dashboard.pages.slides;
 
         //remove all siblings to the right 
-        S.dashboard.pages.cleanSlideshow(e);
+        slides.cleanAfter(e);
 
         //add new slide to slideshow
-        $('.pages-info > .slideshow > .slides').append(details);
+        slides.add(document.getElementById('page_details').innerHTML, data);
 
         //load sub pages list
         if (isfolder == true) {
@@ -56,7 +47,7 @@
                 }
             );
         }
-        S.dashboard.pages.gonext();
+        slides.next();
     },
 
     create: function(e, pageid){
@@ -65,8 +56,17 @@
         if (container.find('.page-title').length == 0) {
             container.append(details);
         }
-        container.addClass('seven laptop-one-total');
+        //add event listeners for page create form
+        container.find('form').on('submit', function (e) {
+            S.dashboard.pages.subpage.create.submit(container.find('form').get(0));
+            e.preventDefault();
+            return false;
+        });
+        container.find('.btn-page-settings a').on('click', function (e) { S.dashboard.pages.subpage.create.submit(this); });
+        container.find('.btn-page-cancel a').on('click', S.dashboard.pages.subpage.create.cancel);
+        $('#txtcreatedesc').on('keyup', S.dashboard.pages.subpage.countChars);
 
+        container.addClass('seven laptop-one-total');
     },
 
     subpage: {
@@ -75,15 +75,47 @@
             slides.style.left = (index * 100 * -1) + "%";
         },
 
+        countChars: function(e){
+            var container = $(e).parents('.page-create');
+            var desc = container.find('#txtcreatedesc').val();
+            container.find('.desc-chars').html((160 - desc.length) + ' characters left');
+        },
+
         create: {
             cancel: function (e) {
                 var container = $(e).parents('.page-create');
-                console.log(container);
                 container.removeClass('seven laptop-one-total');
                 setTimeout(function () { container.html(''); }, 500);
             },
 
             submit: function (e) {
+                var container = $(e).parents('.page-create');
+                var title = container.find('#txtcreatetitle').val();
+                var desc = container.find('#txtcreatedesc').val();
+                var msg = container.find('.message');
+                msg.hide();
+
+                //validate form
+                if (title == '' || title == null) {
+                    S.message.show(msg, 'error', 'Page title cannot be empty');
+                    return false;
+                }
+                if (!S.validate.alphaNumeric(title, [' '])) {
+                    S.message.show(msg, 'error', 'Page title only accepts letters, numbers, and spaces');
+                    return false;
+                }
+                if (desc == '' || desc == null) {
+                    S.message.show(msg, 'error', 'Page description cannot be empty');
+                    return false;
+                }
+                if (!S.validate.text(desc, ['{', '}', '[', ']', '/', '\\'])) {
+                    S.message.show(msg, 'error', 'Page description cannot contain special characters');
+                    return false;
+                }
+                if (desc.length > 160) {
+                    S.message.show(msg, 'error', 'Page description cannot be more than 160 characters long');
+                    return false;
+                }
 
             }
         }

@@ -15,7 +15,7 @@
             el.animate({ opacity: 1, height: h, marginTop: 10, marginBottom: 10, paddingTop: 7, paddingBottom: 7 },
                 { duration: 333, easing: 'easeInSine' });
         } else {
-            el.css({ opacity: 1 }).show();
+            el.css({ opacity: 1, height:'auto' }).show();
         }
         
     }

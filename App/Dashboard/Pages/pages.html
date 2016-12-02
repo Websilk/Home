@@ -86,22 +86,27 @@
 </script>
 
 <script id="page_create" type="text/html">
-    <div class="row pad pad-bottom-lg">
-        <div class="row page-title">
-            <h4>Create Sub Page</h4>
-            <span class="faded sub-title pad-top">For #parent-title#</span>
+    <form>
+        <div class="row pad pad-bottom-lg">
+            <div class="row page-title">
+                <h4>Create Sub Page</h4>
+                <span class="faded sub-title pad-top">For #parent-title#</span>
+                <div class="row message hide"><span></span></div>
+            </div>
+            <div class="row hover">
+                <div class="col field-label">Title</div>
+                <div class="col field-input expand">{{field-create-title}}</div>
+            </div>
+            <div class="row hover margin-bottom-sm">
+                <div class="col field-label">Summary</div>
+                <div class="col field-input expand">{{field-create-summary}}</div>
+            </div>
+            <div class="row text-right desc-chars"></div>
         </div>
-        <div class="row hover">
-            <div class="col field-label">Title</div>
-            <div class="col field-input expand">{{field-create-title}}</div>
+        <div class="absolute bottom buttons pad-bottom pad-left">
+            <div class="col btn-page-settings pad-right"><a class="button" href="javascript:">Create Sub-Page</a></div>
+            <div class="col btn-page-cancel pad-right"><a class="button cancel" href="javascript:" onclick="S.dashboard.pages.subpage.create.cancel(this)">Cancel</a></div>
         </div>
-        <div class="row hover margin-bottom">
-            <div class="col field-label">Summary</div>
-            <div class="col field-input expand">{{field-create-summary}}</div>
-        </div>
-    </div>
-    <div class="absolute bottom buttons pad-bottom pad-left">
-        <div class="col btn-page-settings pad-right"><a class="button" href="javascript:" onclick="S.dashboard.pages.subpage.create.submit(this)">Create Sub-Page</a></div>
-        <div class="col btn-page-delete pad-right"><a class="button cancel" href="javascript:" onclick="S.dashboard.pages.subpage.create.cancel(this)">Cancel</a></div>
-    </div>
+        <button type="submit" class="hide"></button>
+    </form>
 </script>

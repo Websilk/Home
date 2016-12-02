@@ -10,7 +10,6 @@ S.init = function (ajax, pageid, pagetype, pagepath, title, tabTitle, websiteId,
     S.website.host = websiteHost;
     S.viewport.getLevel();
     S.events.url.callback.execute();
-    console.log(arguments);
 }
 
 // Window Events ////////////////////////////////////////////////////////////////////////////////////

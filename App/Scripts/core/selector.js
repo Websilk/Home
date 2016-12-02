@@ -26,7 +26,7 @@
             for(var s of sels) {
                 //check if we can optimize our query selector
                 if (s.indexOf('#') == 0 && s.indexOf(' ') < 0 && elem == document && s.indexOf(':') < 0) {
-                } else if (s.indexOf('.') < 0 && s.indexOf(' ') < 0 && s.indexOf(':') < 0) {
+                } else if (s.indexOf('#') < 0 && s.indexOf('.') < 0 && s.indexOf(' ') < 0 && s.indexOf(':') < 0) {
                 } else if (s.indexOf('.') == 0 && s.indexOf(' ') < 0 && s.indexOf(':') < 0) {
                 }else{optimize = false; break;}
             }
@@ -77,7 +77,7 @@
             }
         } else if (typeof sel == 'object') {
             //elements are already defined instead of using a selector /////////////////////////////////////
-            if (sel.elements) {
+            if (sel.length > 0 && sel.elements && !sel.nodeType) {
                 elems = sel.elements;
             } else {
                 if (Array.isArray(sel)) {
@@ -1091,10 +1091,6 @@
                 obj = obj.split(' ');
             }
         }
-        console.log('select.prototype.removeClass //////////////');
-        console.log(obj);
-        console.log(this);
-        console.log(this.elements);
         if (Array.isArray(obj)) {
             this.elements.forEach(function (e) {
                 obj.forEach(function (a) {
@@ -1121,6 +1117,7 @@
 
     select.prototype.show = function () {
         //Display the matched elements
+        this.removeClass('hide');
         this.elements.forEach(function (e) {
             if (e.style.display == 'none') {
                 e.style.display = '';

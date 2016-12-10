@@ -11,8 +11,7 @@
     },
 
     goback: function(count){
-        var slides = S.dashboard.pages.slides;
-        slides.previous(count);
+        S.dashboard.pages.slides.previous(count);
     },
 
     details: function (e) {
@@ -50,7 +49,8 @@
         slides.next();
     },
 
-    create: function(e, pageid){
+    create: function (e, pageid) {
+        //display the "create page" form
         var details = document.getElementById('page_create').innerHTML;
         var container = $(e).parents('.page-details').find('.page-create');
         if (container.find('.page-title').length == 0) {
@@ -65,8 +65,7 @@
         container.find('.btn-page-settings a').on('click', function (e) { S.dashboard.pages.subpage.create.submit(this); });
         container.find('.btn-page-cancel a').on('click', S.dashboard.pages.subpage.create.cancel);
         $('#txtcreatedesc').on('keyup', S.dashboard.pages.subpage.countChars);
-
-        container.addClass('seven laptop-one-total');
+        container.addClass('view');
     },
 
     subpage: {
@@ -75,16 +74,19 @@
             slides.style.left = (index * 100 * -1) + "%";
         },
 
-        countChars: function(e){
-            var container = $(e).parents('.page-create');
-            var desc = container.find('#txtcreatedesc').val();
+        countChars: function (e) {
+            console.log(arguments);
+            var container = $(e.target).parents('.page-create');
+            var field = container.find('#txtcreatedesc');
+            var desc = field.val();
+            if (desc.length > 160) { desc = desc.substr(0, 160); field.val(desc);}
             container.find('.desc-chars').html((160 - desc.length) + ' characters left');
         },
 
         create: {
             cancel: function (e) {
                 var container = $(e).parents('.page-create');
-                container.removeClass('seven laptop-one-total');
+                container.removeClass('view');
                 setTimeout(function () { container.html(''); }, 500);
             },
 
@@ -92,6 +94,8 @@
                 var container = $(e).parents('.page-create');
                 var title = container.find('#txtcreatetitle').val();
                 var desc = container.find('#txtcreatedesc').val();
+                var secure = container.find('.chk-secure').prop('checked');
+                console.log(secure);
                 var msg = container.find('.message');
                 msg.hide();
 
@@ -117,6 +121,12 @@
                     return false;
                 }
 
+                //submit "create page" form
+                S.ajax.post("/Dashboard/Pages/Create", { parentId: S.dashboard.pages.current_page, title:title, description:desc, secure:secure },
+                function (d) {
+                    console.log(d);
+                }
+            );
             }
         }
     },

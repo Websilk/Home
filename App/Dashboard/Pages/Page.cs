@@ -25,8 +25,8 @@
                 servePage.page = page;
                 scaffold = new Scaffold(S, "/App/Dashboard/Pages/pages.html");
                 scaffold.Data["page-list"] = servePage.View(0, 1, 1000, 4, 0, "").html;
-                scaffold.Data["field-create-title"] = textCreateTitle.Render("txtcreatetitle","","", "Page Title");
-                scaffold.Data["field-create-summary"] = textCreateSummary.Render("txtcreatedesc", "", "", "Page Title", "", Element.Textbox.enumTextType.textarea);
+                scaffold.Data["field-create-title"] = textCreateTitle.Render("txtcreatetitle","","", "New Page Title");
+                scaffold.Data["field-create-summary"] = textCreateSummary.Render("txtcreatedesc", "", "", "Write a description about your new page", "", Element.Textbox.enumTextType.textarea);
                 S.javascriptFiles.Add("dash-pages", "/js/dashboard/pages/pages.js");
                 S.javascript.Add("dash-pages", "S.dashboard.pages.current_page=0;");
             }

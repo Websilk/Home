@@ -41,7 +41,7 @@ namespace Websilk.Element
             if(textType == enumTextType.textarea)
             {
                 //render textarea
-                htm = "<textarea id=\"" + id + "\"" + name + styling + ">" + value + "</textarea>";
+                htm = "<textarea id=\"" + id + "\"" + name + styling + placeholding + ">" + value + "</textarea>";
             }
             else
             {

@@ -98,17 +98,6 @@ var S = {
         }
     },
 
-    css: {
-        add: function (id, css) {
-            $('#css' + id).remove();
-            $('head').append('<style id="css' + id + '" type="text/css">' + css + "</style>");
-        },
-
-        remove: function (id) {
-            $('head').remove('#css' + id);
-        }
-    },
-
     website: {
         id: 0, title: '', protocol:'', host:''
     },
@@ -125,22 +114,8 @@ var S = {
         }
     },
 
-    layers: {
-        cache: [],
-
-        add: function (id, type, title) {
-            for (x = 0; x < this.cache.length; x++) {
-                if (this.cache[x].id == id) {
-                    this.cache[x] = { id:id, type:type, title:title };
-                    return;
-                }
-            }
-            this.cache.push({ pageId: pageId, title: title, pageType: pageType });
-        }
-    },
-
     editor: {
-        selectedLayerId: '', editMode: false, enabled: false
+        editMode: false, enabled: false
     },
 
     lostSession: function () {

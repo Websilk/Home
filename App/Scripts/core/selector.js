@@ -1,13 +1,15 @@
 ﻿//Websilk Selector Framework (replaces jQuery)
 
 //private selector object
-(function(){
+(function () {
+
+    //global variables
     var pxStyles = ['top', 'right', 'bottom', 'left'];
     var pxStylesPrefix = ['border', 'padding', 'margin'];
     var pxStylesSuffix = ['Top', 'Right', 'Bottom', 'Left'];
 
     function select(sel) {
-        //main function
+        //main function, instantiated via $(sel)
         var self = this;
         if (sel) { this.elements = query(document, sel); } else { this.elements = []; }
         this.length = this.elements.length;
@@ -936,6 +938,7 @@
             case "defaultChecked":
                 nn = 'checked';
             case "checked":
+                if (!v) { if (this.elements.length > 0) { return this.elements[0].checked; } }
             case "defaultSelected":
                 nn = 'selected';
             case "selected":
@@ -1230,10 +1233,17 @@
 
     select.prototype.val = function (value) {
         //Get the current value of the first element in the set of matched elements or set the value of every matched element
-        if (this.elements.length > 0) {
-            return this.elements[0].value;
+        if (value != null) {
+            this.elements.forEach(function (a) {
+                a.value = value;
+            });
+        } else {
+            if (this.elements.length > 0) {
+                return this.elements[0].value;
+            }
+            return '';
         }
-        return '';
+        return this;
     }
 
     select.prototype.width = function () {

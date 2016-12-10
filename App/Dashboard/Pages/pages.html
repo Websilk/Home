@@ -3,9 +3,8 @@
     .pages-info .sub-title{white-space:normal;}
     .pages-info .btn-goback{width:50px;}
     .pages-info .page-title{width:calc(100% - 50px);}
-    .page-create{overflow:hidden; margin-left:-100%; height:100%;-webkit-transition:margin-left 250ms; transition:margin-left 250ms;}
-    .page-create.seven{margin-left:0%;}
-    .page-create .buttons{white-space:nowrap;}
+    .page-details{overflow:hidden;}
+    .page-create{height:100%;}
 
     @media (max-width:1024px){
         .pages-info > .slideshow > .slides{ align-items:flex-start;}
@@ -37,7 +36,7 @@
 <script id="page_details" type="text/html">
     <div class="row page-details">
         <div class="row">
-            <div class="col page-create"></div>
+            <div class="col page-create expander seven laptop-one-total"></div>
             <div class="col pad five laptop-one-total box-dark height">
                 <div class="row title pad-height-sm">
                     <div class="col btn-goback pad-right">
@@ -101,7 +100,18 @@
                 <div class="col field-label">Summary</div>
                 <div class="col field-input expand">{{field-create-summary}}</div>
             </div>
-            <div class="row text-right desc-chars"></div>
+            <div class="row text-right pad-top desc-chars font-faded"></div>
+            <div class="row pad-top pad-bottom-sm title"><h6>Security</h6></div>
+            <div class="row hover margin-bottom-lg">
+                <div class="col field-label"></div>
+                <div class="col field-input">
+                    <label>
+                        <input type="checkbox" class="chk-secure" /><span>Private</span>
+                        <span class="font-faded pad-left">Only users who are signed in can view the page</span>
+                    </label>
+                    
+                </div>
+            </div>
         </div>
         <div class="absolute bottom buttons pad-bottom pad-left">
             <div class="col btn-page-settings pad-right"><a class="button" href="javascript:">Create Sub-Page</a></div>

@@ -13,6 +13,8 @@ namespace Websilk.Services.Dashboard
 
         public Pages(Core WebsilkCore) : base(WebsilkCore) { }
 
+        #region "View"
+
         public Inject View(int parentId, int start, int length, int orderby, int viewType, string search)
         {
             var response = new Inject();
@@ -159,5 +161,19 @@ namespace Websilk.Services.Dashboard
                         "</div>" +
                     "</div>";
         }
+
+        #endregion
+
+        #region "Create"
+
+        public Inject Create(int parentId, string title, string description, bool secure)
+        {
+            var response = new Inject();
+            if (!S.User.checkSecurity(page.websiteId, "dashboard/pages", 1)) { return response; }
+
+
+            return response;
+        }
+        #endregion
     }
 }

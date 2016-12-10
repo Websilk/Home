@@ -1,4 +1,6 @@
-﻿S.scaffold = function(html, vars, tagStart, tagEnd){
+﻿S.scaffold = function (html, vars, tagStart, tagEnd) {
+    //tagStart & tagEnd is optional, defines the symbols (#)
+    //to use when searching for scaffold variable placeholders
     this.html = html;
     this.vars = vars;
     if (tagStart) {
@@ -31,7 +33,7 @@ S.scaffold.prototype.render = function () {
                             //hide group of html
                             htm = htm.substr(0, c) + htm.substr(b + 2);
                             ischanged = true;
-                        } else if (elements[x][1] === true) {
+                        } else if (this.vars[key] === true) {
                             //show group of html
                             htm = htm.substr(0, c) + htm.substr(d + 2, a - (d + 2)) + htm.substr(b + 2);
                             ischanged = true;
@@ -42,8 +44,8 @@ S.scaffold.prototype.render = function () {
             }
             //check for scaffold element to replace with a value
             if (ischanged == false) {
-                if (htm.indexOf('{{' + key + '}}') >= 0) {
-                    htm = htm.replace('{{' + key + '}}', this.vars[key]);
+                if (htm.indexOf(this.tagStart + key + this.tagEnd) >= 0) {
+                    htm = htm.replace(this.tagStart + key + this.tagEnd, this.vars[key]);
                     ischanged = true;
                 }
             }

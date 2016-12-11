@@ -1,5 +1,5 @@
 ﻿S.dashboard.pages = {
-    current_page: 0, slides: new S.slides('.pages-info > .slideshow'),
+    current_page: 0, page_info:null, slides: new S.slides('.pages-info > .slideshow'),
 
     cleanSlideshow: function(e){
         var slide = $(e).parents('.page-details').get(0);
@@ -10,8 +10,19 @@
         });
     },
 
-    goback: function(count){
-        S.dashboard.pages.slides.previous(count);
+    goback: function (e, count) {
+        var container = $(e).parents('.page-details').find('.page-create');
+        if (container.hasClass('view')) {
+            //first, hide "create page" form, then go back
+            container.removeClass('view');
+            setTimeout(function () {
+                container.html('');
+                S.dashboard.pages.slides.previous(count);
+            }, 250);
+        } else {
+            S.dashboard.pages.slides.previous(count);
+        }
+        
     },
 
     details: function (e) {
@@ -21,6 +32,7 @@
         var link = e.getAttribute('data-link');
         var data = {
             'title': e.getAttribute('data-title'),
+            'path': e.getAttribute('data-path'),
             'link': link,
             'date-created': e.getAttribute('data-created'),
             'summary': e.getAttribute('data-summary'),
@@ -29,10 +41,12 @@
             'url-name': S.website.host + link.substr(1),
             'link-create': 'S.dashboard.pages.create(this, ' + pageid + ')'
         }
+        S.dashboard.pages.current_page = pageid;
+        S.dashboard.pages.page_info = data;
         var slides = S.dashboard.pages.slides;
 
-        //remove all siblings to the right 
-        slides.cleanAfter(e);
+        //remove all siblings to the right
+        slides.cleanAfter();
 
         //add new slide to slideshow
         slides.add(document.getElementById('page_details').innerHTML, data);
@@ -40,9 +54,11 @@
         //load sub pages list
         if (isfolder == true) {
             var list = $('.pages-info > .slideshow > .slides .pages-list').last();
-            S.ajax.post("/Dashboard/Pages/View", { parentId: pageid, start: 1, length: 1000, orderby: 4, viewType: 0, search: '' },
-                function (d) {
-                    console.log(d);
+            S.ajax.post("Dashboard/Pages/View", { websiteId: S.dashboard.website.id, parentId: pageid, start: 1, length: 1000, orderby: 4, viewType: 0, search: '' },
+                function (data) {
+                    if (data.d != 'err') {
+                        list.html(data.d);
+                    }
                 }
             );
         }
@@ -51,10 +67,16 @@
 
     create: function (e, pageid) {
         //display the "create page" form
-        var details = document.getElementById('page_create').innerHTML;
+        var info = S.dashboard.pages.page_info;
+        var htm = document.getElementById('page_create').innerHTML;
+        var data = {
+            'parent-title': info.path.replace(/\//g, ' > '),
+            'page-url':info['url-name'] + '/'
+        }
+        var scaffold = new S.scaffold(htm, data);
         var container = $(e).parents('.page-details').find('.page-create');
         if (container.find('.page-title').length == 0) {
-            container.append(details);
+            container.append(scaffold.render());
         }
         //add event listeners for page create form
         container.find('form').on('submit', function (e) {
@@ -64,7 +86,8 @@
         });
         container.find('.btn-page-settings a').on('click', function (e) { S.dashboard.pages.subpage.create.submit(this); });
         container.find('.btn-page-cancel a').on('click', S.dashboard.pages.subpage.create.cancel);
-        $('#txtcreatedesc').on('keyup', S.dashboard.pages.subpage.countChars);
+        $('#txtcreatedesc').on('keyup', S.dashboard.pages.subpage.create.countChars);
+        $('#txtcreatetitle').on('keyup', S.dashboard.pages.subpage.create.updateTitle);
         container.addClass('view');
     },
 
@@ -74,16 +97,28 @@
             slides.style.left = (index * 100 * -1) + "%";
         },
 
-        countChars: function (e) {
-            console.log(arguments);
-            var container = $(e.target).parents('.page-create');
-            var field = container.find('#txtcreatedesc');
-            var desc = field.val();
-            if (desc.length > 160) { desc = desc.substr(0, 160); field.val(desc);}
-            container.find('.desc-chars').html((160 - desc.length) + ' characters left');
-        },
-
         create: {
+            updateTitle: function (e) {
+                //updates new page url when typing new page title
+                var container = $(e.target).parents('.page-create');
+                var title = container.find('#txtcreatetitle').val();
+                if (!S.validate.alphaNumeric(title, [' '])) {
+                    //show error color in url
+                    container.find('.page-url').addClass('font-error');
+                } else {
+                    container.find('.page-url').removeClass('font-error');
+                }
+                container.find('.new-url').html(title.replace(/\s/g, '-'));
+            },
+
+            countChars: function (e) {
+                var container = $(e.target).parents('.page-create');
+                var field = container.find('#txtcreatedesc');
+                var desc = field.val();
+                if (desc.length > 160) { desc = desc.substr(0, 160); field.val(desc); }
+                container.find('.desc-chars').html((160 - desc.length) + ' characters left');
+            },
+
             cancel: function (e) {
                 var container = $(e).parents('.page-create');
                 container.removeClass('view');
@@ -95,7 +130,6 @@
                 var title = container.find('#txtcreatetitle').val();
                 var desc = container.find('#txtcreatedesc').val();
                 var secure = container.find('.chk-secure').prop('checked');
-                console.log(secure);
                 var msg = container.find('.message');
                 msg.hide();
 
@@ -122,9 +156,30 @@
                 }
 
                 //submit "create page" form
-                S.ajax.post("/Dashboard/Pages/Create", { parentId: S.dashboard.pages.current_page, title:title, description:desc, secure:secure },
-                function (d) {
-                    console.log(d);
+                S.ajax.post("Dashboard/Pages/Create", { websiteId:S.dashboard.website.id, parentId: S.dashboard.pages.current_page, title:title, description:desc, secure:secure },
+                function (data) {
+                    if (data.d == 'err') {
+                        S.message.show(msg, 'error', 'An error occurred while trying to create your new web page');
+                        return false;
+                    } else {
+                        var slide = container.parents('.page-details').find('.pages-list');
+                        if (slide.length > 0) {
+                            //load sub-page list
+                            slide.html(data.d);
+
+                            //show success message
+                            S.message.show(msg, '', 'Your page, "' + title + '" has been created successfully');
+
+                            //reset form
+                            container.find('#txtcreatetitle').val('');
+                            container.find('#txtcreatedesc').val('');
+                            container.find('.chk-secure').prop('checked', false);
+                            container.find('.new-url').html('');
+
+                            //update parent page list (if data-folder doesn't exist)
+
+                        }
+                    }
                 }
             );
             }

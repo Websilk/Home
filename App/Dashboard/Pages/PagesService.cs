@@ -15,11 +15,10 @@ namespace Websilk.Services.Dashboard
 
         #region "View"
 
-        public Inject View(int parentId, int start, int length, int orderby, int viewType, string search)
+        public string View(int websiteId, int parentId, int start, int length, int orderby, int viewType, string search)
         {
-            var response = new Inject();
             GetPage();
-            if(!S.User.checkSecurity(page.websiteId, "dashboard/pages", 0)) { return response; }
+            if(!S.User.checkSecurity(websiteId, "dashboard/pages", 0)) { return ""; }
 
             int parentPageId = 0;
             string pageTitle = "";
@@ -40,22 +39,22 @@ namespace Websilk.Services.Dashboard
                     parentPathIds = reader2.Get("pathids");
                 }
             }
-            var reader = page.sql.GetPagesForWebsite(page.websiteId, parentId, start, length, orderby, search);
+            var reader = page.sql.GetPagesForWebsite(websiteId, parentId, start, length, orderby, search);
             if((enumViewType)viewType == enumViewType.list)
             {
-                response.html = ViewPagesList(reader, parentId, pageTitle, parentPageId, parentTitle, parentPath, parentPathIds);
+                return ViewPagesList(reader, websiteId, parentId, pageTitle, parentPageId, parentTitle, parentPath, parentPathIds);
             }
 
-            return response;
+            return "";
         }
 
-        private string ViewPagesList(SqlReader reader, int parentId, string pageTitle, int parentPageId, string parentTitle, string parentPath, string parentPathIds)
+        private string ViewPagesList(SqlReader reader, int websiteId, int parentId, string pageTitle, int parentPageId, string parentTitle, string parentPath, string parentPathIds)
         {
             var htm = new StringBuilder();
-            var secureEdit = S.User.checkSecurity(page.websiteId, "dashboard/pages", 0);
-            var secureCreate = S.User.checkSecurity(page.websiteId, "dashboard/pages", 1);
-            var secureDelete = S.User.checkSecurity(page.websiteId, "dashboard/pages", 2);
-            var secureSettings = S.User.checkSecurity(page.websiteId, "dashboard/pages", 3);
+            var secureEdit = S.User.checkSecurity(websiteId, "dashboard/pages", User.enumSecurity.read);
+            var secureCreate = S.User.checkSecurity(websiteId, "dashboard/pages", User.enumSecurity.create);
+            var secureDelete = S.User.checkSecurity(websiteId, "dashboard/pages", User.enumSecurity.delete);
+            var secureSettings = S.User.checkSecurity(websiteId, "dashboard/pages", User.enumSecurity.update);
             
             var subpageTitle = "";
             var pagePath = "";
@@ -139,17 +138,17 @@ namespace Websilk.Services.Dashboard
                     //create
                     options[1] = false;
                 }
-                htm.Append("<li>" + RenderListItem(color, subpageId, subpageTitle, pageLink, pageSummary, pageCreated, options, hasChildren > 0) + "</li>");
+                htm.Append("<li>" + RenderListItem(color, subpageId, subpageTitle, pagePath, pageLink, pageSummary, pageCreated, options, hasChildren > 0) + "</li>");
             }
 
             htm.Append("</ul>");
             return htm.ToString();
         }
 
-        private string RenderListItem(string color, int pageId, string pageTitle, string pageLink, string pageSummary, string createdate, bool[] options, bool isfolder = false)
+        private string RenderListItem(string color, int pageId, string pageTitle, string pagePath, string pageLink, string pageSummary, string createdate, bool[] options, bool isfolder = false)
         {
             return "<div class=\"row hover item\" onclick=\"S.dashboard.pages.details(this)\"" + 
-                    (isfolder == true ? " data-folder=\"true\"" : "") + "\" data-pageid=\"" + pageId + "\" data-title=\"" + pageTitle + "\" data-link=\"" + pageLink + "\" data-summary=\"" + pageSummary.Replace("\"", "&quot;") + "\" data-created=\"" + createdate + "\">" +
+                    (isfolder == true ? " data-folder=\"true\"" : "") + "\" data-pageid=\"" + pageId + "\" data-title=\"" + pageTitle + "\" data-path=\"" + pagePath + "\" data-link=\"" + pageLink + "\" data-summary=\"" + pageSummary.Replace("\"", "&quot;") + "\" data-created=\"" + createdate + "\">" +
                         "<div class=\"color-tag " + color + "\"><div class=\"bg dark\">&nbsp;</div></div>" + 
                         "<div class=\"col color-contents pad-sm clear\">" +
                             "<div class=\"col icon small\">" +
@@ -166,13 +165,16 @@ namespace Websilk.Services.Dashboard
 
         #region "Create"
 
-        public Inject Create(int parentId, string title, string description, bool secure)
+        public string Create(int websiteId, int parentId, string title, string description, bool secure)
         {
-            var response = new Inject();
-            if (!S.User.checkSecurity(page.websiteId, "dashboard/pages", 1)) { return response; }
+            if (!S.User.checkSecurity(websiteId, "dashboard/pages", User.enumSecurity.create)) { return "err"; }
 
+            //create new web page
+            GetPage();
+            page.sql.Create(S.User.userId, websiteId, parentId, title, description, SqlQueries.Page.enumPageType.dynamic, "", secure);
 
-            return response;
+            //return list of sub-pages
+            return View(websiteId, parentId, 0, 100, 0, 0, "");
         }
         #endregion
     }

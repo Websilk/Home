@@ -4,6 +4,14 @@ namespace Websilk.SqlQueries
 {
     public class Page : SqlQuery
     {
+        public enum enumPageType
+        {
+            dynamic = 0,
+            service = 1,
+            shadow = 2,
+            clone = 3
+        }
+
         public Page(Core WebsilkCore) : base(WebsilkCore)
         {
         }
@@ -74,6 +82,23 @@ namespace Websilk.SqlQueries
             return new SqlReader(S, "EXEC GetWebsiteDomains @websiteId=$websiteId", parameters);
         }
 
+        #endregion
+
+        #region "Create"
+        public void Create(int ownerId, int websiteId, int parentId, string title, string description, enumPageType pageType, string service = "", bool security = false, bool enabled = true)
+        {
+            var parameters = new List<SqlParameter>();
+            parameters.Add(new SqlParameter("$ownerId", ownerId.ToString(), 0, enumSqlParameterType.isNumber));
+            parameters.Add(new SqlParameter("$websiteId", websiteId.ToString(), 0, enumSqlParameterType.isNumber));
+            parameters.Add(new SqlParameter("$parentId", parentId.ToString(), 0, enumSqlParameterType.isNumber));
+            parameters.Add(new SqlParameter("$title", title, 250));
+            parameters.Add(new SqlParameter("$description", description, 160));
+            parameters.Add(new SqlParameter("$pageType", ((int)pageType).ToString(), 0, enumSqlParameterType.isNumber));
+            parameters.Add(new SqlParameter("$service", service, 100));
+            parameters.Add(new SqlParameter("$security", security == true ? "1" : "0", 0, enumSqlParameterType.isNumber));
+            parameters.Add(new SqlParameter("$enabled", enabled == true ? "1" : "0", 0, enumSqlParameterType.isNumber));
+            S.Sql.ExecuteNonQuery("EXEC AddWebsitePage @ownerId=$ownerId, @websiteId=$websiteId, @parentId=$parentId, @title=$title, @description=$description, @pageType=$pageType, @service=$service, @security=$security, @enabled=$enabled", parameters);
+        }
         #endregion
     }
 }

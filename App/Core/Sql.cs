@@ -61,7 +61,7 @@ namespace Websilk
         public SqlDataReader ExecuteReader(string sql, List<SqlParameter> parameters = null)
         {
             if (_started == false) { Start(); }
-            cmd.CommandText = GetQuery(sql, parameters);
+            cmd.CommandText = SqlParser.Parse(sql, parameters);
             reader = cmd.ExecuteReader();
             return reader;
         }
@@ -69,32 +69,15 @@ namespace Websilk
         public void ExecuteNonQuery(string sql, List<SqlParameter> parameters = null)
         {
             if (_started == false) { Start(); }
-            cmd.CommandText = GetQuery(sql, parameters);
+            cmd.CommandText = SqlParser.Parse(sql, parameters);
             cmd.ExecuteNonQuery();
         }
 
         public object ExecuteScalar(string sql, List<SqlParameter> parameters = null)
         {
             if (_started == false) { Start(); }
-            cmd.CommandText = GetQuery(sql, parameters);
+            cmd.CommandText = SqlParser.Parse(sql, parameters);
             return cmd.ExecuteScalar();
-        }
-
-        private string GetQuery(string sql, List<SqlParameter> parameters = null)
-        {
-            var q = sql;
-            if(parameters != null)
-            {
-                if (parameters.Count > 0)
-                {
-                    foreach (var p in parameters)
-                    {
-                        q = q.Replace(p.Name, p.Value);
-                    }
-                }
-            }
-            return q;
-
         }
 
         #region "Get"
@@ -166,6 +149,33 @@ namespace Websilk
         #endregion
     }
 
+    public static class SqlParser
+    {
+        /// <summary>
+        /// Generate a safe Sql Query from parameters
+        /// </summary>
+        /// <param name="query"></param>
+        /// <param name="parameters"></param>
+        /// <returns></returns>
+        public static string Parse(string query, List<SqlParameter> parameters)
+        {
+            var q = query;
+            //inject values into query (to prevent sql injection attacks)
+            if (parameters != null)
+            {
+                if (parameters.Count > 0)
+                {
+                    foreach (var p in parameters)
+                    {
+                        q = q.Replace(p.Name, p.Value);
+                    }
+                }
+            }
+            
+            return q;
+        }
+    }
+
     public class SqlReader
     {
         [JsonIgnore]
@@ -177,17 +187,7 @@ namespace Websilk
         public SqlReader(Core WebsilkCore, string query, List<SqlParameter> parameters)
         {
             S = WebsilkCore;
-            var q = query;
-            //inject values into query (to prevent sql injection attacks)
-            if(parameters.Count > 0)
-            {
-                foreach(var p in parameters)
-                {
-                    q = q.Replace(p.Name, p.Value);
-                }
-            }
-
-            var reader = S.Sql.ExecuteReader(q);
+            var reader = S.Sql.ExecuteReader(SqlParser.Parse(query, parameters));
             switch(S.Sql.dataType){
                 case enumSqlDataTypes.SqlClient:
                     ReadFromSqlClient(reader);

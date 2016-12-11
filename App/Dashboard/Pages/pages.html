@@ -40,7 +40,7 @@
             <div class="col pad five laptop-one-total box-dark height">
                 <div class="row title pad-height-sm">
                     <div class="col btn-goback pad-right">
-                        <a href="javascript:" onclick="S.dashboard.pages.goback(1)" class="button circle">
+                        <a href="javascript:" onclick="S.dashboard.pages.goback(this, 1)" class="button circle">
                             <svg viewBox="0 0 25 25" class="medium">
                                 <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#icon-arrow-left" x="0" y="0" width="25" height="25"></use>
                             </svg>
@@ -71,7 +71,7 @@
                 </div>
             <div class="col seven laptop-one-total slideshow height">
                 <div class="slides">
-                    <div class="row pages-list">
+                    <div class="row pages-list pad">
                         <div class="row text-center pad-lg flex">
                             <div class="faded-more flex center">
                                 <h5>This page does not contain any sub-pages</h5>
@@ -89,12 +89,16 @@
         <div class="row pad pad-bottom-lg">
             <div class="row page-title">
                 <h4>Create Sub Page</h4>
-                <span class="faded sub-title pad-top">For #parent-title#</span>
+                <div class="faded sub-title pad-height">For page "#parent-title#"</div>
                 <div class="row message hide"><span></span></div>
             </div>
             <div class="row hover">
                 <div class="col field-label">Title</div>
                 <div class="col field-input expand">{{field-create-title}}</div>
+            </div>
+            <div class="row pad-bottom-sm">
+                <div class="col field-label"></div>
+                <div class="col field-input expand faded page-url">#page-url#<span class="new-url"></span></div>
             </div>
             <div class="row hover margin-bottom-sm">
                 <div class="col field-label">Summary</div>

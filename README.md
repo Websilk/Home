@@ -8,7 +8,7 @@ Built upon the new ASP.NET Core framework, Websilk is a high-end, enterprise lev
 * install submodules `git submodule update --init --recursive`
 * run initial gulp task `gulp default`
 2. Then, install the database by opening the `Sql/Sql.sln` Visual Studio solution file and publishing the project to Sql Server 2014 (or higher)
-3. Finally, run `dotnet run` and open the following web page: http://localhost:7770/api/Init/Website
-, which will generate the initial web pages for your default web site.
-
-To access your website dashboard, navigate to http://localhost:7770/login
+3. Run `dotnet run` and navigate to http://localhost:7770 , which will generate a `config.json` file. You may need to alter the database connection settings within the `config.json` file in order to access the database correctly.
+4. Open the following web page: http://localhost:7770/api/Init/Website
+, which will generate the initial web pages for your default web site, including the home page, login, & dashboard page.
+5. Navigate to http://localhost:7770/login to set your administrator password, then log into your website dashboard.

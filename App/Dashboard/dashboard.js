@@ -1,4 +1,10 @@
 ﻿S.dashboard = {
+    website: {
+        id: 0,
+        title: '',
+        host:''
+    },
+
     sections: {
         show: function (name) {
             $('.dash-body .dash-section').hide();

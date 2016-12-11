@@ -7,6 +7,14 @@ namespace Websilk
 {
     public class User
     {
+        public enum enumSecurity
+        {
+            read = 0,
+            create = 1,
+            update = 2,
+            delete = 3
+        }
+
         public struct structSecurityWebsite
         {
             public int websiteId;
@@ -141,7 +149,7 @@ namespace Websilk
             return security;
         }
 
-        public bool checkSecurity(int websiteId, string feature, int securityIndex)
+        public bool checkSecurity(int websiteId, string feature, enumSecurity securityIndex)
         {
             var i = security.FindIndex(a => a.websiteId == websiteId);
             if(i >= 0)
@@ -153,9 +161,9 @@ namespace Websilk
                     var data = website.security[feature];
                     if(data != null)
                     {
-                        if(data.Length >= securityIndex + 1)
+                        if(data.Length >= (int)securityIndex + 1)
                         {
-                            return data[securityIndex];
+                            return data[(int)securityIndex];
                         }
                     }
                 }

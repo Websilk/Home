@@ -31,15 +31,10 @@ S.slides.prototype.previous = function (count) {
     this.items.css({ left: (this.current_slide * 100 * -1) + "%"});
 };
 
-S.slides.prototype.cleanAfter = function (elem) {
+S.slides.prototype.cleanAfter = function () {
     //remove all slides after the selected element
-    var i = 0;
-    var node = elem;
-    while (node = node.previousSibling) {
-        if (node.nodeType === 1) { ++i }
-    }
     var slides = this.items.children();
-    var slide = slides.get(i);
+    var slide = slides.get(this.current_slide);
     var found = false;
     slides.each(function (e) {
         if (found == true) { $(e).remove(); return; }

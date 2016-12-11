@@ -625,6 +625,11 @@ namespace Websilk
         /// </summary>
         public virtual void Load() { }
 
+        /// <summary>
+        /// Executed when loading a sub page
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
         public virtual Services.Inject LoadSubPage(string path) { return new Services.Inject(); }
 
         public string Render()

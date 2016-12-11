@@ -21,7 +21,7 @@ namespace Websilk.Pages
         public override void Load()
         {
             //load the dashboard layout
-            scaffold = new Scaffold(S, "/App/Dashboard/page.html");
+            scaffold = new Scaffold(S, "/App/Dashboard/dashboard.html");
             S.cssFiles.Add("dashboard", "/css/dashboard/dashboard.css");
             var scaffMenu = new Scaffold(S, "/App/Dashboard/menu-item.html");
 
@@ -32,12 +32,14 @@ namespace Websilk.Pages
 
             //load website info
             var domains = page.getDomainsForWebsite();
+            var domain = "";
             if(domains.Count > 0)
             {
+                domain = domains[0].domain;
                 scaffold.Data["has-domain"] = "true";
                 scaffold.Data["website-name"] = page.websiteTitle;
-                scaffold.Data["website-url"] = "http://www." + domains[0].domain;
-                scaffold.Data["website-url-name"] = "www." + domains[0].domain;
+                scaffold.Data["website-url"] = "http://www." + domain;
+                scaffold.Data["website-url-name"] = "www." + domain;
             }
 
             //generate menu system
@@ -70,18 +72,27 @@ namespace Websilk.Pages
             scaffold.Data["menu"] = "<ul class=\"menu\">" + menu.ToString() + "</ul>";
 
             //add js file
-            S.javascriptFiles.Add("dashboard", "/js/dashboard/page.js");
+            S.javascriptFiles.Add("dashboard", "/js/dashboard/dashboard.js");
 
             //finally, add content of dashboard section
             var inject = new Inject();
             if (page.Url.path != "dashboard")
             {
                 inject = LoadSubPage(page.Url.path.Replace("dashboard/", ""));
-            }else
+            }
+            else
             {
                 inject = LoadSubPage("pages");
                 S.javascript.Add("url", "S.url.push(S.page.title, 'dashboard/pages');");
             }
+
+            //initialize dashboard website info
+            S.javascript.Add("dash-init", 
+                "S.dashboard.website = {" + 
+                "id:" + page.websiteId + ", title:'" + page.websiteTitle.Replace("'","\\'") + "', domain:'" + domain + "'" + 
+                "};"
+            );
+
             scaffold.Data["body"] = inject.html;
         }
 

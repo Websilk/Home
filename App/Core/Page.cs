@@ -58,6 +58,7 @@ namespace Websilk
         public string pageDescription = "";
         public string pageFavIcon = "";
         public string pageFolder = "";
+        public string pagePhoto = "";
         public DateTime pageCreated;
         public DateTime pageModified;
         public int pageSecurity = 0;
@@ -75,7 +76,6 @@ namespace Websilk
         public List<structDomain> domains = new List<structDomain>();
 
         public string googleWebPropertyId = ""; //google Analytics
-        public string pageFacebook = ""; //facebook meta tags
 
         public bool accessDenied = false;
         public bool isEditable = false;
@@ -224,20 +224,14 @@ namespace Websilk
                 websitePage404 = reader.GetInt("page404");
                 googleWebPropertyId = reader.Get("googlewebpropertyid");
                 pageFavIcon = reader.Get("icon");
+                pagePhoto = reader.Get("photo");
 
                 //set up page properties
                 PageTitleForBrowserTab = pageTitle + websiteTitleSeparator + websiteTitle;
                 pageFolder = "/App/Content/websites/" + websiteId + "/pages/" + pageId + "/";
-                Elements = new Elements(S, "/App/Content/themes/" + websiteTheme + "/");
 
-                //set up facebook meta tags
-                pageFacebook = "";
-                if (reader.Get("photo") != "")
-                {
-                    pageFacebook = "<meta id=\"metafbimg\" property=\"og:image\" content=\"" + Url.host + reader.Get("photo") + "\" />";
-                }
-                pageFacebook += "<meta id=\"metafbtitle\" property=\"og:title\" content=\"" + pageTitle + "\" />" +
-                                "<meta id=\"metafbsite\" property=\"og:site_name\" content=\"" + websiteTitle + "\" />";
+                //initialize theme Elements
+                Elements = new Elements(S, "/App/Content/themes/" + websiteTheme + "/");
             }
 
         }
@@ -440,6 +434,15 @@ namespace Websilk
             scaffold.Data["theme-css"] = "/css/themes/" + websiteTheme + "/theme.css";
             scaffold.Data["colors-css"] = "/css/colors/" + websiteColors + ".css";
             scaffold.Data["svg-icons"] = S.Server.LoadFileFromCache("/App/Content/themes/" + websiteTheme + "/icons.svg");
+
+            //set up facebook meta tags
+            scaffold.Data["facebook"] = "";
+            if (pagePhoto != "")
+            {
+                scaffold.Data["facebook"] = "<meta id=\"metafbimg\" property=\"og:image\" content=\"" + Url.host + pagePhoto + "\" />";
+            }
+            scaffold.Data["facebook"] += "<meta id=\"metafbtitle\" property=\"og:title\" content=\"" + pageTitle + "\" />" +
+                            "<meta id=\"metafbsite\" property=\"og:site_name\" content=\"" + websiteTitle + "\" />";
 
             //setup base javascript files
             string min = "";

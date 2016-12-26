@@ -26,7 +26,7 @@
         <div class="slideshow">
             <div class="slides">
                 <div class="row page-details">
-                    <div class="pages-list pad">{{page-list}}</div>
+                    <div class="pages-list">{{page-list}}</div>
                 </div>
             </div>
         </div>
@@ -36,8 +36,8 @@
 <script id="page_details" type="text/html">
     <div class="row page-details">
         <div class="row">
-            <div class="col page-create expander seven laptop-one-total"></div>
-            <div class="col pad five laptop-one-total box-dark height">
+            <div class="col page-create expander eight desktop-sm-seven laptop-one-total"></div>
+            <div class="col pad four desktop-sm-five laptop-one-total box-dark height">
                 <div class="row title pad-height-sm">
                     <div class="col btn-goback pad-right">
                         <a href="javascript:" onclick="S.dashboard.pages.goback(this, 1)" class="button circle">
@@ -69,9 +69,9 @@
                         <div class="col btn-page-delete pad-right"><a class="button cancel" href="javascript:">Delete</a></div>
                     </div>
                 </div>
-            <div class="col seven laptop-one-total slideshow height">
+            <div class="col eight desktop-sm-seven laptop-one-total slideshow height">
                 <div class="slides">
-                    <div class="row pages-list pad">
+                    <div class="row pages-list">
                         <div class="row text-center pad-lg flex">
                             <div class="faded-more flex center">
                                 <h5>This page does not contain any sub-pages</h5>
@@ -119,7 +119,7 @@
         </div>
         <div class="absolute bottom buttons pad-bottom pad-left">
             <div class="col btn-page-settings pad-right"><a class="button" href="javascript:">Create Sub-Page</a></div>
-            <div class="col btn-page-cancel pad-right"><a class="button cancel" href="javascript:" onclick="S.dashboard.pages.subpage.create.cancel(this)">Cancel</a></div>
+            <div class="col btn-page-cancel pad-right"><a class="button cancel" href="javascript:" onclick="S.dashboard.pages.subpage.create.cancel(this)">Done</a></div>
         </div>
         <button type="submit" class="hide"></button>
     </form>

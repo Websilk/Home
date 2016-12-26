@@ -30,7 +30,7 @@
                 scaffold.Data["field-create-title"] = textCreateTitle.Render("txtcreatetitle","","", "New Page Title");
                 scaffold.Data["field-create-summary"] = textCreateSummary.Render("txtcreatedesc", "", "", "Write a description about your new page", "", Element.Textbox.enumTextType.textarea);
                 S.javascriptFiles.Add("dash-pages", "/js/dashboard/pages/pages.js");
-                S.javascript.Add("dash-pages", "S.dashboard.pages.current_page=0;");
+                S.javascript.Add("dash-pages", "S.dashboard.pages.init();");
             }
             
             inject.html = scaffold.Render();

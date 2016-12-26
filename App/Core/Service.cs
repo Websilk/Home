@@ -12,6 +12,9 @@ namespace Websilk.Services
         after = 3
     }
 
+    /// <summary>
+    /// Used to load a single component onto the page
+    /// </summary>
     public class PageComponent
     {
         public string panelClassId = "";
@@ -23,6 +26,9 @@ namespace Websilk.Services
         public Component Component;
     }
 
+    /// <summary>
+    /// Used to load a page and its components, removing any unused components that were previously loaded
+    /// </summary>
     public class PageRequest
     {
         public string url = "";
@@ -36,17 +42,23 @@ namespace Websilk.Services
         public int pageId = 0;
     }
 
+    /// <summary>
+    /// Used to load HTML, CSS, and Javascript directly onto the page by either appending to or replacing a DOM element
+    /// </summary>
     public class Inject
     {
         public string element = "";
         public string html = "";
         public string js = "";
         public string css = "";
-        public string cssid = "";
+        public string cssId = "";
         public string remove = "";
         public enumInjectTypes inject = 0;
     }
 
+    /// <summary>
+    /// Used to load a raw HTML web page as a service (typically not via AJAX)
+    /// </summary>
     public class WebRequest
     {
         public string html = "";
@@ -66,22 +78,6 @@ namespace Websilk
 
         public Service(Core WebsilkCore) {
             S = WebsilkCore;
-        }
-
-        public struct Response
-        {
-            public string html;
-            public string css;
-            public string js;
-            public string window;
-        }
-
-        protected Response lostResponse()
-        {
-            //if session is lost, reload the page
-            Response response = new Response();
-            response.js = "S.lostSession();";
-            return response;
         }
 
         protected Services.Inject lostInject()

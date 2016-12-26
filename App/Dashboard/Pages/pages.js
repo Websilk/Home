@@ -1,5 +1,19 @@
 ﻿S.dashboard.pages = {
-    current_page: 0, page_info:null, slides: new S.slides('.pages-info > .slideshow'),
+    current_page: 0, current_path: [], page_info: null, slides: null,
+
+    init: function(){
+        this.slides = new S.slides('.pages-info > .slideshow');
+        this.current_page = 0;
+        this.current_path = [];
+        this.page_info = null;
+        S.events.doc.resize.callback.remove('dash-pages');
+        S.events.doc.resize.callback.add('dash-pages', null,
+            S.dashboard.pages.resize,
+            S.dashboard.pages.resize,
+            S.dashboard.pages.resize
+        );
+        S.dashboard.pages.resize();
+    },
 
     cleanSlideshow: function(e){
         var slide = $(e).parents('.page-details').get(0);
@@ -22,7 +36,10 @@
         } else {
             S.dashboard.pages.slides.previous(count);
         }
-        
+        for (var x = 1; x <= count; x++) {
+            S.dashboard.pages.current_path.pop(count)
+        }
+        S.dashboard.pages.current_page = S.dashboard.pages.current_path[S.dashboard.pages.current_path.length - 1];
     },
 
     details: function (e) {
@@ -42,6 +59,7 @@
             'link-create': 'S.dashboard.pages.create(this, ' + pageid + ')'
         }
         S.dashboard.pages.current_page = pageid;
+        S.dashboard.pages.current_path.push(pageid);
         S.dashboard.pages.page_info = data;
         var slides = S.dashboard.pages.slides;
 
@@ -176,7 +194,7 @@
                             container.find('.chk-secure').prop('checked', false);
                             container.find('.new-url').html('');
 
-                            //update parent page list (if data-folder doesn't exist)
+                            //update parent page list (if data-folder attribute doesn't exist)
 
                         }
                     }
@@ -194,9 +212,3 @@
     }
 }
 
-S.events.doc.resize.callback.add('dash-pages', null,
-    S.dashboard.pages.resize,
-    S.dashboard.pages.resize,
-    S.dashboard.pages.resize
-);
-S.dashboard.pages.resize();

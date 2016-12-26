@@ -65,6 +65,7 @@ namespace Websilk.Services.Dashboard
             var hasChildren = 0;
             var color = "";
             var options = new bool[] { false, false, false, false };
+            var pageItem = new Scaffold(S, "/App/Dashboard/Pages/page-item.html");
 
             htm.Append("<ul class=\"columns-list\">");
 
@@ -138,27 +139,33 @@ namespace Websilk.Services.Dashboard
                     //create
                     options[1] = false;
                 }
-                htm.Append("<li>" + RenderListItem(color, subpageId, subpageTitle, pagePath, pageLink, pageSummary, pageCreated, options, hasChildren > 0) + "</li>");
+                htm.Append("<li>" + RenderListItem(pageItem, color, subpageId, subpageTitle, pagePath, pageLink, pageSummary, pageCreated, options, hasChildren > 0) + "</li>");
             }
 
             htm.Append("</ul>");
             return htm.ToString();
         }
 
-        private string RenderListItem(string color, int pageId, string pageTitle, string pagePath, string pageLink, string pageSummary, string createdate, bool[] options, bool isfolder = false)
+        private string RenderListItem(Scaffold item, string color, int pageId, string pageTitle, string pagePath, string pageLink, string pageSummary, string createdate, bool[] options, bool isfolder = false)
         {
-            return "<div class=\"row hover item\" onclick=\"S.dashboard.pages.details(this)\"" + 
-                    (isfolder == true ? " data-folder=\"true\"" : "") + "\" data-pageid=\"" + pageId + "\" data-title=\"" + pageTitle + "\" data-path=\"" + pagePath + "\" data-link=\"" + pageLink + "\" data-summary=\"" + pageSummary.Replace("\"", "&quot;") + "\" data-created=\"" + createdate + "\">" +
-                        "<div class=\"color-tag " + color + "\"><div class=\"bg dark\">&nbsp;</div></div>" + 
-                        "<div class=\"col color-contents pad-sm clear\">" +
-                            "<div class=\"col icon small\">" +
-                                (isfolder == true ?
-                                    "<svg viewBox=\"0 0 15 15\"><use xlink:href=\"#icon-folder\" x=\"0\" y=\"0\" width=\"15\" height=\"15\" /></svg>" 
-                                : "") +
-                            "</div>" +
-                            "<div class=\"col label\">" + pageTitle + "</div>" +
-                        "</div>" +
-                    "</div>";
+            item.Data["id"] = pageId.ToString();
+            item.Data["title"] = pageTitle;
+            item.Data["path"] = pagePath;
+            item.Data["link"] = pageLink;
+            item.Data["summary"] = pageSummary.Replace("\"", "&quot;");
+            item.Data["created"] = createdate;
+            item.Data["color"] = color;
+            item.Data["folder"] = isfolder == true ? "true" : "false";
+
+            if(isfolder == true) {
+                item.Data["icon"] = "<svg viewBox=\"0 0 15 15\"><use xlink:href=\"#icon-folder\" x=\"0\" y=\"0\" width=\"15\" height=\"15\" /></svg>";
+            }
+            else
+            {
+                item.Data["icon"] = "&nbsp;";
+            }
+
+            return item.Render();
         }
 
         #endregion

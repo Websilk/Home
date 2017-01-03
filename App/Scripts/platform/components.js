@@ -13,7 +13,7 @@
         }
     },
 
-    addReferences(name, refs) { 
+    addReferences: function(name, refs) { 
         //add DOM element id references to a component type
         var index = -1;
         if (this.types.length > 0) {

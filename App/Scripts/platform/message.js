@@ -1,5 +1,5 @@
 ﻿S.message = {
-    show(element, type, msg, fadein) {
+    show: function(element, type, msg, fadein) {
         var types = 'error warning alert';
         var el = $(element);
         if (type != '' && type != null) {

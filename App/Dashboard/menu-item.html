@@ -1,6 +1,7 @@
 ﻿<li>
     <div class="row hover">
-        <a href="{{href}}"{{target}}>
+        <div class="arrow-right small onselect"></div>
+        <a href="{{href}}" onvalidate="S.dashboard.menu.validate('{{href}}','{{section-name}}')" {{target}}>
             {{gutter}}
             <span class="col icon small pad-right pad-left">
                 <span>    
@@ -11,6 +12,6 @@
             </span>
             <span class="col label nolinks"><span>{{label}}</span></span>
         </a>
-</div>
+    </div>
     {{submenu}}
 </li>

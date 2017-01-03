@@ -4,6 +4,7 @@
 
 body{font-family: Jaldi;}
 
+
 .box{
     .box(#eee, transparent, #444);
     .links(#009B87, #00C5C7, #00C5C7, #009B87);
@@ -13,11 +14,11 @@ body{font-family: Jaldi;}
     .fonts(#222, fade(#222, 30%), #009B87, #4DA400, #FF2222, #376EB2);
     .col(#007A8D);
     .line(#e6e6e6);
-    .button(default,  #009B87, #00A46C, #00C5C7, #00A46C, transparent, transparent, transparent, transparent, transparent, transparent, transparent, transparent, #fff, #fff, #fff, #fff);
-    .button(apply,    #009B87, #00A46C, #00C5C7, #00A46C, transparent, transparent, transparent, transparent, transparent, transparent, transparent, transparent, #fff, #fff, #fff, #fff);
-    .button(special,  #009B87, #00A46C, #00C5C7, #00A46C, transparent, transparent, transparent, transparent, transparent, transparent, transparent, transparent, #fff, #fff, #fff, #fff);
-    .button(cancel,   #009B87, #00A46C, #00C5C7, #00A46C, transparent, transparent, transparent, transparent, transparent, transparent, transparent, transparent, #fff, #fff, #fff, #fff);
-    .button(disabled, #009B87, #00A46C, #00C5C7, #00A46C, transparent, transparent, transparent, transparent, transparent, transparent, transparent, transparent, #fff, #fff, #fff, #fff);
+    .button(default,  #56bf94, #1bcd84, #1bcd84, #1bcd84, transparent, transparent, transparent, transparent, transparent, transparent, transparent, transparent, #fff, #fff, #fff, #fff);
+    .button(apply,    #4dc2c7, #16ced6, #16ced6, #16ced6, transparent, transparent, transparent, transparent, transparent, transparent, transparent, transparent, #fff, #fff, #fff, #fff);
+    .button(special,  #9b56ab, #9938b0, #9938b0, #a70acd, transparent, transparent, transparent, transparent, transparent, transparent, transparent, transparent, #fff, #fff, #fff, #fff);
+    .button(cancel,   #7dd0ae, #4bcc97, #4bcc97, #4bcc97, transparent, transparent, transparent, transparent, transparent, transparent, transparent, transparent, #fff, #fff, #fff, #fff);
+    .button(disabled, #a9d7ec, #a9d7ec, #a9d7ec, #a9d7ec, transparent, transparent, transparent, transparent, transparent, transparent, transparent, transparent, #fff, #fff, #fff, #fff);
     .message(default, #8ccaef, transparent, #0066ff);
     .message(error,   #dc8a8a, transparent, #b30b0b);
     .message(alert,   #dbdb86, transparent, #d79c0c); 
@@ -29,16 +30,25 @@ body{font-family: Jaldi;}
 }
 
 .box-dark{
-    .box(#c3e1ee, transparent, #265f87); 
-    .row(transparent, #c3e1ee, #c3e1ee, #265f87, #33494C, #13474F, #009B87, #00C5C7, #00C5C7, #009B87, #00B4FF, #555, #009B87, #00A46C, #185A64);
-    .row-alt(#c3e1ee, #c3e1ee, #c3e1ee, #265f87, #314747, #1C4646, #009B87, #00C5C7, #00C5C7, #009B87, #00B4FF, #555, #009B87, #00A46C, #185A64);
-    .fonts(#265f87, fade(#265f87, 30%), #009B87, #4DA400, #FF2222, #376EB2);
-    .button(default,  #35a8da, #01a0e5, #01a0e5, #01a0e5, transparent, transparent, transparent, transparent, transparent, transparent, transparent, transparent, #fff, #fff, #fff, #fff);
-    .button(apply,    #35a8da, #01a0e5, #01a0e5, #01a0e5, transparent, transparent, transparent, transparent, transparent, transparent, transparent, transparent, #fff, #fff, #fff, #fff);
+    @color:#118b92;
+    @bg:linear-gradient(to bottom, #caeaf3 0%, #d4ece1 100%);
+    .box(@bg, transparent, @color); 
+    .row(transparent, #c3e1ee, #c3e1ee, @color, #33494C, #13474F, #009B87, #00C5C7, #00C5C7, #009B87, #00B4FF, #555, #009B87, #00A46C, #185A64);
+    .row-alt(#c3e1ee, #c3e1ee, #c3e1ee, @color, #314747, #1C4646, #009B87, #00C5C7, #00C5C7, #009B87, #00B4FF, #555, #009B87, #00A46C, #185A64);
+    .fonts(@color, fade(@color, 30%), #009B87, #4DA400, #FF2222, #376EB2);
+    .button(default,  #56bf94, #1bcd84, #1bcd84, #1bcd84, transparent, transparent, transparent, transparent, transparent, transparent, transparent, transparent, #fff, #fff, #fff, #fff);
+    .button(apply,    #4dc2c7, #16ced6, #16ced6, #16ced6, transparent, transparent, transparent, transparent, transparent, transparent, transparent, transparent, #fff, #fff, #fff, #fff);
     .button(special,  #9b56ab, #9938b0, #9938b0, #a70acd, transparent, transparent, transparent, transparent, transparent, transparent, transparent, transparent, #fff, #fff, #fff, #fff);
-    .button(cancel,   #7fc7e7, #59bce8, #59bce8, #59bce8, transparent, transparent, transparent, transparent, transparent, transparent, transparent, transparent, #fff, #fff, #fff, #fff);
+    .button(cancel,   #7dd0ae, #4bcc97, #4bcc97, #4bcc97, transparent, transparent, transparent, transparent, transparent, transparent, transparent, transparent, #fff, #fff, #fff, #fff);
     .button(disabled, #a9d7ec, #a9d7ec, #a9d7ec, #a9d7ec, transparent, transparent, transparent, transparent, transparent, transparent, transparent, transparent, #fff, #fff, #fff, #fff);
     
+    .row.head{
+        .box(transparent, transparent, #265f87);
+    }
+    .row.foot{
+        .box(rgba(148, 217, 220, 0.36), transparent, @color);
+        a.text{.link(@color, darken(@color,5%), darken(@color,5%), @color);}
+    }
 } 
 
 .dash-side{
@@ -50,13 +60,12 @@ body{font-family: Jaldi;}
     .links(@font, @font-hover, @font-selected, @font); 
     .icons(@font, @font-hover, @font-hover, @font);
 
-    > .head{
+    > .head.row{
+        @bg:linear-gradient(to bottom, #2285a2 0%, #449871 100%);
+        &.hover:hover{background:@bg;color:#fff;}
+        h1, h2, h3, h4, h5, h6{color:#fff;}
         border-bottom-color:#3d3d3d;
-        .box(#bb5000, transparent, #fff); //#00a1ff, #e44600
-        .button(default, #db7200, #f38600, #ff9c00, #ff9c00, transparent, transparent, transparent, transparent, transparent, transparent, transparent, transparent, #ffdbaa, #ffdbaa, #ffdbaa, #ffdbaa);
-        &.row.hover:hover{background-color:#bb3f00;
-            .button(default, #db7200, #f38600, #ff9c00, #ff9c00, transparent, transparent, transparent, transparent, transparent, transparent, transparent, transparent, #ffdbaa, #ffdbaa, #ffdbaa, #ffdbaa);
-        } 
+        .box(@bg, transparent, #fff);
     }
 
     .submenu{

@@ -18,8 +18,6 @@
         } else {
             S.ajax.post('App/Url', { url: url }, S.ajax.callback.pageRequest);
         }
-        
-
         return false;
     },
 
@@ -44,7 +42,15 @@
     },
 
     fromAnchor: function (e) {
-        S.url.load(e.getAttribute("href").substr(1));
+        var href = e.getAttribute("href").substr(1);
+        var validate = e.getAttribute("onvalidate") || '';
+        if (validate != '') {
+            if (eval(validate) === false) {
+                //cancel anchor click if validation returns false
+                return false;
+            }
+        }
+        S.url.load(href);
         return false;
     },
 

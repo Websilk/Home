@@ -25,8 +25,9 @@
             var sels = sel.split(',').map(Function.prototype.call, String.prototype.trim);
             var el;
             var optimize = true;
-            for(var s of sels) {
-                //check if we can optimize our query selector
+            for (var x = 0; x < sels.length; x++) {
+            //check if we can optimize our query selector
+                var s = sels[x];
                 if (s.indexOf('#') == 0 && s.indexOf(' ') < 0 && elem == document && s.indexOf(':') < 0) {
                 } else if (s.indexOf('#') < 0 && s.indexOf('.') < 0 && s.indexOf(' ') < 0 && s.indexOf(':') < 0) {
                 } else if (s.indexOf('.') == 0 && s.indexOf(' ') < 0 && s.indexOf(':') < 0) {
@@ -159,7 +160,7 @@
         //properly set a style for an element
         if (e.nodeName == '#text') { return;}
         var v = val;
-        if (Number.isInteger(val)) {
+        if (val === parseInt(val, 10)) {
             //check for numbers that should be using 'px';
             if (Number(val) != 0) {
                 if (pxStyles.indexOf(name) >= 0) {
@@ -187,8 +188,8 @@
         //
         if (Array.isArray(obj)) {
             //handle content as array
-            for(var o of obj) {
-                arrayFunc(o);
+            for (var x = 0; x < obj.length; x++) {
+                arrayFunc(obj[x]);
             }
             return true;
         }
@@ -352,8 +353,8 @@
         //If selector is given, filter the results to only include ones matching the CSS select.
         var elems = [];
         this.elements.forEach(function (e) {
-            for(var child of e.children) {
-                elems.push(child);
+            for (var x = 0; x < e.children.length; x++) {
+                elems.push(e.children[x]);
             }
         });
         return clone(elems);
@@ -545,11 +546,14 @@
         }else if(typeof classes == 'string'){
             classList = classes.split(' ');
         }
-        for(e of this.elements) {
-            var classNames = e.className.split(' ');
-            if (classNames.length > 0) {
-                if (classList.every(function (a) { return classNames.some(function (b) { return a == b; }); })) {
-                    return true;
+        for (var x = 0; x < this.elements.length; x++) {
+            var n = this.elements.className || '';
+            if (n != '') {
+                var classNames = n.split(' ');
+                if (classNames.length > 0) {
+                    if (classList.every(function (a) { return classNames.some(function (b) { return a == b; }); })) {
+                        return true;
+                    }
                 }
             }
         }
@@ -990,7 +994,7 @@
 
             case "selectedIndex":
                 if (v != null) {
-                    if (Number.isInteger(v)) {
+                    if (v === parseInt(v, 10)) {
                         this.elements.forEach(function (e) {
                             if (e.nodeType == 'SELECT') {
                                 e.selectedIndex = v;
@@ -1146,7 +1150,8 @@
                 q = query(e.parentNode, s);
             }
             sibs = e.parentNode.children;
-            for (sib of sibs) {
+            for (var x = 0; x < sibs.length; x++) {
+                var sib = sibs[x];
                 if (sib != e) {
                     if (s != null) {
                         if (q.some(function (a) { return a == sib; })) {

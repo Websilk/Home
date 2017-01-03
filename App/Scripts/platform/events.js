@@ -315,9 +315,9 @@
     url: {
         change: function (e) {
             if (typeof e.state == 'string') {
+                if (S.events.url.callback.execute(e) == false) { return false; }
                 S.url.load(e.state, 1);
             }
-            S.events.url.callback.execute();
         },
 
         //register & execute callbacks when the url changes
@@ -334,14 +334,15 @@
                 }
             },
 
-            execute: function () {
+            execute: function (e) {
                 if (this.items.length > 0) {
                     for (var x = 0; x < this.items.length; x++) {
                         if (typeof this.items[x].onCallback == 'function') {
-                            this.items[x].onCallback();
+                            if (this.items[x].onCallback(e) == false) { return false; }
                         }
                     }
                 }
+                return true;
             }
         }
     },

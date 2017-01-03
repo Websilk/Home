@@ -11,6 +11,7 @@ namespace Websilk.Pages
         public struct structMenuItem
         {
             public string label;
+            public string id;
             public string href;
             public string icon;
             public List<structMenuItem> submenu;
@@ -46,18 +47,18 @@ namespace Websilk.Pages
             var menu = new StringBuilder();
             var menus = new List<structMenuItem>()
             {
-                menuItem("Timeline", "/dashboard/timeline", "timeline"),
-                menuItem("Pages", "/dashboard/pages", "pages"),
-                menuItem("Photos", "/dashboard/photos", "photos"),
-                menuItem("Downloads", "/dashboard/downloads", "layers"),
-                menuItem("Analytics", "/dashboard/analytics", "analytics"),
-                menuItem("Users", "/dashboard/users", "users"),
-                menuItem("Settings", "/dashboard/settings", "settings",
+                menuItem("Timeline", "timeline", "/dashboard/timeline", "timeline"),
+                menuItem("Pages", "pages", "/dashboard/pages", "pages"),
+                menuItem("Photos", "photos", "/dashboard/photos", "photos"),
+                menuItem("Downloads", "downloads", "/dashboard/downloads", "layers"),
+                menuItem("Analytics", "analytics", "/dashboard/analytics", "analytics"),
+                menuItem("Users", "users",  "/dashboard/users", "users"),
+                menuItem("Settings", "settings", "/dashboard/settings", "settings",
                     new List<structMenuItem>{
-                        menuItem("Domains", "/dashboard/settings/domains", "domains"),
-                        menuItem("Themes", "/dashboard/settings/themes", "themes"),
-                        menuItem("Color Schemes", "/dashboard/settings/colors", "colors"),
-                        menuItem("Cache", "/dashboard/settings/cache", "cache")
+                        menuItem("Domains", "settings-domains", "/dashboard/settings/domains", "domains"),
+                        menuItem("Themes", "settings-themes", "/dashboard/settings/themes", "themes"),
+                        menuItem("Color Schemes", "settings-colorschemes", "/dashboard/settings/colors", "colors"),
+                        menuItem("Cache", "settings-cache", "/dashboard/settings/cache", "cache")
                     }
                 )
             };
@@ -160,10 +161,11 @@ namespace Websilk.Pages
             return inject;
         }
 
-        private structMenuItem menuItem(string label, string href, string icon, List<structMenuItem> submenu = null)
+        private structMenuItem menuItem(string label, string id, string href, string icon, List<structMenuItem> submenu = null)
         {
             var menu = new structMenuItem();
             menu.label = label;
+            menu.id = id;
             menu.href = href;
             menu.icon = icon;
             menu.submenu = submenu;
@@ -190,6 +192,7 @@ namespace Websilk.Pages
             }
             scaff.Data["label"] = item.label;
             scaff.Data["href"] = item.href == "" ? "javascript:" : item.href;
+            scaff.Data["section-name"] = item.id;
             scaff.Data["icon"] = item.icon;
             scaff.Data["gutter"] = gutter;
             if(subs.Length > 0)

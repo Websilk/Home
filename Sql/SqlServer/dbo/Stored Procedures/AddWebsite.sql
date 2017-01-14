@@ -8,6 +8,8 @@ CREATE PROCEDURE [dbo].[AddWebsite]
 	@title nvarchar(100) = '',
 	@theme nvarchar(25) = '',
 	@colors nvarchar(25) = '',
+	@colorsEditor nvarchar(25) = '',
+	@colorsDash nvarchar(25) = '',
 	@description nvarchar(160) = '',
 	@status int = 1,
 	@icon bit = 0,
@@ -37,11 +39,11 @@ BEGIN
     
     -- first create the web site
     INSERT INTO WebSites (
-	websiteid, ownerId, title, theme, colors, datecreated, 
+	websiteid, ownerId, title, theme, colors, colorsEditor, colorsDash, datecreated, 
 	pagetemplate, pagedash, pagehome, pagelogin, pageabout, pagecontact, pagesupport, page404, pagedenied,
 	[status], icon, [enabled], deleted) 
 	VALUES (
-	NEXT VALUE FOR SequenceWebsites, @ownerId, @title, @theme, @colors, @myDate, 
+	NEXT VALUE FOR SequenceWebsites, @ownerId, @title, @theme, @colors, @colorsEditor, @colorsDash, @myDate, 
 	0, 0, 0, 0, 0, 0, 0, 0, 0, @status, @icon, @enabled, 0)
     
     SELECT TOP 1 @websiteId = websiteId FROM WebSites WHERE ownerId=@ownerId ORDER BY websiteId DESC

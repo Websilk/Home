@@ -70,7 +70,9 @@ namespace Websilk
         public string websiteTitle = "";
         public string websiteTitleSeparator = " - ";
         public string websiteTheme = "default";
-        public string websiteColors = "modern";
+        public string websiteColors = "beach";
+        public string editorColors = "dark";
+        public string dashboardColors = "aqua";
         public int websitePageAccessDenied = 0;
         public int websitePage404 = 0;
         public List<structDomain> domains = new List<structDomain>();
@@ -217,6 +219,8 @@ namespace Websilk
                 parentTitle = reader.Get("parenttitle");
                 websiteTheme = reader.Get("theme");
                 websiteColors = reader.Get("colors");
+                editorColors = reader.Get("colorsEditor");
+                dashboardColors = reader.Get("colorsDash");
                 websiteId = reader.GetInt("websiteid");
                 websiteOwner = reader.GetInt("ownerId");
                 websiteTitle = reader.Get("websitetitle");
@@ -432,10 +436,32 @@ namespace Websilk
             scaffold.Data["body-class"] = GetBrowserType() + (S.User.isMobile ? (S.User.isTablet ? " s-tablet" : " s-mobile") : " s-hd");
             scaffold.Data["website-css"] = "/content/websites/" + websiteId + "/website.css?v=" + S.Server.Version;
             scaffold.Data["theme-css"] = "/css/themes/" + websiteTheme + "/theme.css";
-            scaffold.Data["colors-css"] = "/css/colors/" + websiteColors + ".css";
             scaffold.Data["svg-icons"] = S.Server.LoadFileFromCache("/App/Content/themes/" + websiteTheme + "/icons.svg");
 
-            //set up facebook meta tags
+            //setup color scheme
+            if(pageTitle == "Dashboard")
+            {
+                //load dashboard color scheme
+                scaffold.Data["has-colors"] = "1";
+                scaffold.Data["colors-css"] = "/css/colors/dashboard/" + dashboardColors + ".css";
+            }
+            else
+            {
+                //load website color scheme (if desired)
+                if(websiteColors != "")
+                {
+                    scaffold.Data["has-colors"] = "1";
+                    scaffold.Data["colors-css"] = "/css/colors/websites/" + websiteColors + ".css";
+                }
+                if (isEditable == true)
+                {
+                    //load editor color scheme
+                    scaffold.Data["has-editor"] = "1";
+                    scaffold.Data["editor-colors-css"] = "/css/colors/editor/" + editorColors + ".css";
+                }
+            }
+
+            //setup facebook meta tags
             scaffold.Data["facebook"] = "";
             if (pagePhoto != "")
             {
@@ -445,12 +471,10 @@ namespace Websilk
                             "<meta id=\"metafbsite\" property=\"og:site_name\" content=\"" + websiteTitle + "\" />";
 
             //setup base javascript files
-            string min = "";
-            if (S.Server.environment != Server.enumEnvironment.development) { min = ".min"; }
-            S.javascriptFiles.Add("platform", "/js/platform" + min + ".js");
+            S.javascriptFiles.Add("platform", "/js/platform.js");
             if (isEditable == true)
             {
-                S.javascriptFiles.Add("platform", "/js/editor" + min + ".js");
+                S.javascriptFiles.Add("platform", "/js/editor.js");
             }
 
             //render page layout (panels & components)

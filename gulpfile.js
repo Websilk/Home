@@ -59,7 +59,7 @@ paths.working = {
     less:{
         platform: paths.css + 'platform.less',
         app: paths.app + '**/*.less',
-        colors: paths.css + 'colors/*.less',
+        colors: paths.css + 'colors/**/*.less',
         editor: paths.css + 'editor.less',
         tapestry: paths.css + 'tapestry/tapestry.less',
     },
@@ -187,6 +187,9 @@ gulp.task('less', function () {
     gulp.start('less:app');
     gulp.start('less:colors');
     gulp.start('less:editor');
+});
+
+gulp.task('css', function () {
     gulp.start('css:themes');
     gulp.start('css:app');
 });
@@ -195,7 +198,7 @@ gulp.task('less', function () {
 
 
 //default task
-gulp.task('default', ['js', 'less']);
+gulp.task('default', ['js', 'less', 'css']);
 
 //watch task
 gulp.task('watch', function () {

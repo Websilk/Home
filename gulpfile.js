@@ -96,21 +96,6 @@ paths.compiled = {
     themes: paths.webroot + 'css/themes/'
 };
 
-//tasks for cleaning compiled paths ///////////////////////////////////////////////////////////
-gulp.task('clean:js', function () {
-    return gulp.src(paths.compiled.js + '**', { read: false })
-    .pipe(rimraf())
-    .pipe(wait(500));
-});
-
-gulp.task('clean:css', function () {
-    return gulp.src(paths.compiled.css + '**', { read: false })
-    .pipe(rimraf())
-    .pipe(wait(500));
-});
-
-gulp.task('clean', ['clean:js', 'clean:css']);
-
 //tasks for compiling javascript //////////////////////////////////////////////////////////////
 gulp.task('js:app', function () {
     var pathlist = paths.working.exclude.app;
@@ -121,23 +106,23 @@ gulp.task('js:app', function () {
             path.basename = path.basename.toLowerCase();
             path.extname = path.extname.toLowerCase();
         }))
-        .pipe(gulp.dest(paths.compiled.js));
+        .pipe(gulp.dest(paths.compiled.js, { overwrite: true }));
 });
 
 gulp.task('js:platform', function () {
     var p = gulp.src(paths.working.js.platform, { base: '.' })
             .pipe(concat(paths.compiled.platform));
     if (prod == true) { p = p.pipe(uglify()); }
-    return p.pipe(gulp.dest('.'));
+    return p.pipe(gulp.dest('.', { overwrite: true }));
 });
 
 gulp.task('js:editor', function () {
     return gulp.src(paths.working.js.editor, { base: '.' })
         .pipe(concat(paths.compiled.editor))
-        .pipe(gulp.dest('.'));
+        .pipe(gulp.dest('.', { overwrite: true }));
 });
 
-gulp.task('js', ['clean:js'], function () {
+gulp.task('js', function () {
     gulp.start('js:app');
     gulp.start('js:platform');
     gulp.start('js:editor');
@@ -154,25 +139,25 @@ gulp.task('less:app', function () {
             path.basename = path.basename.toLowerCase();
             path.extname = path.extname.toLowerCase();
         }))
-        .pipe(gulp.dest(paths.compiled.app));
+        .pipe(gulp.dest(paths.compiled.app, { overwrite: true }));
 });
 
 gulp.task('less:platform', function () {
     return gulp.src(paths.working.less.platform)
         .pipe(less())
-        .pipe(gulp.dest(paths.compiled.css));
+        .pipe(gulp.dest(paths.compiled.css, { overwrite: true }));
 });
 
 gulp.task('less:colors', function () {
     return gulp.src(paths.working.less.colors)
         .pipe(less())
-        .pipe(gulp.dest(paths.compiled.css + 'colors'));
+        .pipe(gulp.dest(paths.compiled.css + 'colors', { overwrite: true }));
 });
 
 gulp.task('less:editor', function () {
     var editor = gulp.src(paths.working.less.editor).pipe(less());
     var util = gulp.src(paths.working.css.utility);
-    return merge(editor, util).pipe(gulp.dest(paths.compiled.css));
+    return merge(editor, util).pipe(gulp.dest(paths.compiled.css, { overwrite: true }));
 });
 
 gulp.task('css:themes', function () {
@@ -182,7 +167,7 @@ gulp.task('css:themes', function () {
             path.basename = path.basename.toLowerCase();
             path.extname = path.extname.toLowerCase();
         }))
-        .pipe(gulp.dest(paths.compiled.themes));
+        .pipe(gulp.dest(paths.compiled.themes, { overwrite: true }));
 });
 
 gulp.task('css:app', function () {
@@ -194,10 +179,10 @@ gulp.task('css:app', function () {
             path.basename = path.basename.toLowerCase();
             path.extname = path.extname.toLowerCase();
         }))
-        .pipe(gulp.dest(paths.compiled.app));
+        .pipe(gulp.dest(paths.compiled.app, { overwrite: true }));
 });
 
-gulp.task('less', ['clean:css'], function () {
+gulp.task('less', function () {
     gulp.start('less:platform');
     gulp.start('less:app');
     gulp.start('less:colors');

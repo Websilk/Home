@@ -6,8 +6,6 @@
         },
 
         ready: function () {
-            //setTimeout(function () { S.events.render.trigger(1); }, 300);
-            //setTimeout(function () { S.events.render.trigger(1); }, 700);
             S.events.doc.resize.trigger();
         },
 

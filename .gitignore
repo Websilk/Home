@@ -7,15 +7,14 @@
 *.sln.docstates
 
 /config.json
-/wwwroot/css
-/wwwroot/js
-/wwwroot/content/themes/default
+/wwwroot/css/
+/wwwroot/js/
+/wwwroot/content/themes/default/
 /wwwroot/content/websites/
-/wwwroot/images/screenshots
-/wwwroot/images/workflow
-/Vendor
-
-/App/Content/websites
+/wwwroot/images/screenshots/
+/wwwroot/images/workflow/
+/Vendor/
+/App/Content/websites/
 
 *.bak
 *.jfm

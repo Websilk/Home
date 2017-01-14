@@ -12,10 +12,15 @@
     <link type="text/css" rel="stylesheet" href="/css/platform.css" />
     {{head-css}}
     <link type="text/css" rel="stylesheet" href="{{theme-css}}" />
+    {{has-colors}}
     <link type="text/css" rel="stylesheet" href="{{colors-css}}" id="colorsCss" />
+    {{/has-colors}}
     <link type="text/css" rel="stylesheet" href="{{website-css}}" />
     {{css-files}}
-    
+    {{has-editor}}
+    <link type="text/css" rel="stylesheet" href="{{editor-colors-css}}" id="editorColorsCss" />
+    <link type="text/css" rel="stylesheet" href="/css/editor.css" />
+    {{/has-editor}}
 
     <link rel="icon" type="image/ico" href="{{favicon}}" />
     {{font-faces}}

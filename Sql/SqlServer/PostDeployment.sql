@@ -12,7 +12,7 @@ IF (SELECT COUNT(*) FROM Users WHERE userId=1) = 0 BEGIN
 	EXEC AddUser @email='admin@localhost', @password='', @displayname='admin', @photo='', @status=1
 
 	/* Create Default Website */
-	EXEC @websiteId = AddWebsite @ownerId=1, @title=@websiteTitle, @theme='default', @colors='modern', @description=@pageDescription, 
+	EXEC @websiteId = AddWebsite @ownerId=1, @title=@websiteTitle, @theme='default', @colors='beach', @colorsEditor='dark', @colorsDash='aqua', @description=@pageDescription, 
 					@status=1, @icon=1, @security=0, @enabled=1, @domainname='websilk.com'
 	
 	/* Setup Available Components */

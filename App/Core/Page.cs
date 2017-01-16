@@ -236,6 +236,15 @@ namespace Websilk
 
                 //initialize theme Elements
                 Elements = new Elements(S, "/App/Content/themes/" + websiteTheme + "/");
+
+                //check if editable
+                if(pageTitle != "Dashboard")
+                {
+                    if(S.User.checkSecurity(websiteId,"dashboard/pages", User.enumSecurity.update))
+                    {
+                        isEditable = true;
+                    }
+                }
             }
 
         }
@@ -430,13 +439,13 @@ namespace Websilk
         {
             //setup page to render layout, panels, and components (and editor UI too if necessary)
             var scaffold = new Scaffold(S, "/app/core/page.html");
+            var useSVG = false;
 
             //setup scaffold variables
             scaffold.Data["favicon"] = "/images/favicon.gif";
             scaffold.Data["body-class"] = GetBrowserType() + (S.User.isMobile ? (S.User.isTablet ? " s-tablet" : " s-mobile") : " s-hd");
             scaffold.Data["website-css"] = "/content/websites/" + websiteId + "/website.css?v=" + S.Server.Version;
             scaffold.Data["theme-css"] = "/css/themes/" + websiteTheme + "/theme.css";
-            scaffold.Data["svg-icons"] = S.Server.LoadFileFromCache("/App/Content/themes/" + websiteTheme + "/icons.svg");
 
             //setup color scheme
             if(pageTitle == "Dashboard")
@@ -444,6 +453,7 @@ namespace Websilk
                 //load dashboard color scheme
                 scaffold.Data["has-colors"] = "1";
                 scaffold.Data["colors-css"] = "/css/colors/dashboard/" + dashboardColors + ".css";
+                useSVG = true;
             }
             else
             {
@@ -455,10 +465,16 @@ namespace Websilk
                 }
                 if (isEditable == true)
                 {
-                    //load editor color scheme
+                    //load Editor UI
                     scaffold.Data["has-editor"] = "1";
                     scaffold.Data["editor-colors-css"] = "/css/colors/editor/" + editorColors + ".css";
+                    scaffold.Data["editor"] = Editor.Render(S);
+                    useSVG = true;
                 }
+            }
+            if(useSVG == true)
+            {
+                scaffold.Data["svg-icons"] = S.Server.LoadFileFromCache("/App/Content/themes/" + websiteTheme + "/icons.svg");
             }
 
             //setup facebook meta tags
@@ -474,7 +490,7 @@ namespace Websilk
             S.javascriptFiles.Add("platform", "/js/platform.js");
             if (isEditable == true)
             {
-                S.javascriptFiles.Add("platform", "/js/editor.js");
+                S.javascriptFiles.Add("editor", "/js/editor.js");
             }
 
             //render page layout (panels & components)

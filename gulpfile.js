@@ -58,7 +58,10 @@ paths.working = {
 
     less:{
         platform: paths.css + 'platform.less',
-        app: paths.app + '**/*.less',
+        app: [
+            paths.app + '**/*.less',
+            '!' + paths.app + 'CSS/editor.less'
+        ],
         colors: paths.css + 'colors/**/*.less',
         editor: paths.css + 'editor.less',
         tapestry: paths.css + 'tapestry/tapestry.less',
@@ -80,6 +83,7 @@ paths.working = {
         app: [
             '!' + paths.app + 'Content/**/',
             '!' + paths.app + 'CSS/**/',
+            '!' + paths.app + 'CSS/',
             '!' + paths.app + 'Scripts/**/'
         ]
     }
@@ -98,7 +102,7 @@ paths.compiled = {
 
 //tasks for compiling javascript //////////////////////////////////////////////////////////////
 gulp.task('js:app', function () {
-    var pathlist = paths.working.exclude.app;
+    var pathlist = paths.working.exclude.app.slice(0);
     pathlist.unshift(paths.working.js.app);
     return gulp.src(pathlist)
         .pipe(rename(function (path) {
@@ -130,8 +134,10 @@ gulp.task('js', function () {
 
 //tasks for compiling LESS & CSS /////////////////////////////////////////////////////////////////////
 gulp.task('less:app', function () {
-    var pathlist = paths.working.exclude.app;
-    pathlist.unshift(paths.working.less.app);
+    var pathlist = paths.working.exclude.app.slice(0);
+    for (var x = paths.working.less.app.length - 1; x >= 0; x--) {
+        pathlist.unshift(paths.working.less.app[x]);
+    }
     return gulp.src(pathlist)
         .pipe(less())
         .pipe(rename(function (path) {
@@ -171,7 +177,7 @@ gulp.task('css:themes', function () {
 });
 
 gulp.task('css:app', function () {
-    var pathlist = paths.working.exclude.app;
+    var pathlist = paths.working.exclude.app.slice(0);
     pathlist.unshift(paths.working.css.app);
     return gulp.src(pathlist)
         .pipe(rename(function (path) {
@@ -209,19 +215,19 @@ gulp.task('watch', function () {
         paths.scripts + 'platform/*.js'
     ], ['js:platform']);
 
-    //watch editor JS
-    gulp.watch([
-        paths.scripts + 'core/editor.js',
-        paths.scripts + 'editor/*.js'
-    ], ['js:editor']);
-
-    //watch apps JS
-    var pathjs = paths.working.exclude.app;
+    //watch app JS
+    var pathjs = paths.working.exclude.app.slice(0);
     for (var x = 0; x < pathjs.length; x++) {
         pathjs[x] += '*.js';
     }
     pathjs.unshift(paths.working.js.app);
     gulp.watch(pathjs, ['js:app']);
+
+    //watch editor JS
+    gulp.watch([
+        paths.scripts + 'core/editor.js',
+        paths.scripts + 'editor/*.js'
+    ], ['js:editor']);
 
     //watch platform LESS
     gulp.watch([
@@ -230,17 +236,14 @@ gulp.task('watch', function () {
     ], ['less:platform']);
 
     //watch app LESS
-    var pathless = paths.working.exclude.app;
+    var pathless = paths.working.exclude.app.slice(0);
     for (var x = 0; x < pathless.length; x++) {
         pathless[x] += '*.less';
     }
-    pathless.unshift(paths.working.less.app);
+    for (var x = paths.working.less.app.length - 1; x >= 0; x--) {
+        pathless.unshift(paths.working.less.app[x]);
+    }
     gulp.watch(pathless, ['less:app']);
-
-    //watch colors LESS
-    gulp.watch([
-        paths.working.less.colors
-    ], ['less:colors']);
 
     //watch editor LESS
     gulp.watch([
@@ -248,8 +251,13 @@ gulp.task('watch', function () {
         paths.working.css.utility
     ], ['less:editor']);
 
+    //watch colors LESS
+    gulp.watch([
+        paths.working.less.colors
+    ], ['less:colors']);
+
     //watch app CSS
-    var pathcss = paths.working.exclude.app;
+    var pathcss = paths.working.exclude.app.slice(0);
     for (var x = 0; x < pathcss.length; x++) {
         pathcss[x] += '*.css';
     }

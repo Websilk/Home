@@ -1,0 +1,28 @@
+﻿.tooltab{
+    position:absolute; right:0; padding:8px 8px 0 8px; margin:10px; border-radius:50px; width:41px; height:41px; box-sizing:border-box; display:none; z-index:5000;
+    > a > svg{width:25px; height:25px;}
+}
+.editor{
+    position:fixed; width:100%; height:0; z-index:5000; display:none;
+    > .toolbar{
+        position:absolute; width:100%; height:50px;
+        > .container{
+            width:1920px; padding:0 10px; box-sizing:border-box; text-align:center; white-space:nowrap;
+            a.logo{position:absolute;left:10px; top:7px;}
+            > nav.menu{
+                display:inline-block; white-space:nowrap; padding-top:12px;
+                > a{display:inline-block; margin:0 7px;}
+            }
+        }
+        .logo svg{width:100px; height:36px;}
+    }
+    > .windows{width:0; height:0;} 
+}
+
+@media(max-width:1920px){
+    .editor{
+        > .toolbar{
+            > .container{ width:100%; }
+        }
+    }
+}

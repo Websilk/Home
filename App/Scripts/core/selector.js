@@ -268,7 +268,7 @@
         var obj = getObj(content);
         if (isArray(obj, this.after) || obj == null) { return this; }
 
-        insertContent(obj, this.elements,
+        insertContent(obj, this.elements, 
             function (e) { e.insertAdjacentHTML('afterend', obj); },
             function (e) { e.parentNode.insertBefore(obj, e.nextSibling); }
         );
@@ -289,7 +289,7 @@
 
         insertContent(obj, this.elements,
             function (e) { e.insertAdjacentHTML('beforeend', obj); },
-            function (e) { e.insertAfter(obj); }
+            function (e) { e.appendChild(obj); }
         );
         return this;
     }
@@ -1126,11 +1126,7 @@
         //Display the matched elements
         this.removeClass('hide');
         this.elements.forEach(function (e) {
-            if (e.style.display == 'none') {
-                e.style.display = '';
-            } else {
-                e.style.display = 'block';
-            }
+            e.style.display = 'block';
         });
         return this;
     }

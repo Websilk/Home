@@ -115,7 +115,7 @@ var S = {
     },
 
     editor: {
-        editMode: false, enabled: false
+        visible: false, enabled: false
     },
 
     lostSession: function () {

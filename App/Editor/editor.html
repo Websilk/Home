@@ -1,3 +1,43 @@
-﻿<div class="editor box">
-
+﻿<div class="svgicons">{{svg-logo}}</div>
+<div class="tooltab">
+    <a class="icon" href="javascript:" onclick="S.editor.show()">
+        <svg viewBox="0 0 36 36">
+            <use xlink:href="#icon-settings" x="0" y="0" width="36" height="36"></use>
+        </svg>
+    </a>
 </div>
+<div class="editor">
+    <div class="toolbar box">
+        <div class="container">
+            <a class="icon logo" href="http://www.github.com/websilk/home" target="_blank">
+                <svg viewBox="0 0 177 36">
+                    <use xlink:href="#logo-websilk" x="0" y="0" width="177" height="36"></use>
+                </svg>
+            </a>
+            <nav class="menu">
+                <a class="icon plus" href="javascript:"><svg viewBox="0 0 25 25"><use xlink:href="#icon-plus" x="0" y="0" width="25" height="25"></use></svg></a>
+                <a class="icon options" href="javascript:"><svg viewBox="0 0 25 25"><use xlink:href="#icon-options" x="0" y="0" width="25" height="25"></use></svg></a>
+                <a class="icon grid" href="javascript:"><svg viewBox="0 0 25 25"><use xlink:href="#icon-grid" x="0" y="0" width="25" height="25"></use></svg></a>
+                <a class="icon screens" href="javascript:"><svg viewBox="0 0 33 25"><use xlink:href="#icon-screenhd" x="0" y="0" width="33" height="25"></use></svg></a>
+                <a class="icon search" href="javascript:"><svg viewBox="0 0 25 25"><use xlink:href="#icon-search" x="0" y="0" width="25" height="25"></use></svg></a>
+            </nav>
+        </div>
+    </div>
+    <div class="windows"></div>
+</div>
+
+<script type="text/html" id="window_scaffold">
+    <div class="box">
+        #titlebar#
+        <div class="row titlebar pad-sm size-sm">
+            <span class="icon"><svg viewBox="0 0 15 15"><use xlink:href="#icon-#icon#" x="0" y="0" width="36" height="36"></use></svg></span>
+            <span class="title">#title#</span>
+            <div class="col right">
+                #can-maximize#<a class="icon"><svg viewBox="0 0 15 15"><use xlink:href="#icon-windowmaximize" x="0" y="0" width="36" height="36"></use></svg></a>#/can-maximize#
+                #can-close#<a class="icon"><svg viewBox="0 0 15 15"><use xlink:href="#icon-close" x="0" y="0" width="36" height="36"></use></svg></a>#/can-close#
+            </div>
+        </div>
+        #/titlebar#
+        <div class="content">#html#</div>
+    </div>
+</script>

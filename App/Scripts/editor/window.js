@@ -61,19 +61,6 @@
             }
             div.style.top = (win.top + win.alignPadding) + 'px';
 
-            //resize window
-            if (win.height.toString().indexOf('%') < 0) {
-                div.style.minHeight = win.height + 'px';
-            } else {
-                div.style.minHeight = (((S.window.height - win.top) / 100) * parseInt(win.height.replace('%', ''))) + 'px';
-            }
-            if (win.width.toString().indexOf('%') < 0) {
-                div.style.width = win.width + 'px';
-            } else {
-                div.style.width = (((S.window.width - (win.right || win.left)) / 100) * parseInt(win.width.replace('%', ''))) + 'px';
-            }
-            if (win.maxHeight > 0) { div.style.maxHeight = win.maxHeight + 'px' }
-
             //z-index
             if (win.zIndex > 0) {
                 div.style.zIndex = 4500 + win.zIndex;
@@ -96,9 +83,38 @@
             this.items[id] = win;
             $('.editor .windows').append(div);
 
+            //resize window contents
+            var content = $('#win' + id + ' .box > .content').get();
+            if (win.height.toString().indexOf('%') < 0) {
+                content.style.minHeight = win.height + 'px';
+            } else {
+                content.style.minHeight = (((S.window.height - win.top) / 100) * parseInt(win.height.replace('%', ''))) + 'px';
+            }
+            if (win.width.toString().indexOf('%') < 0) {
+                content.style.width = win.width + 'px';
+            } else {
+                content.style.width = (((S.window.width - (win.right || win.left)) / 100) * parseInt(win.width.replace('%', ''))) + 'px';
+            }
+            if (win.maxHeight > 0) { content.style.maxHeight = win.maxHeight + 'px' }
+
             //setup window button events
             $('#win' + id + ' .icon.close').on('click', function () { S.editor.window.close.call(S.editor.window, id) });
             $('#win' + id + ' .icon.maximize').on('click', function () { S.editor.window.maximize.call(S.editor.window, id) });
+
+            //setup titlebar drag event
+            if (win.hasTitleBar && win.canDrag) {
+                S.drag.add(
+                    $('#win' + id + ' .titlebar').get(),
+                    $('#win' + id).get(),
+                    null, null, null,
+                    {
+                        boundTop: S.editor.toolbar.height,
+                        boundLeft: 0,
+                        boundRight: 0,
+                        boundBottom: 0
+                    }
+                );
+            }
 
             //execute loaded callback
             if (win.onLoad) { win.onLoad(); }

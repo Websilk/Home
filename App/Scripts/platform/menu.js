@@ -16,7 +16,7 @@
             var e = items.get(x);
             var a = $(e).find('a');
             if (a.length > 0) {
-                if (window.location.href.indexOf(a.get(0).href) >= 0) {
+                if (window.location.href.indexOf(a.get().href) >= 0) {
                     $(e).addClass('selected');
                     break;
                 }

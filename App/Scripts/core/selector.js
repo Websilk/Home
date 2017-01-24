@@ -30,7 +30,7 @@
                 var s = sels[x];
                 if (s.indexOf('#') == 0 && s.indexOf(' ') < 0 && elem == document && s.indexOf(':') < 0) {
                 } else if (s.indexOf('#') < 0 && s.indexOf('.') < 0 && s.indexOf(' ') < 0 && s.indexOf(':') < 0) {
-                } else if (s.indexOf('.') == 0 && s.indexOf(' ') < 0 && s.indexOf(':') < 0) {
+                } else if (s.indexOf('.') == 0 && s.indexOf('.', 1) < 0 && s.indexOf(' ') < 0 && s.indexOf(':') < 0) {
                 }else{optimize = false; break;}
             }
             if (optimize == true) {
@@ -521,7 +521,7 @@
         //Get all elements or a single element from the current collection. 
         //When no index is given, returns all elements in an ordinary array. 
         //When index is specified, return only the element at that position. 
-        return this.elements[index];
+        return this.elements[index || 0];
     }
 
     select.prototype.has = function(selector) {
@@ -1278,7 +1278,7 @@
         return this;
     }
 
-    select.prototype.width = function () {
+    select.prototype.width = function (val) {
         //Get the current computed width for the first element in the set of matched elements or set the width of every matched element
         var obj = getObj(val);
         if (typeof obj == "string") {

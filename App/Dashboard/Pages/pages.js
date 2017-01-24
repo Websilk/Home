@@ -113,7 +113,7 @@
             }
             //add event listeners for page create form
             container.find('form').on('submit', function (e) {
-                S.dashboard.pages.create.submit(container.find('form').get(0));
+                S.dashboard.pages.create.submit(container.find('form').get());
                 e.preventDefault();
                 return false;
             });

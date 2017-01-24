@@ -1,6 +1,6 @@
 ﻿namespace Websilk
 {
-    public static class Editor
+    public static class EditorUI
     {
 
         public static string Render(Core S)

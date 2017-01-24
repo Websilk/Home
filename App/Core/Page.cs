@@ -468,7 +468,7 @@ namespace Websilk
                     //load Editor UI
                     scaffold.Data["has-editor"] = "1";
                     scaffold.Data["editor-colors-css"] = "/css/colors/editor/" + editorColors + ".css";
-                    scaffold.Data["editor"] = Editor.Render(S);
+                    scaffold.Data["editor"] = EditorUI.Render(S);
                     useSVG = true;
                 }
             }

@@ -53,7 +53,7 @@
             div.className = 'window' + (win.classes != '' ? ' ' + win.classes : '');
 
             //align window
-            if (win.y < S.editor.toolbar.height) { win.y = S.editor.toolbar.height; }
+            if (win.top < S.editor.toolbar.height) { win.top = S.editor.toolbar.height; }
             if (win.right != null) {
                 div.style.right = win.right + 'px';
             } else {
@@ -63,7 +63,7 @@
 
             //resize window
             if (win.height.toString().indexOf('%') < 0) {
-                div.style.minHeight = win.hheight + 'px';
+                div.style.minHeight = win.height + 'px';
             } else {
                 div.style.minHeight = (((S.window.height - win.top) / 100) * parseInt(win.height.replace('%', ''))) + 'px';
             }
@@ -96,13 +96,33 @@
             this.items[id] = win;
             $('.editor .windows').append(div);
 
+            //setup window button events
+            $('#win' + id + ' .icon.close').on('click', function () { S.editor.window.close.call(S.editor.window, id) });
+            $('#win' + id + ' .icon.maximize').on('click', function () { S.editor.window.maximize.call(S.editor.window, id) });
+
             //execute loaded callback
             if (win.onLoad) { win.onLoad(); }
         } else {
             //show existing window
+            $('#win' + id).show();
             win.visible = true;
         }
         if (win.onOpen && win.visible == true) { win.onOpen(); }
+    },
+
+    close: function (id) {
+        var win = this.items[id];
+        console.log(win);
+        $('#win' + id).hide();
+        this.items[id].visible = false;
+
+        if (win.isDialog == true) {
+            //hide dialog modal background
+        }
+    },
+
+    maximize: function (id) {
+
     }
 
 

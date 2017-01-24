@@ -547,7 +547,7 @@
             classList = classes.split(' ');
         }
         for (var x = 0; x < this.elements.length; x++) {
-            var n = this.elements.className || '';
+            var n = this.elements[x].className || '';
             if (n != '') {
                 var classNames = n.split(' ');
                 if (classNames.length > 0) {
@@ -586,8 +586,8 @@
                 if (elem == window) {
                     return window.innerHeight;
                 } else if (elem == document) {
-                    const body = document.body;
-                    const html = document.documentElement;
+                    var body = document.body;
+                    var html = document.documentElement;
                     return Math.max(
                       body.offsetHeight,
                       body.scrollHeight,
@@ -783,7 +783,7 @@
         //When given an object with properties left and top, use those values to 
         //position each element in the collection relative to the document.
         if (this.elements.length > 0) {
-            const box = this.elements[0].getBoundingClientRect();
+            var box = this.elements[0].getBoundingClientRect();
 
             return {
                 top: box.top + window.pageYOffset - document.documentElement.clientTop,
@@ -1153,6 +1153,69 @@
         return this;
     }
 
+    select.prototype.serialize = function () {
+        if (this.elements.length == 0) { return ''; }
+        var form = this.elements[0];
+        if (!form || form.nodeName !== "FORM") {
+            return '';
+        }
+        var i, j, q = [];
+        for (i = form.elements.length - 1; i >= 0; i = i - 1) {
+            if (form.elements[i].name === "") {
+                continue;
+            }
+            switch (form.elements[i].nodeName) {
+                case 'INPUT':
+                    switch (form.elements[i].type) {
+                        case 'text':
+                        case 'hidden':
+                        case 'password':
+                        case 'button':
+                        case 'reset':
+                        case 'submit':
+                            q.push(form.elements[i].name + "=" + encodeURIComponent(form.elements[i].value));
+                            break;
+                        case 'checkbox':
+                        case 'radio':
+                            if (form.elements[i].checked) {
+                                q.push(form.elements[i].name + "=" + encodeURIComponent(form.elements[i].value));
+                            }
+                            break;
+                    }
+                    break;
+                case 'file':
+                    break;
+                case 'TEXTAREA':
+                    q.push(form.elements[i].name + "=" + encodeURIComponent(form.elements[i].value));
+                    break;
+                case 'SELECT':
+                    switch (form.elements[i].type) {
+                        case 'select-one':
+                            q.push(form.elements[i].name + "=" + encodeURIComponent(form.elements[i].value));
+                            break;
+                        case 'select-multiple':
+                            for (j = form.elements[i].options.length - 1; j >= 0; j = j - 1) {
+                                if (form.elements[i].options[j].selected) {
+                                    q.push(form.elements[i].name + "=" + encodeURIComponent(form.elements[i].options[j].value));
+                                }
+                            }
+                            break;
+                    }
+                    break;
+                case 'BUTTON':
+                    switch (form.elements[i].type) {
+                        case 'reset':
+                        case 'submit':
+                        case 'button':
+                            q.push(form.elements[i].name + "=" + encodeURIComponent(form.elements[i].value));
+                            break;
+                    }
+                    break;
+            }
+        }
+        return q.join("&");
+    }
+
     select.prototype.show = function () {
         //Display the matched elements
         this.removeClass('hide');
@@ -1299,8 +1362,8 @@
                 if (elem == window) {
                     return window.innerWidth;
                 } else if (elem == document) {
-                    const body = document.body;
-                    const html = document.documentElement;
+                    var body = document.body;
+                    var html = document.documentElement;
                     return Math.max(
                       body.offsetWidth,
                       body.scrollWidth,
@@ -1372,6 +1435,7 @@
         if (!opt.cache) { opt.cache = false; }
         if (!opt.contentType) { opt.contentType = 'application/x-www-form-urlencoded; charset=UTF-8'; }
         if (!opt.data) { opt.data = ''; }
+        if (!opt.dataType) { opt.dataType = ''; }
         if (!opt.method) { opt.method = "GET"; }
         if (opt.type) { opt.method = opt.type; }
         if (!opt.url) { opt.url = ''; }
@@ -1413,6 +1477,16 @@
         req.open(opt.method, opt.url, opt.async, opt.username, opt.password);
         req.setRequestHeader('Content-Type', opt.contentType);
         req.send(opt.data);
+    }
+
+    $.serializePost = function (elems) {
+        //converts an object to send as data for an AJAX POST
+        var r = '';
+        for (var e in elems) {
+            if (r != '') { r += '&'; }
+            r += e + '=' + elems[e];
+        }
+        return r;
     }
 
 })();

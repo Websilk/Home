@@ -14,7 +14,6 @@
             left: 0, top: 0, width: 142, height: 100, title: 'Components',
             onLoad: function () {
                 //load initial components list from server
-                console.log('loaded components modal window');
             }
         });
     });

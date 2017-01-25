@@ -1,4 +1,5 @@
-﻿//Websilk Selector Framework (replaces jQuery)
+﻿// Websilk Selector Framework (replaces jQuery)
+// https://github.com/Websilk/Home/blob/master/App/Scripts/core/selector.js
 
 //private selector object
 (function () {
@@ -7,6 +8,7 @@
     var pxStyles = ['top', 'right', 'bottom', 'left'];
     var pxStylesPrefix = ['border', 'padding', 'margin'];
     var pxStylesSuffix = ['Top', 'Right', 'Bottom', 'Left'];
+    var listeners = []; //used for capturing event listeners from $('').on 
 
     function select(sel) {
         //main function, instantiated via $(sel)
@@ -772,8 +774,37 @@
     select.prototype.off = function (event, func) {
         //remove an event handler
         this.elements.forEach(function (e) {
-            e.removeEventListener(event, func);
+            for (var x = 0; x < listeners.length; x++) {
+                if (listeners[x].elem == e) {
+                    //found element in listeners array, now find specific function (func)
+                    var item = listeners[x];
+                    if (func == null) {
+                        //remove all events from listener
+                        for (var y = 0; y < item.events.length; y++) {
+                            e.removeEventListener(event, item.events[y]);
+                        }
+                        listeners.splice(x, 1);
+                    } else {
+                        for (var y = 0; y < item.events.length; y++) {
+                            if (item.events[y] == func) {
+                                //remove specific event from element in listeners array
+                                e.removeEventListener(event, func);
+                                listeners[x].events.splice(y, 1);
+                                listen = true;
+                                if (listeners[x].events.length == 0) {
+                                    //remove element from listeners array since no more events exist for the element
+                                    listeners.splice(x, 1);
+                                }
+                                break;
+                            }
+
+                        }
+                    }
+                    break;
+                }
+            }
         });
+        return this;
     }
 
     select.prototype.offset = function(coordinates) {
@@ -806,7 +837,17 @@
         //Attach an event handler function for one or more events to the selected elements.
         this.elements.forEach(function (e) {
             e.addEventListener(event, func);
+            var listen = false;
+            for (var x = 0; x < listeners.length; x++) {
+                if (listeners[x].elem == e) {
+                    listeners[x].events.push(func);
+                    listen = true;
+                    break;
+                }
+            }
+            if (listen == false) { listeners.push({ elem: e, events: [func] });}
         });
+        return this;
     }
 
     select.prototype.one = function (event, func) {
@@ -876,6 +917,14 @@
     select.prototype.prepend = function(content) {
         //Prepend content to the DOM inside each element in the collection. 
         //The content can be an HTML string, a DOM node or an array of nodes.
+        var obj = getObj(content);
+        if (isArray(obj, this.append) || obj == null) { return this; }
+
+
+        insertContent(obj, this.elements,
+            function (e) { e.insertAdjacentHTML('afterbegin', obj); },
+            function (e) { e.insertBefore(obj, e.firstChild); }
+        );
         return this;
     }
 

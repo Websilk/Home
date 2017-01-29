@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Data.SqlClient;
 using Newtonsoft.Json;
 
 namespace Websilk
@@ -103,8 +104,8 @@ namespace Websilk
                 //securely change admin password
                 //get admin email address from database
                 var parameters = new List<SqlParameter>();
-                parameters.Add(new SqlParameter("$userId", userId.ToString(), 0, enumSqlParameterType.isNumber));
-                emailAddr = (string)S.Sql.ExecuteScalar("EXEC GetUserEmail @userId=$userId", parameters);
+                parameters.Add(new SqlParameter("@_userId", userId.ToString()));
+                emailAddr = (string)S.Sql.ExecuteScalar("EXEC GetUserEmail @userId=@_userId", parameters);
                 if (emailAddr != "" && emailAddr != null) { update = true; }
             }
             if(update == true)

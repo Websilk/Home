@@ -61,7 +61,8 @@ namespace Websilk
         public SqlDataReader ExecuteReader(string sql, List<SqlParameter> parameters = null)
         {
             if (_started == false) { Start(); }
-            cmd.CommandText = SqlParser.Parse(sql, parameters);
+            cmd.CommandText = sql;
+            GetParameters(parameters);
             reader = cmd.ExecuteReader();
             return reader;
         }
@@ -69,15 +70,29 @@ namespace Websilk
         public void ExecuteNonQuery(string sql, List<SqlParameter> parameters = null)
         {
             if (_started == false) { Start(); }
-            cmd.CommandText = SqlParser.Parse(sql, parameters);
+            cmd.CommandText = sql;
+            GetParameters(parameters);
             cmd.ExecuteNonQuery();
         }
 
         public object ExecuteScalar(string sql, List<SqlParameter> parameters = null)
         {
             if (_started == false) { Start(); }
-            cmd.CommandText = SqlParser.Parse(sql, parameters);
+            cmd.CommandText = sql;
+            GetParameters(parameters);
             return cmd.ExecuteScalar();
+        }
+
+        private void GetParameters(List<SqlParameter> parameters)
+        {
+            cmd.Parameters.Clear();
+            if(parameters != null)
+            {
+                foreach(var p in parameters)
+                {
+                    cmd.Parameters.Add(p);
+                }
+            }
         }
 
         #region "Get"
@@ -149,32 +164,6 @@ namespace Websilk
         #endregion
     }
 
-    public static class SqlParser
-    {
-        /// <summary>
-        /// Generate a safe Sql Query from parameters
-        /// </summary>
-        /// <param name="query"></param>
-        /// <param name="parameters"></param>
-        /// <returns></returns>
-        public static string Parse(string query, List<SqlParameter> parameters)
-        {
-            var q = query;
-            //inject values into query (to prevent sql injection attacks)
-            if (parameters != null)
-            {
-                if (parameters.Count > 0)
-                {
-                    foreach (var p in parameters)
-                    {
-                        q = q.Replace(p.Name, p.Value);
-                    }
-                }
-            }
-            
-            return q;
-        }
-    }
 
     public class SqlReader
     {
@@ -184,10 +173,10 @@ namespace Websilk
         private int _i = -1;
         public List<Dictionary<string, string>> Rows = new List<Dictionary<string, string>>();
 
-        public SqlReader(Core WebsilkCore, string query, List<SqlParameter> parameters)
+        public SqlReader(Core WebsilkCore, string query, List<SqlParameter> parameters = null)
         {
             S = WebsilkCore;
-            var reader = S.Sql.ExecuteReader(SqlParser.Parse(query, parameters));
+            var reader = S.Sql.ExecuteReader(query, parameters);
             switch(S.Sql.dataType){
                 case enumSqlDataTypes.SqlClient:
                     ReadFromSqlClient(reader);
@@ -279,62 +268,13 @@ namespace Websilk
         }
     }
 
-
-    public enum enumSqlParameterType
-    {
-        isString = 0,
-        isNumber = 1
-    }
-
-    public class SqlParameter
-    {
-        public string Name = "";
-        private string _value = "";
-        public int Length;
-        public enumSqlParameterType Type = enumSqlParameterType.isString;
-
-        public SqlParameter(string name, string value, int maxLength = 0, enumSqlParameterType type = enumSqlParameterType.isString)
-        {
-            Name = name;
-            _value = value;
-            Type = type;
-            Length = maxLength;
-        }
-
-        public string Value
-        {
-            get
-            {
-                var quote = Type == enumSqlParameterType.isString ? "'" : "";
-                return quote + CleanValue(_value) + quote;
-            }
-            set
-            {
-                _value = value;
-            }
-        }
-
-        private string CleanValue(string value)
-        {
-            //prevent SQL injection
-            //replace two (or more) single-quotes with a single-quote and then 
-            //replace one single-quote with two single-quotes
-            var v = value.Replace("''", "'").Replace("''","'").Replace("'","''"); 
-            //truncate data if needed
-            if(v.Length > Length && Length > 0) { v = v.Substring(0, Length - 1); }
-            return v;
-        }
-    }
-
     public class SqlQuery
     {
         protected Core S;
-        protected enumSqlDataTypes dataType;
 
         public SqlQuery(Core WebsilkCore)
         {
             S = WebsilkCore;
-            dataType = S.Sql.dataType;
         }
     }
 }

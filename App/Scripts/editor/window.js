@@ -12,7 +12,6 @@
                 classes: options.classes ? option.classes : '',
                 title: options.title ? options.title : '',
                 icon: options.icon ? options.icon : '',
-                html: options.html ? options.html : '',
                 width: options.width ? options.width : 500,
                 height: options.height ? options.height : 0,
                 maxHeight: options.maxHeight ? options.maxHeight : 0,
@@ -44,7 +43,13 @@
                 onOpen: options.onOpen ? options.onOpen : null,
                 onClose: options.onClose ? options.onClose : null,
                 onMaximize: options.onMaximize ? options.onMaximize : null,
-                onMinimize: options.onMinimize ? options.onMinimize : null
+                onMinimize: options.onMinimize ? options.onMinimize : null,
+                onUrlLoad: options.onUrlLoad ? options.onUrlLoad : null,
+
+                //content
+                html: options.html ? options.html : '',
+                url: options.url ? options.url : '',
+                urlData: options.urlData ? options.urlData : ''
             }
 
             //create window element
@@ -96,6 +101,11 @@
                 content.style.width = (((S.window.width - (win.right || win.left)) / 100) * parseInt(win.width.replace('%', ''))) + 'px';
             }
             if (win.maxHeight > 0) { content.style.maxHeight = win.maxHeight + 'px' }
+
+            //load initial content from server
+            if (win.url != '') {
+                S.ajax.post(win.url, win.urlData, function (data) { $('#win' + id + ' .content').html(data.d); if (win.onUrlLoad) { win.onUrlLoad(); } });
+            }
 
             //setup window button events
             $('#win' + id + ' .icon.close').on('click', function () { S.editor.window.close.call(S.editor.window, id) });

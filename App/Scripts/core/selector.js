@@ -162,13 +162,13 @@
         //properly set a style for an element
         if (e.nodeName == '#text') { return;}
         var v = val;
-        if (val === parseInt(val, 10)) {
+        if (val == parseInt(val, 10)) {
             //check for numbers that should be using 'px';
             if (Number(val) != 0) {
                 if (pxStyles.indexOf(name) >= 0) {
                     v = val + 'px';
-                } else if (pxStylesPrefix.some(function (a) { name.indexOf(a) == 0 })) {
-                    if (pxStylesSuffix.some(function (a) { name.indexOf(a) > 0 })) {
+                } else if (pxStylesPrefix.some(function (a) { return name.indexOf(a) == 0 })) {
+                    if (pxStylesSuffix.some(function (a) { return name.indexOf(a) > 0 })) {
                         v = val + 'px';
                     }
                 }
@@ -223,6 +223,26 @@
         s.elements = elems;
         s.length = elems.length;
         return s;
+    }
+
+    function hover(elem, onEnter, onLeave) {
+        var el = $(elem);
+        var entered = false;
+        el.on('mouseenter', function (e) {
+            if (entered == false) {
+                if (onEnter) { onEnter(e); }
+                entered = true;
+            }
+        });
+        el.on('mouseleave', function (e) {
+            var p = e, f = false;
+            while (p != null) { if (p == elem) { f = true; break; } p = p.parentNode; }
+            if (!f) {
+                entered = false;
+                if (onLeave) { onLeave(e);}
+            }
+        });
+        el = null;
     }
 
     //prototype functions that are accessable by return object //////////////////////////////////////////////////////////////////////////////////////
@@ -815,7 +835,7 @@
         //position each element in the collection relative to the document.
         if (this.elements.length > 0) {
             var box = this.elements[0].getBoundingClientRect();
-
+            console.log(box);
             return {
                 top: box.top + window.pageYOffset - document.documentElement.clientTop,
                 left: box.left + window.pageXOffset - document.documentElement.clientLeft
@@ -833,19 +853,23 @@
         return null;
     }
 
-    select.prototype.on = function (event, func) {
+    select.prototype.on = function (event, func, func2) {
         //Attach an event handler function for one or more events to the selected elements.
         this.elements.forEach(function (e) {
-            e.addEventListener(event, func);
-            var listen = false;
-            for (var x = 0; x < listeners.length; x++) {
-                if (listeners[x].elem == e) {
-                    listeners[x].events.push(func);
-                    listen = true;
-                    break;
+            if (event == "hover") {
+                hover(e, func, func2);
+            } else {
+                e.addEventListener(event, func);
+                var listen = false;
+                for (var x = 0; x < listeners.length; x++) {
+                    if (listeners[x].elem == e) {
+                        listeners[x].events.push(func);
+                        listen = true;
+                        break;
+                    }
                 }
+                if (listen == false) { listeners.push({ elem: e, events: [func] }); }
             }
-            if (listen == false) { listeners.push({ elem: e, events: [func] });}
         });
         return this;
     }

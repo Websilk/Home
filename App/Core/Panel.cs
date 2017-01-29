@@ -129,7 +129,7 @@ namespace Websilk
 
                 //render cell
                 var divcell = new Utility.DOM.Element("div");
-                divcell.Classes.Add("cell cell-" + cell.id);
+                divcell.Classes.Add("cell-" + cell.id + " is-cell");
                 divcell.innerHTML = cell.head + comps.ToString() + cell.foot;
                 htm.Append(divcell.Render());
             }

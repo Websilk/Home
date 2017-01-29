@@ -3,9 +3,11 @@
 html{display:flex; min-height:100%;}
 body{display:flex; width:100%;}
 .body{position:relative; width:100%;}
-.webpage{position:relative; margin:0px auto;}
-.webpage .component{position:relative; vertical-align:top; box-sizing:border-box;}
-.webpage .panel{width:100%;}
-.webpage .cell{position:relative; width:100%; text-align:center;}
+.webpage{
+    position:relative; margin:0px auto; box-sizing:border-box;
+    .component{position:relative; vertical-align:top; box-sizing:border-box;}
+    .is-panel{width:100%;}
+    .is-cell{position:relative; width:100%; text-align:center; box-sizing:border-box;}
+}
 .svgicons{display:none;}
 .hide-submit{position:absolute; left:-10000px;}

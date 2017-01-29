@@ -6,6 +6,7 @@ var gulp = require('gulp'),
     concat = require('gulp-concat'),
     cssmin = require('gulp-cssmin'),
     uglify = require('gulp-uglify'),
+    cleancss = require('gulp-clean-css'),
     util = require('gulp-util'),
     less = require('gulp-less'),
     rename = require('gulp-rename'),
@@ -104,13 +105,14 @@ paths.compiled = {
 gulp.task('js:app', function () {
     var pathlist = paths.working.exclude.app.slice(0);
     pathlist.unshift(paths.working.js.app);
-    return gulp.src(pathlist)
+    var p = gulp.src(pathlist)
         .pipe(rename(function (path) {
             path.dirname = path.dirname.toLowerCase();
             path.basename = path.basename.toLowerCase();
             path.extname = path.extname.toLowerCase();
-        }))
-        .pipe(gulp.dest(paths.compiled.js, { overwrite: true }));
+        }));
+    if (prod == true) { p = p.pipe(uglify()); }
+    return p.pipe(gulp.dest(paths.compiled.js, { overwrite: true }));
 });
 
 gulp.task('js:platform', function () {
@@ -121,9 +123,10 @@ gulp.task('js:platform', function () {
 });
 
 gulp.task('js:editor', function () {
-    return gulp.src(paths.working.js.editor, { base: '.' })
-        .pipe(concat(paths.compiled.editor))
-        .pipe(gulp.dest('.', { overwrite: true }));
+    var p = gulp.src(paths.working.js.editor, { base: '.' })
+            .pipe(concat(paths.compiled.editor));
+    if (prod == true) { p = p.pipe(uglify()); }
+    return p.pipe(gulp.dest('.', { overwrite: true }));
 });
 
 gulp.task('js', function () {
@@ -138,54 +141,61 @@ gulp.task('less:app', function () {
     for (var x = paths.working.less.app.length - 1; x >= 0; x--) {
         pathlist.unshift(paths.working.less.app[x]);
     }
-    return gulp.src(pathlist)
+    var p = gulp.src(pathlist)
         .pipe(less())
         .pipe(rename(function (path) {
             path.dirname = path.dirname.toLowerCase();
             path.basename = path.basename.toLowerCase();
             path.extname = path.extname.toLowerCase();
-        }))
-        .pipe(gulp.dest(paths.compiled.app, { overwrite: true }));
+        }));
+    if(prod == true){ p = p.pipe(cleancss({compatibility: 'ie8'})); }
+    return p.pipe(gulp.dest(paths.compiled.app, { overwrite: true }));
 });
 
 gulp.task('less:platform', function () {
-    return gulp.src(paths.working.less.platform)
-        .pipe(less())
-        .pipe(gulp.dest(paths.compiled.css, { overwrite: true }));
+    var p = gulp.src(paths.working.less.platform)
+        .pipe(less());
+    if (prod == true) { p = p.pipe(cleancss({ compatibility: 'ie8' })); }
+    return p.pipe(gulp.dest(paths.compiled.css, { overwrite: true }));
 });
 
 gulp.task('less:colors', function () {
-    return gulp.src(paths.working.less.colors)
-        .pipe(less())
-        .pipe(gulp.dest(paths.compiled.css + 'colors', { overwrite: true }));
+    var p = gulp.src(paths.working.less.colors)
+        .pipe(less());
+    if (prod == true) { p = p.pipe(cleancss({ compatibility: 'ie8' })); }
+    return p.pipe(gulp.dest(paths.compiled.css + 'colors', { overwrite: true }));
 });
 
 gulp.task('less:editor', function () {
     var editor = gulp.src(paths.working.less.editor).pipe(less());
     var util = gulp.src(paths.working.css.utility);
-    return merge(editor, util).pipe(gulp.dest(paths.compiled.css, { overwrite: true }));
+    var p = merge(editor, util);
+    if (prod == true) { p = p.pipe(cleancss({ compatibility: 'ie8' })); }
+    return p.pipe(gulp.dest(paths.compiled.css, { overwrite: true }));
 });
 
 gulp.task('css:themes', function () {
-    return gulp.src(paths.working.css.themes)
+    var p = gulp.src(paths.working.css.themes)
         .pipe(rename(function (path) {
             path.dirname = path.dirname.toLowerCase();
             path.basename = path.basename.toLowerCase();
             path.extname = path.extname.toLowerCase();
-        }))
-        .pipe(gulp.dest(paths.compiled.themes, { overwrite: true }));
+        }));
+    if (prod == true) { p = p.pipe(cleancss({ compatibility: 'ie8' })); }
+    return p.pipe(gulp.dest(paths.compiled.themes, { overwrite: true }));
 });
 
 gulp.task('css:app', function () {
     var pathlist = paths.working.exclude.app.slice(0);
     pathlist.unshift(paths.working.css.app);
-    return gulp.src(pathlist)
+    var p = gulp.src(pathlist)
         .pipe(rename(function (path) {
             path.dirname = path.dirname.toLowerCase();
             path.basename = path.basename.toLowerCase();
             path.extname = path.extname.toLowerCase();
-        }))
-        .pipe(gulp.dest(paths.compiled.app, { overwrite: true }));
+        }));
+    if (prod == true) { p = p.pipe(cleancss({ compatibility: 'ie8' })); }
+    return p.pipe(gulp.dest(paths.compiled.app, { overwrite: true }));
 });
 
 gulp.task('less', function () {

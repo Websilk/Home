@@ -4,14 +4,15 @@
   "private": true,
   "devDependencies": {
     "gulp": "^3.9.1",
+    "gulp-clean-css": "^2.3.2",
     "gulp-concat": "2.6.0",
     "gulp-cssmin": "0.1.7",
     "gulp-less": "3.1.0",
     "gulp-rename": "1.2.2",
+    "gulp-rimraf": "0.2.1",
     "gulp-uglify": "2.0.0",
     "gulp-util": "3.0.7",
-    "merge-stream": "1.0.0",
-    "gulp-rimraf": "0.2.1",
-    "gulp-wait": "0.0.2"
+    "gulp-wait": "0.0.2",
+    "merge-stream": "1.0.0"
   }
 }

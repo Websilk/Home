@@ -9,6 +9,7 @@
     var pxStylesPrefix = ['border', 'padding', 'margin'];
     var pxStylesSuffix = ['Top', 'Right', 'Bottom', 'Left'];
     var listeners = []; //used for capturing event listeners from $('').on 
+    //listeners = [{ elem: null, events: [{ name: '', list: [] }] }];
 
     function select(sel) {
         //main function, instantiated via $(sel)
@@ -721,9 +722,10 @@
     select.prototype.is = function(selector) {
         //Check if the first element of the current collection matches the CSS select.
         if (this.elements.length > 0) {
+            var sel = this;
             var obj = getObj(selector);
             var q = query(document, obj);
-            if (q.some(function (a) { return a == this.elements[0] }));
+            if (q.some(function (a) { return a == sel.elements[0] }));
         }
         return false;
     }
@@ -799,25 +801,57 @@
                     //found element in listeners array, now find specific function (func)
                     var item = listeners[x];
                     if (func == null) {
-                        //remove all events from listener
-                        for (var y = 0; y < item.events.length; y++) {
-                            e.removeEventListener(event, item.events[y]);
+                        //if no function specified, remove all listeners for a specific event
+                        if (event == null) {
+                            //remove all events and functions for element from listener
+                            for (var y = 0; y < item.events.length; y++) {
+                                var ev = item.events[y];
+                                for (var z = 0; z < ev.list.length; z++) {
+                                    e.removeEventListener(ev.name, ev.list[z]);
+                                }
+                            }
+                            listeners.splice(x, 1);
+                        } else {
+                            //remove all functions (for event) from element in listener
+                            for (var y = 0; y < item.events.length; y++) {
+                                if (item.events[y].name == event) {
+                                    var ev = item.events[y];
+                                    for (var z = 0; z < ev.list.length; z++) {
+                                        e.removeEventListener(event, ev.list[z]);
+                                    }
+                                    listeners[x].events.splice(y, 1);
+                                    if (listeners[x].events.length == 0) {
+                                        //remove element from listeners array since no more events exist for the element
+                                        listeners.splice(x, 1);
+                                    }
+                                    break;
+                                }
+                            }
                         }
-                        listeners.splice(x, 1);
                     } else {
+                        //remove specific listener based on event & function
                         for (var y = 0; y < item.events.length; y++) {
-                            if (item.events[y] == func) {
+                            if (item.events[y].name == event) {
                                 //remove specific event from element in listeners array
-                                e.removeEventListener(event, func);
-                                listeners[x].events.splice(y, 1);
-                                listen = true;
-                                if (listeners[x].events.length == 0) {
-                                    //remove element from listeners array since no more events exist for the element
-                                    listeners.splice(x, 1);
+                                var ev = item.events[y];
+                                for (var z = 0; z < ev.list.length; z++) {
+                                    if (ev.list[z] == func) {
+                                        e.removeEventListener(event, func);
+                                        listeners[x].events[y].list.splice(z, 1);
+                                        break;
+                                    }
+                                }
+                                
+                                if (listeners[x].events[y].list.length == 0) {
+                                    //remove event from element list array since no more functions exist for the event
+                                    listeners[x].events.splice(y, 1);
+                                    if (listeners[x].events.length == 0) {
+                                        //remove element from listeners array since no more events exist for the element
+                                        listeners.splice(x, 1);
+                                    }
                                 }
                                 break;
                             }
-
                         }
                     }
                     break;
@@ -835,7 +869,6 @@
         //position each element in the collection relative to the document.
         if (this.elements.length > 0) {
             var box = this.elements[0].getBoundingClientRect();
-            console.log(box);
             return {
                 top: box.top + window.pageYOffset - document.documentElement.clientTop,
                 left: box.left + window.pageXOffset - document.documentElement.clientLeft
@@ -863,12 +896,27 @@
                 var listen = false;
                 for (var x = 0; x < listeners.length; x++) {
                     if (listeners[x].elem == e) {
-                        listeners[x].events.push(func);
+                        //found element, now find specific event
+                        var events = listeners[x].events;
+                        var f = false;
+                        for (var y = 0; y < events.length; y++) {
+                            if (events[y].name == event) {
+                                //found existing event in list
+                                listeners[x].events[y].list.push(func);
+                                f = true;
+                                break;
+                            }
+                        }
+                        if (f == false) {
+                            //event doesn't exist yet
+                            var ev = { name: event, list: [func] };
+                            listeners[x].events.push(ev);
+                        }
                         listen = true;
                         break;
                     }
                 }
-                if (listen == false) { listeners.push({ elem: e, events: [func] }); }
+                if (listen == false) { listeners.push({ elem: e, events: [{ name: event, list: [func] }] }); }
             }
         });
         return this;

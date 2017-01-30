@@ -8,8 +8,6 @@
         if (!this.items.some(function (a) { a.id == id })) {
             //component is unique
             this.items.push({ id: id, name: name, refs: refs });
-        } else {
-            console.log('component is already loaded onto the page');
         }
     },
 

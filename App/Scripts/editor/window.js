@@ -138,7 +138,6 @@
 
     close: function (id) {
         var win = this.items[id];
-        console.log(win);
         $('#win' + id).hide();
         this.items[id].visible = false;
 

@@ -31,4 +31,14 @@
             $('head').append('<style id="' + id + '" type="text/css">' + css + "</style>");
         },
     }
-};
+}
+
+S.math = {
+    intersect: function(a, b) {
+        if (b.left < a.right && a.left < b.right && b.top < a.bottom){
+            return a.top < b.bottom;
+        }else{
+            return false;
+        }
+    }
+}

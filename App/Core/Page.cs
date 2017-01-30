@@ -265,7 +265,7 @@ namespace Websilk
         #endregion
 
         #region "Page Content"
-        private List<structPage> loadPage(int pageid, string folderType = "pages")
+        public List<structPage> loadPage(int pageid, string folderType = "pages")
         {
             //get a list of components to load onto the page
             var page = new List<structPage>();
@@ -405,7 +405,6 @@ namespace Websilk
                 var panels = loadLayout(scaffold);
 
                 //add components to layout panels
-                var components = new List<int[,,]>();
                 for (var x = 0; x < panels.Count; x++)
                 {
                     foreach (var page in pages)

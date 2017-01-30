@@ -31,7 +31,6 @@
 
     goback: function (e, count) {
         var container = $(e).parents('.page-details').find('.page-create');
-        console.log(this);
         if (container.hasClass('view')) {
             //first, hide "create page" form, then go back
             container.removeClass('view');

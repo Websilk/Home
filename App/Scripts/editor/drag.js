@@ -24,20 +24,21 @@
             var item = this.items[index];
 
             if (typeof item.onStart == 'function') {
-                item.onStart(item);
+                item.onStart.call(item.options ? (item.options.callee ? item.options.callee : this) : this, item);
             }
             var el = $(item.elem);
             var elem = $(item.dragElem);
             var elpos = el.offset();
             var pos = elem.position();
             var win = $(window);
+            var speed = 1000 / 30;
             if (item.options) {
                 if (item.options.useElemPos == true) {
-                    console.log(pos);
-                    console.log(elpos);
                     pos = { left: elpos.left - pos.left, top: elpos.top - pos.top };
                 }
-                console.log(pos);
+                if (item.options.speed != null) {
+                    speed = item.options.speed;
+                }
             }
 
             this.item = {
@@ -71,7 +72,7 @@
             $(document).on('mouseup', S.drag.events.doc.up);
             S.drag.events.drag.call(S.drag);
             clearInterval(this.timer);
-            this.timer = setInterval(function () { S.drag.events.drag.call(S.drag); }, 1000 / 30);
+            this.timer = setInterval(function () { S.drag.events.drag.call(S.drag); }, speed);
 
             //don't let drag event select text on the page
             if (e.stopPropagation) e.stopPropagation();
@@ -93,7 +94,7 @@
 
         drag: function () {
             var item = this.item;
-            if (item.hasOnDrag == true) { this.items[item.index].onDrag(item); }
+            if (item.hasOnDrag == true) { this.items[item.index].onDrag.call(item.options ? (item.options.callee ? item.options.callee : this) : this, item); }
             var x = (item.pos.x + (item.cursor.x - item.start.x));
             var y = (item.pos.y + (item.cursor.y - item.start.y));
             if (item.options) {
@@ -120,7 +121,7 @@
             $(document).off('mouseup', S.drag.events.doc.up);
             item = S.drag.items[S.drag.item.index];
             if (typeof item.onStop == 'function') {
-                item.onStop(item);
+                item.onStop.call(item.options ? (item.options.callee ? item.options.callee : this) : this, item);
             }
         }
     }

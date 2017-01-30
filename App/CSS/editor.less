@@ -23,13 +23,23 @@
     > .clone{
         position:absolute; z-index:5001;
     }
+    > .temp{
+        z-index:3000;
+        .cellbox{position:absolute; outline-style:dashed; outline-width:2px; outline-offset:-2px; box-sizing:border-box;}
+        .compline{position:absolute; border-left-style:dashed; border-left-width:2px;}
+    }
     > .windows{width:0; height:0;} 
     .window{
         position:absolute; overflow:hidden;
-        .titlebar{cursor:default;}
-        .titlebar .title{top:-5px;}
+        .titlebar{
+            cursor:move;
+            .title{top:-5px;}
+            .close{cursor:default;}
+        }
     }
 }
+
+.drag-component .webpage .is-cell{min-height:50px; outline-style:dashed; outline-width:2px; outline-offset:-1px;}
 
 @media(max-width:1920px){
     .editor{

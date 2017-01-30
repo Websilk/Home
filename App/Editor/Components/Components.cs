@@ -30,5 +30,16 @@ namespace Websilk.Services.Editor
             ui.Data["components"] = html.ToString();
             return ui.Render();
         }
+
+        public Inject Create(string name, string panelId, int componentIndex)
+        {
+            var inject = new Inject();
+            GetPage();
+            var pagelist = page.loadPage(page.pageId);
+
+            //load new component into existing panel cell
+
+            return inject;
+        }
     }
 }

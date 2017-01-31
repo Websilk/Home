@@ -34,7 +34,8 @@
 }
 
 S.math = {
-    intersect: function(a, b) {
+    intersect: function (a, b) {
+        //checks to see if rect (a) intersects with rect (b)
         if (b.left < a.right && a.left < b.right && b.top < a.bottom){
             return a.top < b.bottom;
         }else{

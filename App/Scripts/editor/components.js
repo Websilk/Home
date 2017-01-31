@@ -167,11 +167,15 @@
                 $('body').removeClass('drag-component');
 
                 //send an AJAX request to create the new component on the page
+                var cid = this.drag.component.id || '';
+                if (cid.length > 0) { cid = cid.substring(1);}
                 var data = {
                     name: '',
+                    pageId: S.page.pageId,
                     panelId: '',
                     cellId: '',
-                    componentIndex: 0
+                    componentId: cid,
+                    append: this.drag.drop == 'after' ? 1 : 0
                 };
                 S.ajax.post('Editor/Components/Create', data, function (d) {
                     S.ajax.callback.inject(d);

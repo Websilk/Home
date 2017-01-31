@@ -2,12 +2,13 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 
 namespace Websilk
 {
     public class Page
     {
-
+        #region "properties"
         private Core S;
         public SqlQueries.Page sql;
         public Elements Elements;
@@ -24,6 +25,7 @@ namespace Websilk
         {
             //structure used to save page content to JSON file
             public int pageId;
+            public int pageType;
             public List<Component> components;
             public List<Panel> panels;
             public List<int> layers;
@@ -50,11 +52,11 @@ namespace Websilk
         public int pageType = 0; //0 = default, 1 = service, 2 = shadow, 3 = clone
         public int pageParentId = 0;
         public string pageTitle = "";
-        public string pagePathName = "";
-        public string pagePathIds = "";
+        public string pagePathName = ""; //page title hierarchy
+        public string pagePathIds = ""; //page id hierarchy
         public string PageTitleForBrowserTab = "";
         public string parentTitle = "";
-        public string pageService = ""; //if pageType = 1, the name of the C# StaticPage class to execute (Websilk.Pages.???)
+        public string pageService = ""; //if pageType = 1, the name of the C# StaticPage class to execute, Websilk.Pages.[pageService]
         public string pageDescription = "";
         public string pageFavIcon = "";
         public string pageFolder = "";
@@ -81,12 +83,15 @@ namespace Websilk
 
         public bool accessDenied = false;
         public bool isEditable = false;
+        public string editType = ""; //page type to edit (usually "edit" when isEditable = true)
+        public string editFolder = ""; //sub-folder where page.json is located (usually used for "history" folder)
 
         public Page(Core WebsilkCore)
         {
             S = WebsilkCore;
             sql = new SqlQueries.Page(S);
         }
+        #endregion
 
         #region "Page Info"
         public void getPageInfo(int pageId)
@@ -264,29 +269,52 @@ namespace Websilk
         }
         #endregion
 
-        #region "Page Content"
+        #region "Dynamic Page"
+
+        public List<Panel> loadLayout(Scaffold scaffold)
+        {
+            var panels = new List<Panel>();
+            foreach (var item in scaffold.elements)
+            {
+                if (item.name.IndexOf("panel-") == 0)
+                {
+                    //create a new panel for the layout
+                    var id = item.name.Split('-')[1];
+                    var p = new Panel(S, id, "panel " + id);
+                    p.cells = new List<Panel.structCell>();
+                    p.arrangement = new Panel.structArrangement();
+                    p.AddCell();
+                    panels.Add(p);
+                }
+            }
+            return panels;
+        }
+
+        public string GetPageFilePath(string folderType = "pages", int pageid = 0, string specialFolder = "", string pageType = "", bool checkIfExists = false)
+        {
+
+            var path = "/App/Content/websites/" + 
+                websiteId + "/" + folderType + "/" + pageid.ToString() + "/" + 
+                (specialFolder != "" ? specialFolder + "/" : "") + 
+                (pageType != "" ? pageType + "_" : "") + "page.json";
+
+            if(File.Exists(S.Server.MapPath(path)))
+            {
+                return path;
+            }else
+            {
+                return "/App/Content/websites/" + websiteId + "/" + folderType + "/" + pageid.ToString() + "/" + "page.json";
+            }
+        }
+
         public List<structPage> loadPage(int pageid, string folderType = "pages")
         {
             //get a list of components to load onto the page
             var page = new List<structPage>();
-            var filename = "page.json";
-            var pagePath = "/App/Content/websites/" + websiteId + "/" + folderType + "/";
-            if (pageid > 0)
+            var file = S.Server.LoadFileFromCache(GetPageFilePath(folderType, pageid, editFolder, editType, true));
+            if(file != "")
             {
-                var folder = S.Server.MapPath(pagePath + pageid + "/");
-
-                if (S.Server.Cache.ContainsKey(folder + filename))
-                {
-                    //load page from cache
-                    page.Add((structPage)S.Server.Cache[folder + filename]);
-                }else
-                {
-                    //load page from file
-                    if (File.Exists(folder + filename))
-                    {
-                        page.Add((structPage)S.Util.Serializer.OpenFromFile(typeof(structPage), folder + filename));
-                    }
-                }
+                page.Add((structPage)S.Util.Serializer.ReadObject(file, typeof(structPage)));
             }
             if(page.Count == 0)
             {
@@ -321,6 +349,45 @@ namespace Websilk
             return page;
         }
 
+        /// <summary>
+        /// Load panels from the page layout, along with all components from the specified page
+        /// </summary>
+        /// <param name="pageid">the page to load</param>
+        /// <returns></returns>
+        public Tuple<Scaffold, List<structPage>, List<Panel>> loadPageAndLayout(int pageid)
+        {
+            //load page layout scaffolding
+            var scaffold = new Scaffold(S, "/App/Content/themes/" + websiteTheme + "/layout.html");
+
+            //load page(s) from file/cache
+            var pages = loadPage(pageId);
+
+            //get a list of panels in the layout HTML
+            var panels = loadLayout(scaffold);
+
+            //add components to layout panels
+            for (var x = 0; x < panels.Count; x++)
+            {
+                foreach (var page in pages)
+                {
+                    //find components in this page & all page layers 
+                    //associated with this page that belong to a layout panel
+                    foreach (var c in page.components)
+                    {
+                        if (c.panelId == panels[x].id)
+                        {
+                            //add component to layout panel cell
+                            loadComponent(c, panels[x], panels[x].cells[0]);
+                            break;
+                        }
+                    }
+                }
+            }
+            return Tuple.Create(scaffold, pages, panels);
+        }
+        #endregion
+
+        #region "Static Page"
         public StaticPage getStaticPage(string pageName)
         {
             Type type = Type.GetType("Websilk.Pages." + pageName);
@@ -332,52 +399,6 @@ namespace Websilk
             StaticPage staticPage = getStaticPage(pageName);
             staticPage.Load();
             return staticPage.Render();
-        }
-
-        public List<Panel> loadLayout(Scaffold scaffold)
-        {
-            var panels = new List<Panel>();
-            foreach (var item in scaffold.elements)
-            {
-                if (item.name.IndexOf("panel-") == 0)
-                {
-                    //create a new panel for the layout
-                    var id = item.name.Split('-')[1];
-                    var p = new Panel(S, id, "panel " + id);
-                    p.cells = new List<Panel.structCell>();
-                    p.arrangement = new Panel.structArrangement();
-                    p.AddCell();
-                    panels.Add(p);
-                }
-            }
-            return panels;
-        }
-
-        /// <summary>
-        /// Initializes a component & sets up default properties if they don't already exist
-        /// </summary>
-        /// <param name="component"></param>
-        /// <param name="panelId"></param>
-        public Component loadComponent(Component component, Panel panel, Panel.structCell cell, bool isCreated = false)
-        {
-            if(component.id == "")
-            {
-                //component is new
-                component.id = S.Util.Str.CreateID();
-            }
-            component.panelId = panel.id;
-            component.panelCellId = cell.id;
-
-            //add component to panel cell
-            var cellIndex = panel.cells.FindIndex(a => a.id == cell.id);
-            if (cellIndex < 0) { cellIndex = 0; }
-            var compIndex = panel.cells[cellIndex].components.Count;
-            panel.cells[cellIndex].components.Add(component);
-            panel.cells[cellIndex].componentIds.Add(component.id);
-            panel.cells[cellIndex].components[compIndex].Initialize(S, this);
-            if(isCreated == true) { panel.cells[cellIndex].components[compIndex].Create(); }
-            panel.cells[cellIndex].components[compIndex].Load();
-            return panel.cells[cellIndex].components[compIndex];
         }
         #endregion
 
@@ -396,33 +417,17 @@ namespace Websilk
             {
                 //load a Dynamic Page //////////////////
 
-                var scaffold = new Scaffold(S, "/App/Content/themes/" + websiteTheme + "/layout.html");
+                var tuple = loadPageAndLayout(pageId);
+
+                //load page layout scaffolding
+                var scaffold = tuple.Item1;
 
                 //load page(s) from file/cache
-                var pages = loadPage(pageId);
+                var pages = tuple.Item2;
 
                 //get a list of panels in the layout HTML
-                var panels = loadLayout(scaffold);
-
-                //add components to layout panels
-                for (var x = 0; x < panels.Count; x++)
-                {
-                    foreach (var page in pages)
-                    {
-                        //find components in this page & all page layers 
-                        //associated with this page that belong to a layout panel
-                        foreach (var c in page.components)
-                        {
-                            if (c.panelId == panels[x].id)
-                            {
-                                //add component to layout panel cell
-                                loadComponent(c, panels[x], panels[x].cells[0]);
-                                break;
-                            }
-                        }
-                    }
-                }
-
+                var panels = tuple.Item3;
+                
                 //finally, render each layout panel
                 //this will force all components & panels within the hierarchy to render as well
                 foreach (var panel in panels)
@@ -506,6 +511,146 @@ namespace Websilk
                                        ;
             //finally, render web page
             return scaffold.Render();
+        }
+        #endregion
+
+        #region "Panels"
+
+        /// <summary>
+        /// Find a specific panel instance based on the given panel id
+        /// </summary>
+        /// <param name="panels"></param>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public Panel GetPanelById(List<Panel> panels, string id)
+        {
+            //traverse through the hierarchy of panels & components until we find the correct panel
+            foreach(var panel in panels)
+            {
+                if(panel.id == id) { return panel; }
+                foreach(var cell in panel.cells)
+                {
+                    if(cell.components.Count > 0)
+                    {
+                        foreach(var component in cell.components)
+                        {
+                            if(component.panels != null)
+                            {
+                                var p = GetPanelById(component.panels, id);
+                                if(p != null) { return p; }
+                            }
+                        }
+                    }
+                }
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Get a list of all panels loaded on the page
+        /// </summary>
+        /// <param name="panels"></param>
+        /// <returns></returns>
+        public List<Panel> GetAllPanels(List<Panel> panels)
+        {
+            var list = new List<Panel>();
+            foreach (var panel in panels)
+            {
+                list.Add(panel);
+                //get a list of cells within each panel
+                foreach (var cell in panel.cells)
+                {
+                    if (cell.components.Count > 0)
+                    {
+                        //get a list of components within each panel cell
+                        foreach (var component in cell.components)
+                        {
+                            if (component.panels != null)
+                            {
+                                //get a list of panels within each component
+                                var p = GetAllPanels(component.panels);
+                                if (p != null) {
+                                    foreach(var q in p)
+                                    {
+                                        list.Add(q);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            return list;
+        }
+        #endregion
+
+        #region "Components"
+
+        /// <summary>
+        /// Initializes a component & sets up default properties if they don't already exist
+        /// </summary>
+        /// <param name="component"></param>
+        /// <param name="panelId"></param>
+        public Component loadComponent(Component component, Panel panel, Panel.structCell cell, bool isCreated = false)
+        {
+            if (component.id == "")
+            {
+                //component is new
+                component.id = S.Util.Str.CreateID();
+            }
+            component.panelId = panel.id;
+            component.panelCellId = cell.id;
+
+            //add component to panel cell
+            var cellIndex = panel.cells.FindIndex(a => a.id == cell.id);
+            if (cellIndex < 0) { cellIndex = 0; }
+            var compIndex = panel.cells[cellIndex].components.Count;
+            panel.cells[cellIndex].components.Add(component);
+
+            //initialize new component
+            panel.cells[cellIndex].components[compIndex].Initialize(S, this);
+
+            //call component Create() function if this is a newly created component (in the Editor by drag & drop)
+            if (isCreated == true) { panel.cells[cellIndex].components[compIndex].Create(); }
+
+            //call component Load() function
+            panel.cells[cellIndex].components[compIndex].Load();
+            return panel.cells[cellIndex].components[compIndex];
+        }
+
+        /// <summary>
+        /// Create a new component on the page (from within the Editor)
+        /// </summary>
+        /// <param name="name">name of the component class within the Websilk.Components namespace</param>
+        /// <param name="panel">instance of the panel which contains the cell instance</param>
+        /// <param name="cell">panel cell instance to load the component into</param>
+        /// <returns></returns>
+        public Component createNewComponent(string name, string panelId, string cellId)
+        {
+            //first, find component class by name
+            string className = "Websilk.Components." + name;
+            Type type = Type.GetType(className);
+            var component = (Component)Activator.CreateInstance(type);
+            component.id = S.Util.Str.CreateID();
+            component.panelId = panelId;
+            component.panelCellId = cellId;
+            component.Initialize(S, this);
+            component.Create();
+            component.Load();
+
+            return component;
+        }
+
+        /// <summary>
+        /// Get a list of all the components loaded on the page
+        /// </summary>
+        /// <param name="panels"></param>
+        /// <returns></returns>
+        public List<Component> GetAllComponents(List<Panel> panels)
+        {
+            var list = new List<Component>();
+
+            return list;
         }
         #endregion
 

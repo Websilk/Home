@@ -76,7 +76,6 @@ namespace Websilk
             public string foot;
             public string css;
             public bool overflow;
-            public List<string> componentIds;
             [JsonIgnore]
             public List<Component> components;
         }
@@ -87,6 +86,8 @@ namespace Websilk
 
         public string name = ""; //a human-readable name for human reference only
         public string id = ""; //a unique ID
+        [JsonIgnore]
+        public int pageId = 0;
         public structArrangement arrangement;
         public List<structCell> cells;
 
@@ -107,7 +108,6 @@ namespace Websilk
             //set up settings for a new cell
             var cell = new structCell();
             cell.components = new List<Component>();
-            cell.componentIds = new List<string>();
             cell.id = S.Util.Str.CreateID();
             cells.Add(cell);
         }

@@ -81,9 +81,13 @@ namespace Websilk
         public string LoadFileFromCache(string filename)
         {
             if (Cache.ContainsKey(filename)) { return (string)Cache[filename]; }
-            var file = File.ReadAllText(MapPath(filename));
-            Cache.Add(filename, file);
-            return file;
+            if (File.Exists(MapPath(filename)))
+            {
+                var file = File.ReadAllText(MapPath(filename));
+                Cache.Add(filename, file);
+                return file;
+            }
+            return "";
         }
         #endregion
     }

@@ -1,6 +1,6 @@
 ﻿S.editor.components = {
     list: {
-        panels:[], hoverIndex:0, hoverStart:true, hoverComp:1,
+        cells:[], hoverIndex:0, hoverStart:true, hoverComp:1,
 
         init: function(){
             //set up drag event for components window icons
@@ -11,7 +11,7 @@
         },
 
         drag: {
-            panel: null, component: null, drop: 'after',
+            cell: null, component: null, drop: 'after',
 
             start: function(item){
                 //drag new component onto the page from the components window
@@ -28,7 +28,7 @@
                 $('body').addClass('drag-component');
 
                 //get list of panel cells on page
-                this.panels = [];
+                this.cells = [];
                 $('.is-cell').each(function(e){
                     var el = $(e);
                     var pof = el.offset();
@@ -51,7 +51,7 @@
                     });
 
                     //add panel cell to list
-                    S.editor.components.list.panels.push({ 
+                    S.editor.components.list.cells.push({ 
                         elem: e, 
                         rect: { 
                             left: pof.left, right: pof.left + pdim.width, top: pof.top, bottom: pof.top + pdim.height 
@@ -65,18 +65,18 @@
 
             go: function (item) {
                 //detect currently hovered panel
-                var panel = this.panels[this.hoverIndex];
+                var cell = this.cells[this.hoverIndex];
                 var cursor = { left: item.cursor.x, top: item.cursor.y, right: item.cursor.x + 1, bottom: item.cursor.y + 1 };
                 var curr = null;
                 var comp;
 
-                if (!S.math.intersect(panel.rect, cursor) || this.hoverStart == true) {
+                if (!S.math.intersect(cell.rect, cursor) || this.hoverStart === true) {
                     //intersecting a different cell
                     var found = false;
-                    for (var x = 0; x < this.panels.length; x++) {
-                        panel = this.panels[x];
-                        if (S.math.intersect(panel.rect, cursor)) {
-                            this.hoverIndex = x;
+                    for (var i = 0; i < this.cells.length; i++) {
+                        cell = this.cells[i];
+                        if (S.math.intersect(cell.rect, cursor)) {
+                            this.hoverIndex = i;
                             found = true;
                             break;
                         }
@@ -85,98 +85,102 @@
                         // generate box around currently hovered panel cell
                         var div = document.createElement('div');
                         div.className = "cellbox";
-                        div.style.left = panel.rect.left + 'px';
-                        div.style.top = panel.rect.top + 'px';
-                        div.style.width = panel.width + 'px';
-                        div.style.height = panel.height + 'px';
+                        div.style.left = cell.rect.left + 'px';
+                        div.style.top = cell.rect.top + 'px';
+                        div.style.width = cell.width + 'px';
+                        div.style.height = cell.height + 'px';
                         $('.editor > .temp > .cellbox').remove();
                         $('.editor > .temp > .compline').remove();
                         $('.editor > .temp').append(div);
                         this.hoverComp = 1;
                         this.drag.drop = '';
                     } else {
-                        panel = this.panels[0];
+                        cell = this.cells[0];
                         this.hoverIndex = 0;
                     }
                     
                     
-                    if (this.hoverStart == true) { this.hoverStart = false; }
+                    if (this.hoverStart === true) { this.hoverStart = false; }
                 }
 
                 //detect which two components the cursor is between
-                this.drag.panel = panel.elem;
-                if (panel.comps) {
+                this.drag.cell = cell.elem;
+                if (cell.comps) {
                     var cy = cursor.top;
                     var cx = cursor.left;
-                    for (var x = 0; x < panel.comps.length; x++) {
-                        comp = panel.comps[x].rect;
-                        if (cy >= (comp.top + (comp.bottom - comp.top) / 5)) {
+                    for (var x = 0; x < cell.comps.length; x++) {
+                        comp = cell.comps[x].rect;
+                        if (cy >= comp.top + (comp.bottom - comp.top) / 5) {
                             if (cy <= comp.bottom + 30) {
-                                if (cx >= (comp.left + (comp.right - comp.left) / 2.5)) {
-                                    curr = panel.comps[x];
+                                if (cx >= comp.left + (comp.right - comp.left) / 2.5) {
+                                    curr = cell.comps[x];
                                 }
                             } else {
-                                curr = panel.comps[x];
+                                curr = cell.comps[x];
                             }
                         } else {
                             break;
                         }
                     }
-                    if (curr != null) {
-                        if (curr.elem != this.hoverComp && this.drag.drop != 'after') {
+                    if (curr !== null) {
+                        if (curr.elem !== this.hoverComp && this.drag.drop !== 'after') {
                             this.compline(curr.elem, 'after', comp.right, comp.top, curr.height);
                             this.hoverComp = curr.elem;
                         }
                     }
                 }
-                if (curr == null && this.hoverComp != 1) {
+                if (curr === null && this.hoverComp !== 1) {
                     //load component line before first component
                     this.hoverComp = 1;
-                    if (panel.comps.length > 0) {
-                        comp = panel.comps[0];
+                    if (cell.comps.length > 0) {
+                        comp = cell.comps[0];
                         this.compline(comp.elem, 'before', comp.rect.left, comp.rect.top, comp.height);
                         console.log('2');
                     } else {
-                        this.compline(null, 'before', panel.rect.left + ((panel.rect.right - panel.rect.left) / 2), panel.rect.top, panel.height);
+                        this.compline(null, 'before', cell.rect.left + ((cell.rect.right - cell.rect.left) / 2), cell.rect.top, cell.height);
                         console.log('3'); 
                     }
-                } else if (found == true) {
-                    if (panel.comps.length > 0) {
+                } else if (found === true) {
+                    if (cell.comps.length > 0) {
                         var lf = 0;
                         var drop;
-                        if (cursor.top > panel.rect.top + ((panel.rect.bottom - panel.rect.top) / 2)) {
-                            comp = panel.comps[panel.comps.length - 1];
+                        if (cursor.top > cell.rect.top + ((cell.rect.bottom - cell.rect.top) / 2)) {
+                            comp = cell.comps[cell.comps.length - 1];
                             lf = comp.rect.right;
                             drop = 'after';
                         } else {
-                            comp = panel.comps[0];
+                            comp = cell.comps[0];
                             lf = comp.rect.left;
                             drop = 'before';
                         }
                         this.compline(comp.elem, drop, lf, comp.rect.top, comp.height);
                         console.log('4');
                     } else {
-                        this.compline(null, 'before', panel.rect.left + ((panel.rect.right - panel.rect.left) / 2), panel.rect.top, panel.height);
+                        this.compline(null, 'before', cell.rect.left + ((cell.rect.right - cell.rect.left) / 2), cell.rect.top, cell.height);
                         console.log('5');
                     }
                 }
             },
 
             end: function (item) {
-                $('.editor > .clone *, .editor > .temp > .cellbox, .editor > .temp > .compline').remove();
+                $('.editor > .clone *, ' +
+                  '.editor > .temp > .cellbox, ' +
+                  '.editor > .temp > .compline').remove();
                 $('body').removeClass('drag-component');
 
                 //send an AJAX request to create the new component on the page
-                var cid = this.drag.component.id || '';
+                var cid = '';
+                if (this.drag.component) { cid = this.drag.component.id; }
                 if (cid.length > 0) { cid = cid.substring(1);}
                 var data = {
-                    name: '',
-                    pageId: S.page.pageId,
-                    panelId: '',
-                    cellId: '',
+                    name: item.elem.getAttribute('data-id'),
+                    layerId: S.page.id,
+                    panelId: $(this.drag.cell).parent('.is-panel').get(0).id.replace('panel_',''),
+                    cellId: this.drag.cell.id.replace('cell_', ''),
                     componentId: cid,
-                    append: this.drag.drop == 'after' ? 1 : 0
+                    append: this.drag.drop === 'after' ? 1 : 0
                 };
+                console.log(data);
                 S.ajax.post('Editor/Components/Create', data, function (d) {
                     S.ajax.callback.inject(d);
                 });

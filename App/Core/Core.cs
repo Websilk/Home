@@ -133,7 +133,7 @@ namespace Websilk
                     js.Append("S.util.js.load('" + item.Value + "', 'jsf_" + item.Key.Replace(" ", "_") + "',function(){");
                 }
                 js.Append(syncJs);
-                for (var x = 0; x < _resources.Count - 1; x++)
+                for (var x = 0; x < _resources.Count; x++)
                 {
                     js.Append("});");
                 }

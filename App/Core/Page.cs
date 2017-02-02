@@ -276,14 +276,13 @@ namespace Websilk
             var panels = new List<Panel>();
             foreach (var item in scaffold.elements)
             {
-                if (item.name.IndexOf("panel-") == 0)
+                if (item.name != "")
                 {
                     //create a new panel for the layout
-                    var id = item.name.Split('-')[1];
-                    var p = new Panel(S, id, "panel " + id);
+                    var p = new Panel(S, item.name, item.name);
                     p.cells = new List<Panel.structCell>();
                     p.arrangement = new Panel.structArrangement();
-                    p.AddCell();
+                    p.AddCell(item.name);
                     panels.Add(p);
                 }
             }
@@ -354,7 +353,7 @@ namespace Websilk
         /// </summary>
         /// <param name="pageid">the page to load</param>
         /// <returns></returns>
-        public Tuple<Scaffold, List<structPage>, List<Panel>> loadPageAndLayout(int pageid)
+        public Tuple<Scaffold, List<structPage>, List<Panel>> loadPageAndLayout(int pageid, bool noExecution = false)
         {
             //load page layout scaffolding
             var scaffold = new Scaffold(S, "/App/Content/themes/" + websiteTheme + "/layout.html");
@@ -365,20 +364,18 @@ namespace Websilk
             //get a list of panels in the layout HTML
             var panels = loadLayout(scaffold);
 
-            //add components to layout panels
-            for (var x = 0; x < panels.Count; x++)
+            //add components to layout panels (from layer pages first, then main page last)
+            for (var y = pages.Count == 1 ? 0 : 1; y < pages.Count; y = y == pages.Count - 1 && pages.Count > 1 ? 0 : (y == 0 ? pages.Count : y++))
             {
-                foreach (var page in pages)
+                for (var x = 0; x < panels.Count; x++)
                 {
-                    //find components in this page & all page layers 
-                    //associated with this page that belong to a layout panel
-                    foreach (var c in page.components)
+                    foreach (var c in pages[y].components)
                     {
                         if (c.panelId == panels[x].id)
                         {
                             //add component to layout panel cell
-                            loadComponent(c, panels[x], panels[x].cells[0]);
-                            break;
+                            c.pageId = pages[y].pageId;
+                            loadComponent(c, panels[x], panels[x].cells[0], false, noExecution);
                         }
                     }
                 }
@@ -432,7 +429,7 @@ namespace Websilk
                 //this will force all components & panels within the hierarchy to render as well
                 foreach (var panel in panels)
                 {
-                    scaffold.Data["panel-" + panel.id] = panel.Render();
+                    scaffold.Data[panel.id] = panel.Render();
                 }
                 return scaffold.Render();
             }
@@ -591,7 +588,7 @@ namespace Websilk
         /// </summary>
         /// <param name="component"></param>
         /// <param name="panelId"></param>
-        public Component loadComponent(Component component, Panel panel, Panel.structCell cell, bool isCreated = false)
+        public Component loadComponent(Component component, Panel panel, Panel.structCell cell, bool isCreated = false, bool noExecution = false)
         {
             if (component.id == "")
             {
@@ -610,11 +607,14 @@ namespace Websilk
             //initialize new component
             panel.cells[cellIndex].components[compIndex].Initialize(S, this);
 
-            //call component Create() function if this is a newly created component (in the Editor by drag & drop)
-            if (isCreated == true) { panel.cells[cellIndex].components[compIndex].Create(); }
+            if (!noExecution)
+            {
+                //call component Create() function if this is a newly created component (in the Editor by drag & drop)
+                if (isCreated == true) { panel.cells[cellIndex].components[compIndex].Create(); }
 
-            //call component Load() function
-            panel.cells[cellIndex].components[compIndex].Load();
+                //call component Load() function
+                panel.cells[cellIndex].components[compIndex].Load();
+            }
             return panel.cells[cellIndex].components[compIndex];
         }
 
@@ -651,6 +651,21 @@ namespace Websilk
             var list = new List<Component>();
 
             return list;
+        }
+        #endregion
+
+        #region "Save"
+        public void SavePage(structPage page, bool saveToDisk = false)
+        {
+            var type = "pages";
+            switch (page.pageType)
+            {
+                case 1: type = "layers"; break;
+            }
+            var path = GetPageFilePath(type, page.pageId, editFolder, editType);
+            var serialize = S.Util.Serializer.WriteObjectAsString(page, Newtonsoft.Json.Formatting.None);
+            S.Server.SaveToCache(path, serialize);
+            if (saveToDisk == true) { File.WriteAllText(S.Server.MapPath(path), serialize); }
         }
         #endregion
 

@@ -36,6 +36,8 @@
                 //load new content from web service
                 if (data.d.element != '') {
                     var elem = $(data.d.element);
+                    var node = null;
+                    if (data.d.node != '') { node = $(data.d.node);}
                     if (elem.length > 0 && data.d.html != '') {
                         if (data.d.remove != '') {
                             $(data.d.remove).remove();
@@ -53,14 +55,20 @@
                             case 3: //after
                                 elem.after(data.d.html);
                                 break;
+                            case 4: //beforeNode
+                                node.before(data.d.html);
+                                break;
+                            case 5: //afterNode
+                                node.after(data.d.html);
+                                break;
                         }
                     }
                 }
                 //add any CSS to the page
                 if (data.d.css != null && data.d.css != '') {
-                    S.css.add(data.d.cssid, data.d.css);
+                    S.util.css.add(data.d.css, data.d.cssid);
                 }
-
+                //
                 //finally, execute callback javascript
                 if (data.d.js != '' && data.d.js != null) {
                     var js = new Function(data.d.js);

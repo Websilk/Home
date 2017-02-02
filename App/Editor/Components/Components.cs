@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Data.SqlClient;
-using System.IO;
 using System.Text;
 
 namespace Websilk.Services.Editor
@@ -22,7 +21,7 @@ namespace Websilk.Services.Editor
 
             while (reader.Read())
             {
-                component.Data["id"] = reader.Get("componentid");
+                component.Data["id"] = reader.Get("namespace");
                 component.Data["icon"] = reader.Get("componentid");
                 component.Data["name"] = reader.Get("name");
                 component.Data["summary"] = reader.Get("description");
@@ -32,14 +31,14 @@ namespace Websilk.Services.Editor
             return ui.Render();
         }
 
-        public Inject Create(string name, int pageId, string panelId, string cellId, string componentId, int append)
+        public Inject Create(string name, int layerId, string panelId, string cellId, string componentId, int append)
         {
             //create a new component on the page
             var inject = new Inject();
 
             //load the current page
             GetPage();
-            var tuple = page.loadPageAndLayout(page.pageId);
+            var tuple = page.loadPageAndLayout(page.pageId, true);
 
             //load page layout scaffolding
             var scaffold = tuple.Item1;
@@ -55,13 +54,7 @@ namespace Websilk.Services.Editor
             Component component = null;
             if(panel != null)
             {
-                foreach(var cell in panel.cells)
-                {
-                    if(cell.id == cellId)
-                    {
-                        component = page.createNewComponent(name, panel.id, cell.id);
-                    }
-                }
+                component = page.createNewComponent(name, panel.id, cellId);
             }
             if(component != null)
             {
@@ -71,8 +64,6 @@ namespace Websilk.Services.Editor
                     //save page layers
                     if(layer.pageId == pageId)
                     {
-                        var path = page.GetPageFilePath(layer.pageId == page.pageId ? "pages" : "layers", layer.pageId, page.editFolder, page.editType);
-                        var serialize = "";
                         var save = new Page.structPage();
                         save.pageId = layer.pageId;
                         save.pageType = layer.pageType;
@@ -102,6 +93,8 @@ namespace Websilk.Services.Editor
                                             if (append == 0 && cell.id == cellId && comp.id == componentId && layer.pageId == pageId)
                                             {
                                                 save.components.Add(component);
+                                                inject.node = "#c" + comp.id;
+                                                inject.inject = enumInjectTypes.beforeNode;
                                             }
 
                                             if (comp.pageId == pageId)
@@ -113,20 +106,29 @@ namespace Websilk.Services.Editor
                                             if (append == 1 && cell.id == cellId && comp.id == componentId && layer.pageId == pageId)
                                             {
                                                 save.components.Add(component);
+                                                inject.node = "#c" + comp.id;
+                                                inject.inject = enumInjectTypes.afterNode;
                                             }
+                                        }
+                                    }else
+                                    {
+                                        if(cell.id == cellId)
+                                        {
+                                            save.components.Add(component);
+                                            inject.inject = enumInjectTypes.append;
                                         }
                                     }
                                 }
                             }
                         }
 
-                        //finally, save page to cache & file
-                        serialize = S.Util.Serializer.WriteObjectAsString(save, Newtonsoft.Json.Formatting.None);
-                        S.Server.Cache[path] = serialize;
-                        File.WriteAllText(S.Server.MapPath(path), serialize);
+                        //finally, save each page to cache (but not to file)
+                        page.SavePage(save);
                     }
                 }
+
                 //render component to inject onto the page
+                inject.element = "#cell_" + cellId;
                 inject.html = component.Render();
                 inject.js =  S.javascriptFiles.renderJavascriptFiles(false, S.javascript.renderJavascript(false));
                 inject.css = S.css.renderCss(false);

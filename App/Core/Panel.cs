@@ -103,12 +103,18 @@ namespace Websilk
             name = Name;
         }
 
-        public void AddCell()
+        public void AddCell(string cellId = "")
         {
             //set up settings for a new cell
             var cell = new structCell();
             cell.components = new List<Component>();
-            cell.id = S.Util.Str.CreateID();
+            if(cellId != "")
+            {
+                cell.id = cellId;
+            }else
+            {
+                cell.id = S.Util.Str.CreateID();
+            }
             cells.Add(cell);
         }
 
@@ -129,12 +135,14 @@ namespace Websilk
 
                 //render cell
                 var divcell = new Utility.DOM.Element("div");
-                divcell.Classes.Add("cell-" + cell.id + " is-cell");
+                divcell.Classes.Add("is-cell");
+                divcell.id = "cell_" + cell.id.Replace("-", "_");
                 divcell.innerHTML = cell.head + comps.ToString() + cell.foot;
                 htm.Append(divcell.Render());
             }
 
-            div.Classes.Add("panel-" + id + " is-panel");
+            div.Classes.Add("is-panel");
+            div.id = "panel_" + id.Replace("-", "_");
             div.innerHTML = head + htm.ToString() + foot;
 
             return div.Render();

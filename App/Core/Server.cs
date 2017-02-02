@@ -89,6 +89,17 @@ namespace Websilk
             }
             return "";
         }
+
+        public void SaveToCache(string key, string value)
+        {
+            if (Cache.ContainsKey(key))
+            {
+                Cache[key] = value;
+            }else
+            {
+                Cache.Add(key, value);
+            }
+        }
         #endregion
     }
 

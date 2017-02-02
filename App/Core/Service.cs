@@ -9,7 +9,9 @@ namespace Websilk.Services
         replace = 0,
         append = 1,
         before = 2,
-        after = 3
+        after = 3,
+        beforeNode = 4,
+        afterNode = 5
     }
 
     /// <summary>
@@ -53,6 +55,7 @@ namespace Websilk.Services
         public string css = "";
         public string cssId = "";
         public string remove = "";
+        public string node = "";
         public enumInjectTypes inject = 0;
     }
 

@@ -33,6 +33,7 @@
     callback: {
         inject: function (data) {
             if (data.type == 'Websilk.Services.Inject') {
+                console.log(data.d);
                 //load new content from web service
                 if (data.d.element != '') {
                     var elem = $(data.d.element);
@@ -66,7 +67,7 @@
                 }
                 //add any CSS to the page
                 if (data.d.css != null && data.d.css != '') {
-                    S.util.css.add(data.d.css, data.d.cssid);
+                    S.util.css.add(data.d.css, data.d.cssId);
                 }
                 //
                 //finally, execute callback javascript

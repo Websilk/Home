@@ -1,13 +1,13 @@
 ﻿.tooltab{
-    position:absolute; right:0; padding:7px 0 0 7px; margin:6px; border-radius:50px; width:36px; height:36px; box-sizing:border-box; display:none; z-index:5000;
+    position:fixed; right:0; padding:7px 0 0 7px; margin:6px; border-radius:50px; width:36px; height:36px; box-sizing:border-box; display:none; z-index:5000;
     > a > svg{width:22px; height:22px;}
 }
-.editor{
-    position:fixed; width:100%; height:0; z-index:5000; display:none;
+.editor > .fixed{
+    width:100%; height:0; z-index:5000; display:none;
     > .toolbar{
         position:absolute; width:100%; height:50px; cursor:default;
         > .container{
-            width:1920px; padding:0 10px; box-sizing:border-box; text-align:center; white-space:nowrap;
+            max-width:1920px; padding:0 10px; box-sizing:border-box; text-align:center; white-space:nowrap;
             > nav.menu{
                 display:inline-block; white-space:nowrap; padding-top:12px;
                 > a{display:inline-block; margin:0 10px;}
@@ -20,14 +20,7 @@
         .right-side{position:absolute; right:0;}
         .save-page{padding:3px 5px 0 0;}
     }
-    > .clone{
-        position:absolute; z-index:5001;
-    }
-    > .temp{
-        z-index:3000;
-        .cellbox{position:absolute; outline-style:dashed; outline-width:2px; outline-offset:-2px; box-sizing:border-box;}
-        .compline{position:absolute; border-left-style:dashed; border-left-width:2px;}
-    }
+    
     > .windows{width:0; height:0;} 
     .window{
         position:absolute; overflow:hidden;
@@ -39,7 +32,43 @@
     }
 }
 
-.drag-component .webpage .is-cell{min-height:50px; outline-style:dashed; outline-width:2px; outline-offset:-1px;}
+.editor{
+    > .temp{
+        position:absolute; z-index:3000; 
+        .cellbox{position:absolute; outline-style:dashed; outline-width:2px; outline-offset:-2px; box-sizing:border-box;}
+        .compline{position:absolute; border-left-style:dashed; border-left-width:2px;}
+    }
+    > .clone{
+        position:absolute; z-index:5001;
+    }
+
+    > .component-hover{position:absolute; display:none; border:2px dashed transparent; cursor:move; z-index:3000;}
+
+    > .component-select{
+        cursor:move; position:absolute; display:none; z-index:3000;
+        .side, .corner{position:absolute;}
+        .r-top, .r-bottom{cursor:ns-resize;}
+        .r-left, .r-right{cursor:ew-resize;}
+        .r-left-top, .r-top-left, .r-right-bottom, .r-bottom-right{cursor:nwse-resize;}
+        .r-top-right, .r-right-top, .r-bottom-left, .r-left-bottom{cursor:nesw-resize;}
+        &.isalsocell .resize{cursor:default;}
+        &.isalsopanel{
+            .resize.top, .r-bottom{cursor:ns-resize;}
+            .r-left, .r-right{cursor:ew-resize;}
+            .r-left-top, resize.top-left, .r-right-bottom, .r-bottom-right{cursor:nwse-resize;}
+            .r-top-right, .r-right-top, .r-bottom-left, .r-left-bottom{cursor:nesw-resize;}
+        } 
+        @bar:4px;
+        .r-top, .r-top-right, .r-top-left, .r-bottom, .r-bottom-right, .r-bottom-left{height:@bar;}
+        .r-left, .r-left-top, .r-left-bottom, .r-right, .r-right-top, .r-right-bottom{width:@bar;}
+    }
+}
+
+.drag-component {
+    .webpage {
+        .is-cell{min-height:50px; outline-style:dashed; outline-width:2px; outline-offset:-1px;}
+    }
+}
 
 @media(max-width:1920px){
     .editor{

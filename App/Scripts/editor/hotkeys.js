@@ -5,8 +5,8 @@
             var k = e.keyCode, itemId = '', isPanel = false, c = null;
             if (S.editor.components.hovered != null) {
                 c = S.editor.components.hovered;
-                itemId = c.id.substr(1);
-                if ($(c).hasClass('type-stackpanel') == true) { isPanel = true; }
+                itemId = c.get().id.substr(1);
+                if (c.hasClass('type-panel') == true) { isPanel = true; }
             }
 
             if (e.shiftKey == true) {//shift pressed

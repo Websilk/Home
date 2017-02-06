@@ -79,6 +79,7 @@ namespace Websilk
         {
             if(_resources == null) { _resources = new Dictionary<string, string>(); }
             if (!_resources.ContainsKey(name)) { _resources.Add(name, resource); }
+            else { _resources[name] += "\n\n" + resource; }
         }
 
         public Dictionary<string, string> Resources

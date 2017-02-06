@@ -49,12 +49,12 @@
                     h: win.height()
                 },
                 start:{
-                    x: e.clientX,
-                    y: e.clientY
+                    x: e.clientX + document.body.scrollLeft,
+                    y: e.clientY + document.body.scrollTop
                 },
                 cursor:{
-                    x: e.clientX,
-                    y: e.clientY
+                    x: e.clientX + document.body.scrollLeft,
+                    y: e.clientY + document.body.scrollTop
                 },
                 pos:{
                     x: pos.left,
@@ -88,13 +88,13 @@
         },
 
         mouse: function(e){
-            this.item.cursor.x = e.clientX;
-            this.item.cursor.y = e.clientY;
+            this.item.cursor.x = e.clientX + document.body.scrollLeft;
+            this.item.cursor.y = e.clientY + document.body.scrollTop;
         },
 
         drag: function () {
             var item = this.item;
-            if (item.hasOnDrag == true) { this.items[item.index].onDrag.call(item.options ? (item.options.callee ? item.options.callee : this) : this, item); }
+            if (item.hasOnDrag == true) { if (this.items[item.index].onDrag.call(item.options ? (item.options.callee ? item.options.callee : this) : this, item) == false) { return; } }
             var x = (item.pos.x + (item.cursor.x - item.start.x));
             var y = (item.pos.y + (item.cursor.y - item.start.y));
             if (item.options) {

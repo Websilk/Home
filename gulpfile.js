@@ -63,7 +63,7 @@ paths.working = {
             paths.app + '**/*.less',
             '!' + paths.app + 'CSS/editor.less'
         ],
-        colors: paths.css + 'colors/**/*.less',
+        colors: paths.css + 'colors/**/**/*.less',
         editor: paths.css + 'editor.less',
         tapestry: paths.css + 'tapestry/tapestry.less',
     },

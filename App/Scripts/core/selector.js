@@ -5,7 +5,7 @@
 (function () {
 
     //global variables
-    var pxStyles = ['top', 'right', 'bottom', 'left'];
+    var pxStyles = ['top', 'right', 'bottom', 'left', 'width', 'height'];
     var pxStylesPrefix = ['border', 'padding', 'margin'];
     var pxStylesSuffix = ['Top', 'Right', 'Bottom', 'Left'];
     var listeners = []; //used for capturing event listeners from $('').on 
@@ -34,6 +34,7 @@
                 if (s.indexOf('#') == 0 && s.indexOf(' ') < 0 && elem == document && s.indexOf(':') < 0) {
                 } else if (s.indexOf('#') < 0 && s.indexOf('.') < 0 && s.indexOf(' ') < 0 && s.indexOf(':') < 0) {
                 } else if (s.indexOf('.') == 0 && s.indexOf('.', 1) < 0 && s.indexOf(' ') < 0 && s.indexOf(':') < 0) {
+                }else if(s == '*'){
                 }else{optimize = false; break;}
             }
             if (optimize == true) {
@@ -163,18 +164,22 @@
         //properly set a style for an element
         if (e.nodeName == '#text') { return;}
         var v = val;
-        if (val == parseInt(val, 10)) {
-            //check for numbers that should be using 'px';
-            if (Number(val) != 0) {
-                if (pxStyles.indexOf(name) >= 0) {
+
+        //check for empty value
+        if (v == '' || v == null) { e.style[name] = v == '' ? null : v; return; }
+
+        //check for numbers that should be using 'px';
+        if (parseInt(val) != 0) {
+            if (pxStyles.indexOf(name) >= 0) {
+                v = val + 'px';
+            } else if (pxStylesPrefix.some(function (a) { return name.indexOf(a) == 0 })) {
+                if (pxStylesSuffix.some(function (a) { return name.indexOf(a) > 0 })) {
                     v = val + 'px';
-                } else if (pxStylesPrefix.some(function (a) { return name.indexOf(a) == 0 })) {
-                    if (pxStylesSuffix.some(function (a) { return name.indexOf(a) > 0 })) {
-                        v = val + 'px';
-                    }
                 }
             }
         }
+
+        //last resort, set style to string value
         e.style[name] = v;
     }
 
@@ -240,7 +245,7 @@
             while (p != null) { if (p == elem) { f = true; break; } p = p.parentNode; }
             if (!f) {
                 entered = false;
-                if (onLeave) { onLeave(e);}
+                if (onLeave) { onLeave(e); }
             }
         });
         el = null;
@@ -249,13 +254,18 @@
     //prototype functions that are accessable by return object //////////////////////////////////////////////////////////////////////////////////////
     select.prototype.add = function (elems) {
         //Add new (unique) elements to the existing elements array
-        elems.forEach(function (e) {
-            //check for duplicates
-            if (this.elements.indexOf(e) < 0) {
-                //element is unique
-                this.elements.push(e);
+        var obj = getObj(elems);
+        if (!obj) { return this; }
+        if (obj.elements) { obj = obj.elements;}
+        if (obj.length > 0) {
+            for(var x = 0; x < obj.length; x++){
+                //check for duplicates
+                if (this.elements.indexOf(obj[x]) < 0) {
+                    //element is unique
+                    this.elements.push(obj[x]);
+                }
             }
-        })
+        }
         return this;
     }
 
@@ -870,8 +880,8 @@
         if (this.elements.length > 0) {
             var box = this.elements[0].getBoundingClientRect();
             return {
-                top: box.top + window.pageYOffset - document.documentElement.clientTop,
-                left: box.left + window.pageXOffset - document.documentElement.clientLeft
+                top: box.top + document.body.scrollTop,
+                left: box.left + document.body.scrollLeft
             };
         }
         return { top: 0, left: 0 };

@@ -39,6 +39,14 @@ body{font-family: Jaldi;}
     .message(confirm, #92e061, transparent, #228f4b); 
 }
 
-.editor > .temp > .cellbox{outline-color:#9700ff;}
-.editor > .temp > .compline{border-left-color:#ff6a00;}
+
 .drag-component .webpage .is-cell{outline-color:#03d6d9;}
+.editor{
+    > .temp > .cellbox{outline-color:#9700ff;}
+    > .temp > .compline{border-left-color:#ff6a00;}
+    > .component-hover{border-color:#ff6a00;}
+    > .component-select{
+        .resize.side{background-color:@bg;} 
+        .resize.corner{background-color:@bg;}
+    }
+}

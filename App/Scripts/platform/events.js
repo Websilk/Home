@@ -144,7 +144,7 @@
         },
 
         resize: {
-            timer: { started: false, fps: 60, timeout: 100, date: new Date(), callback: null },
+            timer: { started: false, fps: 60, timeout: 250, date: new Date(), callback: null },
 
             trigger: function () {
                 this.timer.date = new Date();
@@ -153,30 +153,30 @@
 
             start: function () {
                 if (this.timer.started == true) { return; }
-                this.timer.started = true;
+                clearInterval(this.timer.callback);
                 this.timer.date = new Date();
+                this.timer.started = true;
                 this.callback.execute('onStart');
+                this.timer.callback = setInterval(function () { S.events.doc.resize.go(); }, 1000 / this.timer.fps);
                 this.go();
             },
 
             go: function () {
-                S.window.changed = true; S.window.pos();
                 if (this.timer.started == false) { return; }
+                S.window.changed = true; S.window.pos();
                 this.callback.execute('onGo');
-                if (S.viewport.getLevel() == true) {
-                    this.callback.execute('onLevelChange');
-                }
-
-
                 if (new Date() - this.timer.date > this.timer.timeout) {
                     this.stop();
-                } else {
-                    this.timer.callback = setTimeout(function () { S.events.doc.resize.go(); }, 1000 / this.timer.fps)
+                    return;
+                }
+                if (S.viewport.getLevel() == true) {
+                    this.callback.execute('onLevelChange');
                 }
             },
 
             stop: function () {
                 if (this.timer.started == false) { return; }
+                clearInterval(this.timer.callback);
                 this.timer.started = false;
                 if (S.viewport.getLevel() == true) {
                     this.callback.execute('onLevelChange');
@@ -201,33 +201,25 @@
                 execute: function (type, lvl) {
                     if (this.items.length > 0) {
                         switch (type) {
-                            case '': case null: case 'onStart':
+                            case 'onStart':
                                 for (var x = 0; x < this.items.length; x++) {
-                                    if (typeof this.items[x].onStart == 'function') {
-                                        this.items[x].onStart();
-                                    }
+                                    if (this.items[x].onStart) {this.items[x].onStart();}
                                 } break;
 
                             case 'onGo':
                                 for (var x = 0; x < this.items.length; x++) {
-                                    if (typeof this.items[x].onGo == 'function') {
-                                        this.items[x].onGo();
-                                    }
+                                    if (this.items[x].onGo) {this.items[x].onGo();}
                                 } break;
 
                             case 'onStop':
                                 for (var x = 0; x < this.items.length; x++) {
-                                    if (typeof this.items[x].onStop == 'function') {
-                                        this.items[x].onStop();
-                                    }
+                                    if (this.items[x].onStop) {this.items[x].onStop();}
                                 } break;
 
                             case 'onLevelChange':
 
                                 for (var x = 0; x < this.items.length; x++) {
-                                    if (typeof this.items[x].onLevelChange == 'function') {
-                                        this.items[x].onLevelChange(lvl);
-                                    }
+                                    if (this.items[x].onLevelChange) {this.items[x].onLevelChange(lvl);}
                                 } break;
                         }
                     }

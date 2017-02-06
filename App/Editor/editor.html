@@ -1,65 +1,81 @@
 ﻿<div class="svgicons">{{svg-logo}}</div>
-<div class="tooltab">
-    <a class="icon" href="javascript:" onclick="S.editor.show()">
-        <svg viewBox="0 0 36 36">
-            <use xlink:href="#icon-settings" x="0" y="0" width="36" height="36"></use>
-        </svg>
-    </a>
-</div>
 <div class="editor">
-    <div class="clone absolute"></div>
-    <div class="temp absolute"></div>
-    <div class="toolbar box">
-        <div class="container">
-            <a class="icon logo" href="http://www.github.com/websilk/home" target="_blank">
-                <svg viewBox="0 0 177 36">
-                    <use xlink:href="#logo-websilk" x="0" y="0" width="177" height="36"></use>
-                </svg>
-            </a>
-
-            <div class="right-side pad-right">
-                <div class="col save-page nosave">
-                    <a class="button icon" href="javascript:" onclick="S.editor.save.click()">
-                        <svg viewBox="0 0 25 25" style="width:25px; height:25px;">
-                            <use xlink:href="#icon-save" x="0" y="0" width="25" height="25"></use>
-                        </svg>
-                    </a>
-                </div>
-                <div class="col pad-top">
-                    <a class="icon small" href="javascript:" onclick="S.editor.hide()">
-                        <svg viewBox="0 0 16 16">
-                            <use xlink:href="#icon-close" x="0" y="0" width="36" height="36"></use>
-                        </svg>
-                    </a>
-                </div>
-            </div>
-
-            <nav class="menu">
-                <a class="icon plus" href="javascript:"><svg viewBox="0 0 25 25"><use xlink:href="#icon-plus" x="0" y="0" width="25" height="25"></use></svg></a>
-                <a class="icon options" href="javascript:"><svg viewBox="0 0 25 25"><use xlink:href="#icon-options" x="0" y="0" width="25" height="25"></use></svg></a>
-                <a class="icon grid" href="javascript:"><svg viewBox="0 0 25 25"><use xlink:href="#icon-grid" x="0" y="0" width="25" height="25"></use></svg></a>
-                <a class="icon screens" href="javascript:"><svg viewBox="0 0 33 25"><use xlink:href="#icon-screenhd" x="0" y="0" width="33" height="25"></use></svg></a>
-                <a class="icon search" href="javascript:"><svg viewBox="0 0 25 25"><use xlink:href="#icon-search" x="0" y="0" width="25" height="25"></use></svg></a>
-            </nav>
-            
-            
-        </div>
+    <div class="temp"></div>
+    <div class="clone"></div>
+    <div class="tooltab">
+        <a class="icon" href="javascript:">
+            <svg viewBox="0 0 36 36">
+                <use xlink:href="#icon-settings" x="0" y="0" width="36" height="36"></use>
+            </svg>
+        </a>
     </div>
-    <div class="windows"></div>
-    <script type="text/html" id="window_scaffold">
-        <div class="box">
-            #titlebar#
-            <div class="row hover titlebar pad-sm size-sm">
-                <div class="col icon"><svg viewBox="0 0 15 15"><use xlink:href="#icon-#icon#" x="0" y="0" width="36" height="36"></use></svg></div>
-                <div class="col title faded">#title#</div>
-                <div class="col right">
-                    #can-maximize#<a href="javascript:" class="icon maximize"><svg viewBox="0 0 15 15"><use xlink:href="#icon-windowmaximize" x="0" y="0" width="36" height="36"></use></svg></a>#/can-maximize#
-                    #can-close#<a href="javascript:" class="icon close"><svg viewBox="0 0 15 15"><use xlink:href="#icon-close" x="0" y="0" width="36" height="36"></use></svg></a>#/can-close#
-                </div>
-            </div>
-            #/titlebar#
-            <div class="content">#html#</div>
-        </div>
-    </script>
-</div>
+    <div class="component-hover"></div>
+    <div class="component-select hide">
+        <div class="resize side r-top"></div>
+        <div class="resize corner r-top-right"></div>
+        <div class="resize corner r-right-top"></div>
+        <div class="resize side r-right"></div>
+        <div class="resize corner r-right-bottom"></div>
+        <div class="resize corner r-bottom-right"></div>
+        <div class="resize side r-bottom"></div>
+        <div class="resize corner r-bottom-left"></div>
+        <div class="resize corner r-left-bottom"></div>
+        <div class="resize side r-left"></div>
+        <div class="resize corner r-left-top"></div>
+        <div class="resize corner r-top-left"></div>
+    </div>
+    <div class="fixed">
+        <div class="toolbar box">
+            <div class="container">
+                <a class="icon logo" href="http://www.github.com/websilk/home" target="_blank">
+                    <svg viewBox="0 0 177 36">
+                        <use xlink:href="#logo-websilk" x="0" y="0" width="177" height="36"></use>
+                    </svg>
+                </a>
 
+                <div class="right-side pad-right">
+                    <div class="col save-page nosave">
+                        <a class="button icon" href="javascript:" onclick="S.editor.save.click()">
+                            <svg viewBox="0 0 25 25" style="width:25px; height:25px;">
+                                <use xlink:href="#icon-save" x="0" y="0" width="25" height="25"></use>
+                            </svg>
+                        </a>
+                    </div>
+                    <div class="col pad-top">
+                        <a class="icon small" href="javascript:" onclick="S.editor.hide()">
+                            <svg viewBox="0 0 16 16">
+                                <use xlink:href="#icon-close" x="0" y="0" width="36" height="36"></use>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+
+                <nav class="menu">
+                    <a class="icon plus" href="javascript:"><svg viewBox="0 0 25 25"><use xlink:href="#icon-plus" x="0" y="0" width="25" height="25"></use></svg></a>
+                    <a class="icon options" href="javascript:"><svg viewBox="0 0 25 25"><use xlink:href="#icon-options" x="0" y="0" width="25" height="25"></use></svg></a>
+                    <a class="icon grid" href="javascript:"><svg viewBox="0 0 25 25"><use xlink:href="#icon-grid" x="0" y="0" width="25" height="25"></use></svg></a>
+                    <a class="icon screens" href="javascript:"><svg viewBox="0 0 33 25"><use xlink:href="#icon-screenhd" x="0" y="0" width="33" height="25"></use></svg></a>
+                    <a class="icon search" href="javascript:"><svg viewBox="0 0 25 25"><use xlink:href="#icon-search" x="0" y="0" width="25" height="25"></use></svg></a>
+                </nav>
+
+
+            </div>
+        </div>
+        <div class="windows"></div>
+        <script type="text/html" id="window_scaffold">
+            <div class="box">
+                #titlebar#
+                <div class="row hover titlebar pad-sm size-sm">
+                    <div class="col icon"><svg viewBox="0 0 15 15"><use xlink:href="#icon-#icon#" x="0" y="0" width="36" height="36"></use></svg></div>
+                    <div class="col title faded">#title#</div>
+                    <div class="col right">
+                        #can-maximize#<a href="javascript:" class="icon maximize"><svg viewBox="0 0 15 15"><use xlink:href="#icon-windowmaximize" x="0" y="0" width="36" height="36"></use></svg></a>#/can-maximize#
+                        #can-close#<a href="javascript:" class="icon close"><svg viewBox="0 0 15 15"><use xlink:href="#icon-close" x="0" y="0" width="36" height="36"></use></svg></a>#/can-close#
+                    </div>
+                </div>
+                #/titlebar#
+                <div class="content">#html#</div>
+            </div>
+        </script>
+    </div>
+</div>

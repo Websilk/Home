@@ -240,7 +240,7 @@
                 topLeft: $('.editor > .component-select > .r-top-left'),
             }
         },
-        visible: false, corners: 20, pad: 13, bar:4,
+        visible: false, corners: 20, pad: 13, bar: 4, menu: { width: 40 },
 
         init: function () {
             //set up static sizes for some resize bars
@@ -261,6 +261,8 @@
         },
 
         refresh: function () {
+            //reposition all resize bars & menu system for the component select box
+            if (S.editor.components.selected == null) { return;}
             var c = S.editor.components.selected;
             var pos = c.offset();
             var w = c.width();
@@ -268,17 +270,33 @@
             var r = this.elem.resize;
             var maxw = w + (this.pad * 2);
             var maxh = h + (this.pad * 2);
-            this.elem.compSel.css({ top: pos.top - this.pad, left: pos.left - this.pad });
-            r.top.css({ left: this.corners, width: maxw - (this.corners * 2) });
-            r.topRight.css({ left: maxw - this.corners, width: this.corners });
-            r.rightTop.css({ left: maxw - this.bar, height: this.corners });
-            r.right.css({ top: this.corners, left: maxw - this.bar, height: maxh - (this.corners * 2) });
-            r.rightBottom.css({ top: maxh - this.corners, left: maxw - this.bar, height: this.corners });
-            r.bottomRight.css({ top: maxh - this.bar, left: maxw - this.corners, width: this.corners });
-            r.bottom.css({ top: maxh - this.bar, left: this.corners, width: maxw - (this.corners * 2) });
-            r.bottomLeft.css({ top: maxh - this.bar, width: this.corners });
-            r.leftBottom.css({ top: maxh - this.corners, height: this.corners });
-            r.left.css({ top: this.corners, height: maxh - (this.corners * 2) });
+            var win = S.window.pos();
+            var rightspace = win.w - (pos.left - this.pad + maxw);
+            var bottomspace = win.h - (pos.top - this.pad + maxh);
+
+            //set up select box dimensions (with window-bound constraints)
+            var box = {
+                x: pos.left - this.pad < 0 ? 0 : pos.left - this.pad, 
+                y: pos.top - this.pad < S.editor.toolbar.height ? S.editor.toolbar.height : pos.top - this.pad,
+                w: rightspace < 0 ? maxw + rightspace : maxw, 
+                h: bottomspace < 0 ? maxh + bottomspace : maxh };
+
+            //reposition component select box container
+            this.elem.compSel.css({ top: box.y, left: box.x });
+
+            //reposition all resize bars
+            r.top.css({ left: this.corners, width: box.w - (this.corners * 2) });
+            r.topRight.css({ left: box.w - this.corners, width: this.corners });
+            r.rightTop.css({ left: box.w - this.bar, height: this.corners });
+            r.right.css({ top: this.corners, left: box.w - this.bar, height: box.h - (this.corners * 2) });
+            r.rightBottom.css({ top: box.h - this.corners, left: box.w - this.bar, height: this.corners });
+            r.bottomRight.css({ top: box.h - this.bar, left: box.w - this.corners, width: this.corners });
+            r.bottom.css({ top: box.h - this.bar, left: this.corners, width: box.w - (this.corners * 2) });
+            r.bottomLeft.css({ top: box.h - this.bar, width: this.corners });
+            r.leftBottom.css({ top: box.h - this.corners, height: this.corners });
+            r.left.css({ top: this.corners, height: box.h - (this.corners * 2) });
+
+            //reposition menu system
 
         }
     },
@@ -349,6 +367,10 @@
 
         mouseout: function(e){
             if (this.isdragging == true) { return; }
+            this.hide();
+        },
+
+        hide: function(){
             this.elem.compHover.hide();
             S.editor.components.hovered = null;
         },

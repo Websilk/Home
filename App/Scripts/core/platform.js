@@ -59,45 +59,6 @@ var S = {
         }
     },
 
-    elem: {
-        pos: function (elem) {
-            var x = 0, y = 0, w = 0, h = 0;
-            if (typeof elem != 'undefined' && elem != null) {
-                var e = elem;
-                while (e.offsetParent) {
-                    x += e.offsetLeft + (e.clientLeft || 0);
-                    y += e.offsetTop + (e.clientTop || 0);
-                    e = e.offsetParent;
-                }
-                w = elem.offsetWidth ? elem.offsetWidth : elem.clientWidth;
-                h = elem.offsetHeight ? elem.offsetHeight : elem.clientHeight;
-                if (h == 0) { h = $(elem).height(); }
-            }
-            return { x: x, y: y, w: w, h: h };
-        },
-
-        offset: function (elem) {
-            return {
-                y: elem.offsetTop ? elem.offsetTop : elem.clientTop,
-                x: elem.offsetLeft ? elem.offsetLeft : elem.clientLeft,
-                w: elem.offsetWidth ? elem.offsetWidth : elem.clientWidth,
-                h: elem.offsetHeight ? elem.offsetHeight : elem.clientHeight
-            }
-        },
-
-        top: function (elem) {
-            return elem.offsetTop ? elem.offsetTop : elem.clientTop;
-        },
-
-        width: function (elem) {
-            return elem.offsetWidth ? elem.offsetWidth : elem.clientWidth;
-        },
-
-        height: function (elem) {
-            return elem.offsetHeight ? elem.offsetHeight : elem.clientHeight;
-        }
-    },
-
     website: {
         id: 0, title: '', protocol:'', host:''
     },

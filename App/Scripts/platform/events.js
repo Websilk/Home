@@ -188,8 +188,8 @@
                 //register & execute callbacks when the window resizes
                 items: [],
 
-                add: function (elem, vars, onStart, onGo, onStop, onLevelChange) {
-                    this.items.push({ elem: elem, vars: vars, onStart: onStart, onGo: onGo, onStop: onStop, onLevelChange: onLevelChange });
+                add: function (elem, onStart, onGo, onStop, onLevelChange) {
+                    this.items.push({ elem: elem, onStart: onStart, onGo: onGo, onStop: onStop, onLevelChange: onLevelChange });
                 },
 
                 remove: function (elem) {
@@ -262,8 +262,8 @@
         callback: {
             items: [],
 
-            add: function (elem, vars, onStart, onComplete, onError) {
-                this.items.push({ elem: elem, vars: vars, onStart: onStart, onComplete: onComplete, onError: onError });
+            add: function (elem, onStart, onComplete, onError) {
+                this.items.push({ elem: elem, onStart: onStart, onComplete: onComplete, onError: onError });
             },
 
             remove: function (elem) {
@@ -314,8 +314,8 @@
         callback: {
             items: [],
 
-            add: function (elem, vars, onCallback) {
-                this.items.push({ elem: elem, vars: vars, onCallback: onCallback });
+            add: function (elem, onCallback) {
+                this.items.push({ elem: elem, onCallback: onCallback });
             },
 
             remove: function (elem) {

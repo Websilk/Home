@@ -22,6 +22,8 @@
                 $('.editor > .clone').append(clone);
                 this.hoverIndex = 0;
                 this.hoverStart = true;
+                S.editor.components.select.hide();
+                S.editor.components.hover.hide();
 
                 //override drag element object with clone
                 item.dragElem = clone;

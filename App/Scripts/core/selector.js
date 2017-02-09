@@ -169,7 +169,7 @@
         if (v == '' || v == null) { e.style[name] = v == '' ? null : v; return; }
 
         //check for numbers that should be using 'px';
-        if (parseInt(val) != 0) {
+        if (Number(v) == v) {
             if (pxStyles.indexOf(name) >= 0) {
                 v = val + 'px';
             } else if (pxStylesPrefix.some(function (a) { return name.indexOf(a) == 0 })) {

@@ -7,11 +7,7 @@
         this.current_path = [];
         this.reset_info();
         S.events.doc.resize.callback.remove('dash-pages');
-        S.events.doc.resize.callback.add('dash-pages', null,
-            this.resize,
-            this.resize,
-            this.resize
-        );
+        S.events.doc.resize.callback.add('dash-pages', this.resize, this.resize, this.resize);
         this.resize();
     },
 
@@ -77,7 +73,7 @@
         slides.cleanAfter();
 
         //add new slide to slideshow
-        slides.add(document.getElementById('page_details').innerHTML, data);
+        slides.add($('#page_details').html(), data);
 
         //load sub pages list
         if (isfolder == true) {
@@ -244,7 +240,7 @@
 
     resize: function () {
         $('.pages-info .pages-list ul.columns-list').each(function (e) {
-            var y = S.elem.top(e);
+            var y = $(e).offset().top;
             e.style.maxHeight = (window.innerHeight - y - 40) + 'px';
         });
     }

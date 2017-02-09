@@ -33,7 +33,6 @@
     callback: {
         inject: function (data) {
             if (data.type == 'Websilk.Services.Inject') {
-                console.log(data.d);
                 //load new content from web service
                 if (data.d.element != '') {
                     var elem = $(data.d.element);

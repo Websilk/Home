@@ -111,7 +111,7 @@
     <Build Include="dbo\Stored Procedures\Users\AddUser.sql" />
     <Build Include="dbo\Stored Procedures\Websites\AddWebsite.sql" />
     <Build Include="dbo\Stored Procedures\Pages\AddWebsiteLayer.sql" />
-    <Build Include="dbo\Stored Procedures\Pages\AddWebsitePage.sql" />
+    <Build Include="dbo\Stored Procedures\Pages\AddPage.sql" />
     <Build Include="dbo\Stored Procedures\Security\AddWebsiteSecurity.sql" />
     <Build Include="dbo\Stored Procedures\Security\AuthenticateLogin.sql" />
     <Build Include="dbo\Stored Procedures\Photos\DeletePhoto.sql" />

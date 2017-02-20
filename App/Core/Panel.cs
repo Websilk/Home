@@ -86,6 +86,7 @@ namespace Websilk
 
         public string name = ""; //a human-readable name for human reference only
         public string id = ""; //a unique ID
+        public string layout = ""; //name of layout section to load into
         [JsonIgnore]
         public int pageId = 0;
         public structArrangement arrangement;
@@ -96,11 +97,12 @@ namespace Websilk
         [JsonIgnore]
         public string foot = "";
         
-        public Panel(Core WebsilkCore, string Id = "", string Name = "")
+        public Panel(Core WebsilkCore, string Id = "", string Name = "", string Layout = "")
         {
             S = WebsilkCore;
             id = Id;
             name = Name;
+            layout = Layout;
         }
 
         public void AddCell(string cellId = "")

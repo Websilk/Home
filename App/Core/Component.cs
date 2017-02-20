@@ -336,6 +336,14 @@ namespace Websilk
             return div.Render();
         }
 
+        /// <summary>
+        /// Sets a value for a custom variable within the component that is later saved to the page.json file 
+        /// </summary>
+        /// <param name="data"></param>
+        public virtual void SetValue(object data)
+        {
+
+        }
         #endregion
 
         #region "Utility"

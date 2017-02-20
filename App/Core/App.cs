@@ -75,7 +75,7 @@ namespace Websilk.Services
                     if(page.pageService != "")
                     {
                         var service = page.getStaticPage(page.pageService);
-                        var response = service.LoadSubPage(page.Url.path.Replace(page.pagePathName + "/", ""));
+                        var response = service.LoadSubPage(page.Url.path.Replace(page.pagePathName.ToLower() + "/", ""));
                         S.javascript.Add("static-page", "S.url.push('" + page.pageTitle + "','" + url.Replace(" ", "-") + "');");
                         response.js =
                             S.cssFiles.renderCssFiles(false) + "\n" +

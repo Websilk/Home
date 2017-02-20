@@ -19,7 +19,7 @@ S.scaffold.prototype.render = function () {
     var ischanged = true;
     for (var key in this.vars) {
         ischanged = true;
-        while (ischanged == true) {
+        while (ischanged) {
             ischanged = false;
             //check for scaffold closing first
             a = htm.indexOf(this.tagStart + '/' + key + this.tagEnd);

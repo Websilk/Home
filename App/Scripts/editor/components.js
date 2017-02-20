@@ -1,29 +1,24 @@
 ﻿S.editor.components = {
-    hovered: null, selected: null,
+    hovered: null, selected: null, 
     // the list of components loaded within the component window /////////////////////////////////////////////////
     list: { 
-        cells:[], hoverIndex:0, hoverStart:true, hoverComp:1,
-
         init: function(){
             //set up drag event for components window icons
             $('#winComponents .component-icon').each(function (e) {
                 var a = S.editor.components.list.drag;
-                S.drag.add(e, e, a.start, a.go, a.end, { useElemPos: true, callee: S.editor.components.list, speed: 1000 / 30 });
+                S.drag.add(e, e, a.start, a.go, a.end, { useElemPos: true, callee: S.editor.components.list, speed: 1000 / 24 });
             });
         },
 
         drag: {
-            cell: null, component: null, drop: 'after',
-
             start: function(item){
                 //drag new component onto the page from the components window
                 //clone component icon from window
                 var clone = item.elem.cloneNode(true);
                 $('.editor > .clone').append(clone);
-                this.hoverIndex = 0;
-                this.hoverStart = true;
                 S.editor.components.select.hide();
                 S.editor.components.hover.hide();
+                S.editor.components.hover.isdragging = true;
 
                 //override drag element object with clone
                 item.dragElem = clone;
@@ -31,196 +26,40 @@
                 //update body tag
                 $('body').addClass('drag-component');
 
-                //get list of panel cells on page
-                this.cells = [];
-                $('.is-cell').each(function(e){
-                    var el = $(e);
-                    var pof = el.offset();
-                    var pdim = { width: el.width(), height: el.height() };
-
-                    //get list of components within panel cell
-                    var comps = [];
-                    el.find('.component').each(function(c){
-                        var ce = $(c);
-                        var of = ce.offset();
-                        var dim = { width:ce.width(), height:ce.height() };
-                        comps.push({ 
-                            elem: c, 
-                            rect: { 
-                                left: of.left, right: of.left + dim.width, top: of.top, bottom: of.top + dim.height 
-                            }, 
-                            width: dim.width, 
-                            height: dim.height 
-                        });
-                    });
-                    //sort components based on top left position
-                    comps.sort(function (a, b) {
-                        var c = a.rect.top - b.rect.top;
-                        if (c == 0) {
-                            return a.rect.left - b.rect.left;
-                        } else { return c;}
-                    });
-
-                    //add panel cell to list
-                    S.editor.components.list.cells.push({ 
-                        elem: e, 
-                        rect: { 
-                            left: pof.left, right: pof.left + pdim.width, top: pof.top, bottom: pof.top + pdim.height 
-                        }, 
-                        width: pdim.width, 
-                        height: pdim.height,
-                        comps: comps
-                    });
-                });
+                //start component tracking
+                S.editor.components.track.drag.start.call(S.editor.components.track);
             },
 
             go: function (item) {
-                //detect currently hovered panel
-                var cell = this.cells[this.hoverIndex];
-                var cursor = { left: item.cursor.x, top: item.cursor.y, right: item.cursor.x + 1, bottom: item.cursor.y + 1 };
-                var curr = null;
-                var comp;
-                var found = false;
-
-                if (!S.math.intersect(cell.rect, cursor) || this.hoverStart === true) {
-                    //intersecting a different cell
-                    for (var i = 0; i < this.cells.length; i++) {
-                        cell = this.cells[i];
-                        if (S.math.intersect(cell.rect, cursor)) {
-                            this.hoverIndex = i;
-                            found = true;
-                            break;
-                        }
-                    }
-                    if (found) {
-                        // generate box around currently hovered panel cell
-                        var div = document.createElement('div');
-                        div.className = "cellbox";
-                        div.style.left = cell.rect.left + 'px';
-                        div.style.top = cell.rect.top + 'px';
-                        div.style.width = cell.width + 'px';
-                        div.style.height = cell.height + 'px';
-                        $('.editor > .temp > .cellbox').remove();
-                        $('.editor > .temp > .compline').remove();
-                        $('.editor > .temp').append(div);
-                        this.hoverComp = 1;
-                        this.drag.drop = '';
-                    } else {
-                        cell = this.cells[0];
-                        this.hoverIndex = 0;
-                    }
-                    
-                    
-                    if (this.hoverStart === true) { this.hoverStart = false; }
-                }
-
-                //detect which two components the cursor is between
-                this.drag.cell = cell.elem;
-                if (cell.comps) {
-                    var cy = cursor.top;
-                    var cx = cursor.left;
-                    var rectx = 0;
-                    var drop = 'after';
-                    for (var x = 0; x < cell.comps.length; x++) {
-                        comp = cell.comps[x].rect;
-                        if (cy >= comp.top) {
-                            if (cy <= comp.bottom) {
-                                if (cx >= comp.left + ((comp.right - comp.left) / 2.5)) {
-                                    curr = cell.comps[x];
-                                    rectx = curr.rect.right;
-                                    drop = 'after';
-                                } else if(curr == null) {
-                                    curr = cell.comps[x];
-                                    rectx = curr.rect.left;
-                                    drop = 'before';
-                                }
-                            }
-                        } else { break; }
-                    }
-                    
-                    if (curr !== null) {
-                        if (curr.elem !== this.hoverComp || this.drag.drop != drop) {
-                            this.compline(curr.elem, drop, rectx, curr.rect.top, curr.height);
-                            this.hoverComp = curr.elem;
-                            return;
-                        } else if (curr.elem == this.hoverComp) { return;}
-                    }
-                }
-                if (curr === null && this.hoverComp !== 1) {
-                    //load component line before first component
-                    this.hoverComp = 1;
-                    if (cell.comps.length > 0) {
-                        comp = cell.comps[cell.comps.length - 1];
-                        if (cursor.top > comp.rect.bottom) {
-                            //after last component in cell
-                            this.compline(comp.elem, 'after', comp.rect.right, comp.rect.top, comp.height);
-                        } else {
-                            //before first component in cell
-                            comp = cell.comps[0];
-                            this.compline(comp.elem, 'before', comp.rect.left, comp.rect.top, comp.height);
-                        }
-                    } else {
-                        this.compline(null, 'before', cell.rect.left + ((cell.rect.right - cell.rect.left) / 2), cell.rect.top, cell.height);
-                    }
-                } else if (found === true) {
-                    //cursor moved from one cell to another
-                    if (cell.comps.length > 0) {
-                        if (cursor.top > cell.rect.top + ((cell.rect.bottom - cell.rect.top) / 2)) {
-                            //after last component in cell
-                            comp = cell.comps[cell.comps.length - 1];
-                            this.compline(comp.elem, 'after', comp.rect.right, comp.rect.top, comp.height);
-                        } else {
-                            //before first component in cell
-                            comp = cell.comps[0];
-                            this.compline(comp.elem, 'before', comp.rect.left, comp.rect.top, comp.height);
-                        }
-                        
-                    } else {
-                        //before first component in cell
-                        this.compline(null, 'before', cell.rect.left + ((cell.rect.right - cell.rect.left) / 2), cell.rect.top, cell.height);
-                    }
-                }
+                S.editor.components.track.drag.go.call(S.editor.components.track, { left: item.cursor.x, top: item.cursor.y, right: item.cursor.x + 1, bottom: item.cursor.y + 1 });
             },
 
             end: function (item) {
-                $('.editor > .clone *, ' +
-                  '.editor > .temp > .cellbox, ' +
-                  '.editor > .temp > .compline').remove();
+                S.editor.components.track.drag.end();
+                S.editor.components.hover.isdragging = false;
+
+                //update body tag
                 $('body').removeClass('drag-component');
 
                 //send an AJAX request to create the new component on the page
                 var cid = '';
-                if (this.drag.component) { cid = this.drag.component.id; }
+                var track = S.editor.components.track;
+                if (track.component) { cid = track.component.id; }
                 if (cid.length > 0) { cid = cid.substring(1);}
                 var data = {
                     name: item.elem.getAttribute('data-id'),
                     layerId: S.page.id,
-                    panelId: $(this.drag.cell).parent('.is-panel').get(0).id.replace('panel_',''),
-                    cellId: this.drag.cell.id.replace('cell_', ''),
+                    panelId: $(track.cell).parent('.is-panel').get(0).id.replace('panel_', ''),
+                    cellId: track.cell.id.replace('cell_', ''),
                     componentId: cid,
-                    append: this.drag.drop === 'after' ? 1 : 0
+                    append: track.drop === 'after' ? 1 : 0
                 };
                 S.ajax.post('Editor/Components/Create', data, function (d) {
                     S.ajax.callback.inject(d);
-                    S.editor.components.select.init(); //reinitialize component events
+                    S.editor.components.hover.reinit(); //reinitialize component events
                 });
             }
         },
-
-        compline: function (elem, drop, left, top, height) {
-            //display a dotted line to show where the new component 
-            //will be dropped (between two components on the page)
-            var div = document.createElement('div');
-            div.className = "compline";
-            div.style.left = left + 'px';
-            div.style.top = top + 'px';
-            div.style.width = '1px';
-            div.style.height = height + 'px';
-            $('.editor > .temp > .compline').remove();
-            $('.editor > .temp').append(div);
-            this.drag.component = elem;
-            this.drag.drop = drop;
-        }
     },
 
     // the select box used for resizing components & modifying component properties //////////////////////////////
@@ -257,9 +96,14 @@
             this.visible = true;
         },
 
-        hide: function(){
+        hide: function () {
+            S.editor.components.selected = null;
             this.elem.compSel.hide();
             this.visible = false;
+        },
+
+        resize: function(){
+            //resize component based on resize bar drag position
         },
 
         refresh: function () {
@@ -273,8 +117,8 @@
             var maxw = w + (this.pad * 2);
             var maxh = h + (this.pad * 2);
             var win = S.window.pos();
-            var rightspace = win.w - (pos.left - this.pad + maxw);
-            var bottomspace = win.h - (pos.top - this.pad + maxh);
+            var rightspace = (win.w + win.scrollx) - (pos.left - this.pad + maxw);
+            var bottomspace = (win.h + win.scrolly) - (pos.top - this.pad + maxh);
 
             //set up select box dimensions (with window-bound constraints)
             var box = {
@@ -308,14 +152,20 @@
         elem:{
             compHover: $('.editor > .component-hover')
         },
-        pad:13, timer:{ date: new Date(), timeout: 250}, isdragging: false, trigdrag: false,
+        pad: 13, timer: { date: new Date(), timeout: 250 }, isdragging: false, trigdrag: false,
 
         init: function(){
-            $('.webpage .component').off().on('hover', function (e) { S.editor.components.hover.mouseover.call(S.editor.components.hover, e.target); });
-            this.elem.compHover.off().on('mouseleave', function (e) { S.editor.components.hover.mouseout.call(S.editor.components.hover, e.target); });
+            var e = this.elem.compHover.get();
+            if (!S.drag.has(e)) {
+                this.elem.compHover.off().on('mouseleave', function (e) { S.editor.components.hover.mouseout.call(S.editor.components.hover, e.target); });
+                S.drag.add(e, e, this.drag.start, this.drag.go, this.drag.end, { callee: this, speed: 1000 / 30 });
+            }
+            this.reinit();
+        },
 
-            var e = $('.editor > .component-hover').get();
-            S.drag.add(e, e, this.dragStart, this.drag, this.dragEnd, { callee: this, speed: 1000 / 30 });
+        reinit: function () {
+            //reinitialize component hover events (in case of new components loaded onto the page)
+            $('.webpage .component').off().on('hover', function (e) { S.editor.components.hover.mouseover.call(S.editor.components.hover, e.target); });
         },
 
         hovered: function (elem) {
@@ -351,12 +201,12 @@
                 
             var parents = el.parents('.component');
             if (parents.length > 0) {
-                if (parents[0].get() == sel) {
+                if (parents.get() == sel) {
                     this.hovered(el);
                     return;
                 } else {
                     for (var x = 0; x < parents.length; x++) {
-                        if (parents[x].get() == sel) {
+                        if (parents.get(x) == sel) {
                             return;
                         }
                     }
@@ -377,40 +227,68 @@
             S.editor.components.hovered = null;
         },
 
-        dragStart: function (item) {
-            this.isdragging = true;
-            this.timer.date = new Date();
-            this.trigdrag = false;
-            this.elem.compHover.hide();
-            item.dragElem = S.editor.components.hovered.get();
-        },
+        drag:{
+            start: function (item) {
+                this.isdragging = true;
+                this.timer.date = new Date();
+                this.trigdrag = false;
+                this.elem.compHover.hide();
+                item.dragElem = S.editor.components.hovered.get();
 
-        drag: function (item) {
-            if (this.trigdrag == false) {
-                var cx = item.start.x - item.cursor.x;
-                var cy = item.start.y - item.cursor.y;
-                if (cx < 0) { cx = cx * -1; }
-                if (cy < 0) { cy = cy * -1; }
-                if (new Date() - this.timer.date > this.timer.timeout || cx + cy > 8) {
-                    var pos = S.editor.components.hovered.position();
-                    S.editor.components.hovered.css({ 'position': 'absolute', left: pos.left, top: pos.top });
-                    S.editor.components.select.hide();
-                    this.trigdrag = true;
+            },
+
+            go: function (item) {
+                if (this.trigdrag == false) {
+                    var cx = item.start.x - item.cursor.x;
+                    var cy = item.start.y - item.cursor.y;
+                    if (cx < 0) { cx = cx * -1; }
+                    if (cy < 0) { cy = cy * -1; }
+                    if (new Date() - this.timer.date > this.timer.timeout || cx + cy > 8) {
+                        //trigger drag instead of click
+                        var pos = S.editor.components.hovered.position();
+                        S.editor.components.hovered.css({ 'position': 'absolute', left: pos.left, top: pos.top });
+                        S.editor.components.select.hide();
+                        this.trigdrag = true;
+                        $('body').addClass('drag-component');
+                        //start component tracking
+                        S.editor.components.track.drag.start.call(S.editor.components.track);
+                    }
+                    return false;
                 }
-                return false;
-            }
-            
-        },
+                S.editor.components.track.drag.go.call(S.editor.components.track, { left: item.cursor.x, top: item.cursor.y, right: item.cursor.x + 1, bottom: item.cursor.y + 1 });
+            },
 
-        dragEnd: function (item) {
-            this.isdragging = false;
-            if (this.trigdrag == false) {
-                //register click event instead of drag event
-                S.editor.components.select.show(S.editor.components.hovered); return;
-            } else {
-                //finish dragging component
-                S.editor.components.hovered.css({ 'position': '', top:'', left:'' });
-                S.editor.components.hovered = null;
+            end: function (item) {
+                this.isdragging = false;
+                if (this.trigdrag == false) {
+                    //register click event instead of drag event
+                    S.editor.components.select.show(S.editor.components.hovered); return;
+                } else {
+                    //finish dragging component
+                    S.editor.components.track.drag.end();
+
+                    //update body tag
+                    $('body').removeClass('drag-component');
+
+                    //move component
+                    var e = S.editor.components.hovered;
+                    var elem = e.get();
+                    var track = S.editor.components.track;
+                    if (track.component) {
+                        if (track.drop == "after") {
+                            $(track.component).after(elem);
+                        } else {
+                            $(track.component).before(elem);
+                        }
+                    } else {
+                        $(track.cell).append(elem);
+                    }
+                    e.css({ 'position': '', top: '', left: '' });
+
+                    //reinitialize component events
+                    S.editor.components.hover.reinit();
+                    S.editor.components.hovered = null;
+                }
             }
         },
 
@@ -421,8 +299,227 @@
             var pos = hovered.offset();
             var w = hovered.width();
             var h = hovered.height();
+            var win = S.window.pos();
+            var a = pos.top + h + (this.pad * 2);
+            var b = win.scrolly + win.h;
+            //fit to window bounds
+            if (a > b) { h = h - (a - b) + (this.pad / 2); }
+            a = pos.left + w + (this.pad * 2);
+            b = win.scrollx + win.w;
+            if (a > b) { w = w - (a - b) + (this.pad / 2); }
             //resize hover box
             this.elem.compHover.css({ top: pos.top - this.pad, left: pos.left - this.pad, width: w + (this.pad * 2), height: h + (this.pad * 2) });
+        }
+    },
+
+    // executed when the user clicks anywhere on the web page ////////////////////////////////////////////////////
+    click: function (target, type) {
+        if (type != 'component-select' && type != 'component-hover' && type != 'window' && type != 'toolbar') {
+            //deselect component
+            S.editor.components.select.hide();
+        }
+    },
+
+    // utility for component tracking while dragging /////////////////////////////////////////////////////////////
+    track: {
+        cells: [], hoverIndex: 0, hoverStart: true, timer: { timout: 500, date: null} ,
+        cell: null, component: null, drop: 'after', hoverComp: 1,
+
+        drag:{
+            start: function(){
+                this.hoverComp = 1;
+                this.hoverIndex = 0;
+                this.hoverStart = true;
+                this.cells = [];
+                $('.is-cell').each(function (e) {
+                    S.editor.components.track.cells.push(S.editor.components.track.getCell($(e)));
+                });
+                this.timer.date = new Date();
+            },
+
+            go: function (cursor) {
+                if (new Date() - this.timer.date < this.timer.timeout) { return; }
+                var cell = this.cells[this.hoverIndex];
+                var comp;
+                var found = false;
+                this.timer.date = new Date();
+
+                if (!S.math.intersect(cell.rect, cursor) || this.hoverStart === true) {
+                    //intersecting a different cell
+                    for (var i = 0; i < this.cells.length; i++) {
+                        cell = this.cells[i];
+                        if (S.math.intersect(cell.rect, cursor)) {
+                            this.hoverIndex = i;
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (found) {
+                        // generate box around currently hovered panel cell
+                        var div = document.createElement('div');
+                        div.className = "cellbox";
+                        div.style.left = cell.rect.left + 'px';
+                        div.style.top = cell.rect.top + 'px';
+                        div.style.width = cell.width + 'px';
+                        div.style.height = cell.height + 'px';
+                        $('.editor > .temp > .cellbox').remove();
+                        $('.editor > .temp > .displayComponentLine').remove();
+                        $('.editor > .temp').append(div);
+                        this.hoverComp = 1;
+                        this.drop = '';
+                    } else {
+                        cell = this.cells[0];
+                        this.hoverIndex = 0;
+                    }
+                    if (this.hoverStart === true) { this.hoverStart = false; }
+                    this.cell = cell.elem;
+                }
+                this.getComponentHoveredOver(cursor, cell, cell.comps, found);
+            },
+
+            end: function () {
+                $('.editor > .clone *, ' +
+                 '.editor > .temp > .cellbox, ' +
+                 '.editor > .temp > .compline').remove();
+            }
+        },
+
+        getCell(e){
+            var pof = e.offset();
+            var pdim = { width: e.width(), height: e.height() };
+
+            //get list of components within panel cell
+            var comps = this.getComponentsInCell(e);
+
+            //add panel cell to list
+            return {
+                elem: e.get(),
+                rect: {
+                    left: pof.left, right: pof.left + pdim.width, top: pof.top, bottom: pof.top + pdim.height
+                },
+                width: pdim.width,
+                height: pdim.height,
+                comps: comps
+            };
+        },
+
+        getComponentsInCell: function (cell) {
+            var comps = [];
+            cell.find('.component').each(function (c) {
+                if (c.style.position != "absolute") {
+                    var ce = $(c);
+                    var of = ce.offset();
+                    var dim = { width: ce.width(), height: ce.height() };
+                    comps.push({
+                        elem: c,
+                        rect: {
+                            left: of.left, right: of.left + dim.width, top: of.top, bottom: of.top + dim.height
+                        },
+                        width: dim.width,
+                        height: dim.height
+                    });
+                }
+                
+            });
+            //sort components based on top left position
+            comps.sort(function (a, b) {
+                var c = a.rect.top - b.rect.top;
+                if (c == 0) {
+                    return a.rect.left - b.rect.left;
+                } else { return c; }
+            });
+
+            return comps;
+        },
+
+        getComponentHoveredOver: function (cursor, cell, comps, newcell) {
+            var curr = null;
+            if (comps) {
+                var cy = cursor.top;
+                var cx = cursor.left;
+                var rectx = 0;
+                var drop = 'after';
+                for (var x = 0; x < comps.length; x++) {
+                    comp = comps[x].rect;
+                    if (cy >= comp.top) {
+                        if (cy <= comp.bottom) {
+                            if (cx >= comp.left + ((comp.right - comp.left) / 2.5)) {
+                                curr = comps[x];
+                                rectx = curr.rect.right;
+                                drop = 'after';
+                            } else if (curr == null) {
+                                curr = comps[x];
+                                rectx = curr.rect.left;
+                                drop = 'before';
+                            } else {
+                                break;
+                            }
+                        }
+                    } else { break; }
+                }
+
+                if (curr !== null) {
+                    if (curr.elem !== this.hoverComp || this.drop != drop) {
+                        this.displayComponentLine(curr.elem, drop, rectx, curr.rect.top, curr.height);
+                        this.hoverComp = curr.elem;
+                        return;
+                    } else if (curr.elem == this.hoverComp) { return; }
+                }
+            }
+            if (curr === null && this.hoverComp !== 1) {
+                //load component line before first component
+                this.hoverComp = 1;
+                if (comps.length > 0) {
+                    comp = comps[comps.length - 1];
+                    if (cursor.top > comp.rect.bottom) {
+                        //after last component in cell
+                        this.displayComponentLine(comp.elem, 'after', comp.rect.right, comp.rect.top, comp.height);
+                    } else {
+                        //before first component in cell
+                        comp = comps[0];
+                        this.displayComponentLine(comp.elem, 'before', comp.rect.left, comp.rect.top, comp.height);
+                    }
+                } else {
+                    this.displayComponentLine(null, 'before', cell.rect.left + ((cell.rect.right - cell.rect.left) / 2), cell.rect.top, cell.height);
+                }
+            } else if (newcell === true) {
+                //cursor moved from one cell to another
+                if (comps.length > 0) {
+                    if (cursor.top > cell.rect.top + ((cell.rect.bottom - cell.rect.top) / 2)) {
+                        //after last component in cell
+                        comp = comps[comps.length - 1];
+                        this.displayComponentLine(comp.elem, 'after', comp.rect.right, comp.rect.top, comp.height);
+                    } else {
+                        //before first component in cell
+                        comp = comps[0];
+                        this.displayComponentLine(comp.elem, 'before', comp.rect.left, comp.rect.top, comp.height);
+                    }
+
+                } else {
+                    //before first component in cell
+                    this.displayComponentLine(null, 'before', cell.rect.left + ((cell.rect.right - cell.rect.left) / 2), cell.rect.top, cell.height);
+                }
+            }
+        },
+
+        displayComponentLine: function (elem, drop, left, top, height) {
+            //display a dotted line to show where the new component 
+            //will be dropped (between two components on the page)
+            var div = $('.editor > .temp > .compline');
+            if ($('.editor > .temp > .compline').length == 0) {
+                var div = document.createElement('div');
+                div.className = "compline";
+                div.style.left = left + 'px';
+                div.style.top = top + 'px';
+                div.style.width = '1px';
+                div.style.height = height + 'px';
+                $('.editor > .temp > .compline').remove();
+                $('.editor > .temp').append(div);
+            } else {
+                div.css({ top: top, left: left, height: height });
+            }
+            this.component = elem;
+            this.drop = drop;
         }
     }
 };

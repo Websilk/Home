@@ -9,11 +9,12 @@
             S.events.doc.resize.trigger();
         },
 
-        click: {
+        mousedown: {
             trigger: function (target) {
-
                 var type = 'bg';
+                if (!target) { return type; }
                 var t = $(target);
+                if (t.length == 0) { return type; }
                 if (t.parents('.component').length > 0 || t.hasClass('component') == true) {
                     type = 'component';
                 } else if (t.parents('.window').length > 0 || t.hasClass('window') == true) {
@@ -22,19 +23,27 @@
                     type = 'toolbar';
                 } else if (t.parents('.component-select').length > 0 || t.hasClass('component-select') == true) {
                     type = 'component-select';
-                } else if (t.parents('.tools').length > 0) {
-                    type = 'tools';
+                } else if (t.parents('.component-hover').length > 0 || t.hasClass('component-hover') == true) {
+                    type = 'component-hover';
                 }
+                S.events.doc.click.type = type;
+            }
+        },
 
-                this.callback.execute(target, type);
+        click: {
+            type: '',
+
+            trigger: function (target) {
+                this.callback.execute(target, this.type);
+                return this.type;
             },
 
             callback: {
                 //register & execute callbacks when the user clicks anywhere on the document
                 items: [],
 
-                add: function (elem, vars, onClick) {
-                    this.items.push({ elem: elem, vars: vars, onClick: onClick });
+                add: function (elem, onClick) {
+                    this.items.push({ elem: elem, onClick: onClick });
                 },
 
                 remove: function (elem) {
@@ -101,8 +110,8 @@
                 //register & execute callbacks when the window resizes
                 items: [],
 
-                add: function (elem, vars, onStart, onGo, onStop) {
-                    this.items.push({ elem: elem, vars: vars, onStart: onStart, onGo: onGo, onStop: onStop });
+                add: function (elem, onStart, onGo, onStop) {
+                    this.items.push({ elem: elem, onStart: onStart, onGo: onGo, onStop: onStop });
                 },
 
                 remove: function (elem) {

@@ -172,13 +172,13 @@ namespace Websilk.Services.Dashboard
 
         #region "Create"
 
-        public string Create(int websiteId, int parentId, string title, string description, bool secure)
+        public string Create(int websiteId, int parentId, string title, string description, bool secure, string layout = "", string service = "")
         {
             if (!S.User.checkSecurity(websiteId, "dashboard/pages", User.enumSecurity.create)) { return "err"; }
 
             //create new web page
             GetPage();
-            page.sql.Create(S.User.userId, websiteId, parentId, title, description, SqlQueries.Page.enumPageType.dynamic, "", secure);
+            page.sql.Create(S.User.userId, websiteId, parentId, title, description, SqlQueries.Page.enumPageType.dynamic, layout, service, secure);
 
             //return list of sub-pages
             return View(websiteId, parentId, 0, 100, 0, 0, "");

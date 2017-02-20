@@ -581,7 +581,7 @@
         }
         for (var x = 0; x < this.elements.length; x++) {
             var n = this.elements[x].className || '';
-            if (n != '') {
+            if (typeof n == 'string') {
                 var classNames = n.split(' ');
                 if (classNames.length > 0) {
                     if (classList.every(function (a) { return classNames.some(function (b) { return a == b; }); })) {
@@ -902,7 +902,7 @@
             if (event == "hover") {
                 hover(e, func, func2);
             } else {
-                e.addEventListener(event, func);
+                e.addEventListener(event, func, true);
                 var listen = false;
                 for (var x = 0; x < listeners.length; x++) {
                     if (listeners[x].elem == e) {

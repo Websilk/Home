@@ -42,7 +42,7 @@
 
                 <div class="right-side pad-right">
                     <div class="col save-page nosave">
-                        <a class="button icon" href="javascript:" onclick="S.editor.save.click()">
+                        <a class="button icon" href="javascript:">
                             <svg viewBox="0 0 25 25" style="width:25px; height:25px;">
                                 <use xlink:href="#icon-save" x="0" y="0" width="25" height="25"></use>
                             </svg>
@@ -69,20 +69,14 @@
             </div>
         </div>
         <div class="windows"></div>
-        <script type="text/html" id="window_scaffold">
-            <div class="box">
-                #titlebar#
-                <div class="row hover titlebar pad-sm size-sm">
-                    <div class="col icon"><svg viewBox="0 0 15 15"><use xlink:href="#icon-#icon#" x="0" y="0" width="36" height="36"></use></svg></div>
-                    <div class="col title faded">#title#</div>
-                    <div class="col right">
-                        #can-maximize#<a href="javascript:" class="icon maximize"><svg viewBox="0 0 15 15"><use xlink:href="#icon-windowmaximize" x="0" y="0" width="36" height="36"></use></svg></a>#/can-maximize#
-                        #can-close#<a href="javascript:" class="icon close"><svg viewBox="0 0 15 15"><use xlink:href="#icon-close" x="0" y="0" width="36" height="36"></use></svg></a>#/can-close#
-                    </div>
-                </div>
-                #/titlebar#
-                <div class="content">#html#</div>
-            </div>
-        </script>
+        
     </div>
+
+    <script type="text/html" id="template_window">
+        {{template-window}}
+    </script>
+
+    <script type="text/html" id="template_dashboard">
+        {{template-dashboard}}
+    </script>
 </div>

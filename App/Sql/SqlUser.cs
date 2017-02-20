@@ -13,39 +13,39 @@ namespace Websilk.SqlQueries
         public SqlReader AuthenticateUser(string email, string password)
         {
             var parameters = new List<SqlParameter>();
-            parameters.Add(new SqlParameter("@_email", email));
-            parameters.Add(new SqlParameter("@_password", password));
-            return new SqlReader(S, "EXEC AuthenticateUser @email=@_email, @password=@_password", parameters);
+            parameters.Add(new SqlParameter("@email", email));
+            parameters.Add(new SqlParameter("@password", password));
+            return new SqlReader(S, "EXEC AuthenticateUser @email=@email, @password=@password", parameters);
         }
 
         public SqlReader UpdatePassword(int userId, string password)
         {
             var parameters = new List<SqlParameter>();
-            parameters.Add(new SqlParameter("@_userId", userId.ToString()));
-            parameters.Add(new SqlParameter("@_password", password));
-            return new SqlReader(S, "EXEC UpdateUserPassword @userId=@_userId, @password=@_password", parameters);
+            parameters.Add(new SqlParameter("@userId", userId.ToString()));
+            parameters.Add(new SqlParameter("@password", password));
+            return new SqlReader(S, "EXEC UpdateUserPassword @userId=@userId, @password=@password", parameters);
         }
 
         public string GetEmail(int userId)
         {
             var parameters = new List<SqlParameter>();
-            parameters.Add(new SqlParameter("@_userId", userId.ToString()));
-            return (string)S.Sql.ExecuteScalar("EXEC GetUserEmail @userId=@_userId", parameters);
+            parameters.Add(new SqlParameter("@userId", userId.ToString()));
+            return (string)S.Sql.ExecuteScalar("EXEC GetUserEmail @userId=@userId", parameters);
         }
 
         public string GetPassword(string email)
         {
             var parameters = new List<SqlParameter>();
-            parameters.Add(new SqlParameter("@_email", email));
-            return (string)S.Sql.ExecuteScalar("EXEC GetUserPassword @email=@_email", parameters);
+            parameters.Add(new SqlParameter("@email", email));
+            return (string)S.Sql.ExecuteScalar("EXEC GetUserPassword @email=@email", parameters);
         }
 
         public SqlReader UpdateEmail(int userId, string email)
         {
             var parameters = new List<SqlParameter>();
-            parameters.Add(new SqlParameter("@_userId", userId.ToString()));
-            parameters.Add(new SqlParameter("@_email", email));
-            return new SqlReader(S, "EXEC UpdateUserEmail @userId=@_userId, @email=@_email", parameters);
+            parameters.Add(new SqlParameter("@userId", userId.ToString()));
+            parameters.Add(new SqlParameter("@email", email));
+            return new SqlReader(S, "EXEC UpdateUserEmail @userId=@userId, @email=@email", parameters);
         }
         #endregion
 
@@ -53,9 +53,9 @@ namespace Websilk.SqlQueries
         public SqlReader GetWebsiteSecurity(int websiteId, int userId)
         {
             var parameters = new List<SqlParameter>();
-            parameters.Add(new SqlParameter("@_websiteId", websiteId.ToString()));
-            parameters.Add(new SqlParameter("@_userId", userId.ToString()));
-            return new SqlReader(S, "EXEC GetSecurityForWebsite @websiteId=@_websiteId, @userId=@_userId", parameters);
+            parameters.Add(new SqlParameter("@websiteId", websiteId.ToString()));
+            parameters.Add(new SqlParameter("@userId", userId.ToString()));
+            return new SqlReader(S, "EXEC GetSecurityForWebsite @websiteId=@websiteId, @userId=@userId", parameters);
         }
 
 

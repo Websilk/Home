@@ -583,6 +583,24 @@ M 32.35 14.55
 L 25.4 23.05 3.7 14.45 0 19 3.7 20.45 25.4 29.05 32.35 20.55 36.05 16.05 32.35 14.55 Z"/>
     </g>
 
+    <g id="iconLayout_0_Layer1_0_FILL">
+      <path fill="#FFFFFF" stroke="none" d="
+M 0 0
+L 0 36 36 36 36 0 0 0
+M 2 2
+L 34 2 34 34 2 34 2 2
+M 4 29
+L 4 30 33 30 33 29 4 29
+M 32 7
+L 32 6 4 6 4 7 32 7 Z"/>
+    </g>
+
+    <g id="iconLayout_0_Layer0_0_FILL">
+      <path fill="#FFFFFF" fill-opacity="0" stroke="none" d="
+M 36 36
+L 36 0 0 0 0 36 36 36 Z"/>
+    </g>
+
     <g id="icon_logo_0_Layer1_0_FILL">
       <path fill="#FFFFFF" stroke="none" d="
 M 34.25 2.3
@@ -2265,6 +2283,19 @@ L 1 13 1 1 7 1 7 13 Z"/>
 
       <g transform="matrix( 1, 0, 0, 1, 0,0) ">
         <use xlink:href="#icon_layers_0_Layer0_0_FILL"/>
+      </g>
+    </g>
+  </symbol>
+  <symbol id="icon-layout" viewBox="0 0 36 36">
+
+
+    <g transform="matrix( 1, 0, 0, 1, 0,0) ">
+      <g transform="matrix( 1, 0, 0, 1, 0,0) ">
+        <use xlink:href="#iconLayout_0_Layer1_0_FILL"/>
+      </g>
+
+      <g transform="matrix( 1, 0, 0, 1, 0,0) ">
+        <use xlink:href="#iconLayout_0_Layer0_0_FILL"/>
       </g>
     </g>
   </symbol>

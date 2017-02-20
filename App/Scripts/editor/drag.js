@@ -19,6 +19,13 @@
         $(elem).on('mousedown', function (e) { S.drag.events.start.call(S.drag, x, e) });
     },
 
+    has: function (elem){
+        this.items.forEach(function (item) {
+            if (item.elem == elem) { return true;}
+        });
+        return false;
+    },
+
     events: {
         start: function (index, e) {
             var item = this.items[index];

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reflection;
+using Newtonsoft.Json;
 
 namespace Websilk
 {
@@ -29,6 +29,15 @@ namespace Websilk
             public List<Component> components;
             public List<Panel> panels;
             public List<int> layers;
+            public List<structLayout> layout;
+            [JsonIgnore]
+            public bool changed;
+        }
+
+        public struct structLayout
+        {
+            public string name;
+            public List<string> panels;
         }
 
         public enum enumDomainProtocols
@@ -56,6 +65,7 @@ namespace Websilk
         public string pagePathIds = ""; //page id hierarchy
         public string PageTitleForBrowserTab = "";
         public string parentTitle = "";
+        public string pageLayout = "default";
         public string pageService = ""; //if pageType = 1, the name of the C# StaticPage class to execute, Websilk.Pages.[pageService]
         public string pageDescription = "";
         public string pageFavIcon = "";
@@ -213,12 +223,13 @@ namespace Websilk
                 ownerId = reader.GetInt("ownerId");
                 pageId = reader.GetInt("pageId");
                 pageTitle = reader.Get("title");
-                pagePathName = reader.Get("path").ToLower();
+                pagePathName = reader.Get("path");
                 pagePathIds = reader.Get("pathIds");
                 pageDescription = S.Sql.Decode(reader.Get("description"));
                 pageCreated = reader.GetDateTime("datecreated");
                 pageSecurity = reader.GetInt("security");
                 pageType = reader.GetInt("pagetype");
+                pageLayout = reader.Get("layout");
                 pageService = reader.Get("service");
                 pageParentId = reader.GetInt("parentid");
                 parentTitle = reader.Get("parenttitle");
@@ -236,6 +247,7 @@ namespace Websilk
                 pagePhoto = reader.Get("photo");
 
                 //set up page properties
+                if(pageLayout == "") { pageLayout = "default"; }
                 PageTitleForBrowserTab = pageTitle + websiteTitleSeparator + websiteTitle;
                 pageFolder = "/App/Content/websites/" + websiteId + "/pages/" + pageId + "/";
 
@@ -279,7 +291,7 @@ namespace Websilk
                 if (item.name != "")
                 {
                     //create a new panel for the layout
-                    var p = new Panel(S, item.name, item.name);
+                    var p = new Panel(S, item.name, item.name, item.name);
                     p.cells = new List<Panel.structCell>();
                     p.arrangement = new Panel.structArrangement();
                     p.AddCell(item.name);
@@ -356,13 +368,32 @@ namespace Websilk
         public Tuple<Scaffold, List<structPage>, List<Panel>> loadPageAndLayout(int pageid, bool noExecution = false)
         {
             //load page layout scaffolding
-            var scaffold = new Scaffold(S, "/App/Content/themes/" + websiteTheme + "/layout.html");
+            var scaffold = new Scaffold(S, "/App/Content/themes/" + websiteTheme + "/layouts/" + pageLayout + ".html");
 
             //load page(s) from file/cache
             var pages = loadPage(pageId);
 
             //get a list of panels in the layout HTML
             var panels = loadLayout(scaffold);
+
+            //load extra panels from page layout
+            foreach(var page in pages)
+            {
+                if (page.layout != null)
+                {
+                    foreach(var section in page.layout)
+                    {
+                        foreach(var pan in section.panels)
+                        {
+                            var p = new Panel(S, pan, pan, section.name);
+                            p.cells = new List<Panel.structCell>();
+                            p.arrangement = new Panel.structArrangement();
+                            p.AddCell(pan);
+                            panels.Add(p);
+                        }
+                    }
+                }
+            }
 
             //add components to layout panels (from layer pages first, then main page last)
             for (var y = pages.Count == 1 ? 0 : 1; y < pages.Count; y = y == pages.Count - 1 && pages.Count > 1 ? 0 : (y == 0 ? pages.Count : y++))
@@ -469,7 +500,7 @@ namespace Websilk
                     //load Editor UI
                     scaffold.Data["has-editor"] = "1";
                     scaffold.Data["editor-colors-css"] = "/css/colors/editor/" + editorColors + ".css";
-                    scaffold.Data["editor"] = EditorUI.Render(S);
+                    scaffold.Data["editor"] = EditorUI.Render(S, this);
                     useSVG = true;
                 }
             }

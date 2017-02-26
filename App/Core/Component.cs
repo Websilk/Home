@@ -70,8 +70,7 @@ namespace Websilk
         protected Page Page;
 
         public string id = ""; //unique ID
-        [JsonIgnore]
-        public int pageId = 0; //can be page or layer id
+        public int blockId = 0;
         public string panelId = ""; //unique ID of panel this component belongs to
         public string panelCellId = ""; //unique ID of panel cell this component belongs to
 
@@ -296,7 +295,7 @@ namespace Websilk
             }
 
             //add compiled CSS to renderer
-            S.css.Add("layer_" + pageId, css.ToString());
+            S.css.Add("block_" + blockId, css.ToString());
 
             //add component reference (with component instance-specific resource references) to page
             js.Append("S.components.add('" + id + "', '" + Name + "', [");

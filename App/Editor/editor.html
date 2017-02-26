@@ -1,7 +1,7 @@
 ﻿<div class="svgicons">{{svg-logo}}</div>
 <div class="editor">
-    <div class="temp"></div>
-    <div class="clone"></div>
+    <div class="temp box"></div>
+    <div class="clone box"></div>
     <div class="tooltab">
         <a class="icon" href="javascript:">
             <svg viewBox="0 0 36 36">
@@ -65,7 +65,7 @@
                     <a class="icon search" href="javascript:"><svg viewBox="0 0 25 25"><use xlink:href="#icon-search" x="0" y="0" width="25" height="25"></use></svg></a>
                 </nav>
 
-
+                <div class="dialog"></div>
             </div>
         </div>
         <div class="windows"></div>
@@ -78,5 +78,13 @@
 
     <script type="text/html" id="template_dashboard">
         {{template-dashboard}}
+    </script>
+
+    <script type="text/html" id="template_layout_dialog">
+        {{template-layout-dialog}}
+    </script>
+
+    <script type="text/html" id="template_layout_options">
+        {{template-layout-options}}
     </script>
 </div>

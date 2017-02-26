@@ -34,22 +34,22 @@ namespace Websilk.Services
         private void GeneratePage(string name)
         {
             var P = new Page(S);
-            var page = new Page.structPage();
-            var scaffold = new Scaffold(S, "/App/Content/themes/default/layout.html");
-            var panels = P.loadLayout(scaffold);
-            var panelHead = panels[0];
-            var panelBody = panels[1];
-            var panelFoot = panels[2];
 
-            page.layers = new List<int>();
-            page.panels = new List<Panel>();
-            page.components = new List<Component>();
+            //get page info
+            P.Url = P.parseUrl("/" + name);
+            P.getPageInfoFromUrl();
+
+            var tuple = P.loadPageAndLayout(P.pageId);
+
+            var page = tuple.Item3;
+            var panelHead = page.areas[0].blocks[0].panel;
+            var panelBody = page.areas[1].blocks[0].panel;
+            var panelFoot = page.areas[2].blocks[0].panel;
 
             if (name == "home")
             {
                 //generate a home page
-                P.Url = P.parseUrl("/home");
-                P.getPageInfoFromUrl();
+                
 
             }else if (name == "login")
             {
@@ -72,26 +72,55 @@ namespace Websilk.Services
                 cLogin.position[4] = posLogin;
             }
 
+            //save components from header area
+            var area = page.areas[0];
+            var block = area.blocks[0];
+            block.panel = panelHead;
+            block.components = new List<Component>();
+            foreach(var cell in block.panel.cells)
+            {
+                foreach(var comp in cell.components)
+                {
+                    block.components.Add(comp);
+                }
+            }
+            area.blocks[0] = block;
+            page.areas[0] = area;
+
+            //save components from body area
+            area = page.areas[1];
+            block = area.blocks[0];
+            block.panel = panelBody;
+            block.components = new List<Component>();
+            foreach (var cell in block.panel.cells)
+            {
+                foreach (var comp in cell.components)
+                {
+                    block.components.Add(comp);
+                }
+            }
+            area.blocks[0] = block;
+            page.areas[1] = area;
+
+            //save components from footer area
+            area = page.areas[2];
+            block = area.blocks[0];
+            block.panel = panelFoot;
+            block.components = new List<Component>();
+            foreach (var cell in block.panel.cells)
+            {
+                foreach (var comp in cell.components)
+                {
+                    block.components.Add(comp);
+                }
+            }
+            area.blocks[0] = block;
+            page.areas[2] = area;
+            
             page.pageId = P.pageId;
 
-            //add components from head, body, & foot
-            foreach (var component in panelHead.cells[0].components)
-            {
-                page.components.Add(component);
-            }
-
-            foreach (var component in panelBody.cells[0].components)
-            {
-                page.components.Add(component);
-            }
-
-            foreach (var component in panelFoot.cells[0].components)
-            {
-                page.components.Add(component);
-            }
-
             //save page to file
-            S.Util.Serializer.SaveToFile(page, S.Server.MapPath("/App/Content/websites/1/pages/" + page.pageId + "/page.json"), Newtonsoft.Json.Formatting.None);
+            S.Util.Serializer.SaveToFile(page, S.Server.MapPath("/App/Content/websites/" + P.websiteId + "/pages/" + P.pageId + "/page.json"), Newtonsoft.Json.Formatting.None);
         }
     }
 }

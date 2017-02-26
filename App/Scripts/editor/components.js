@@ -24,7 +24,7 @@
                 item.dragElem = clone;
 
                 //update body tag
-                $('body').addClass('drag-component');
+                $('body').addClass('show-empty-cells');
 
                 //start component tracking
                 S.editor.components.track.drag.start.call(S.editor.components.track);
@@ -39,7 +39,7 @@
                 S.editor.components.hover.isdragging = false;
 
                 //update body tag
-                $('body').removeClass('drag-component');
+                $('body').removeClass('show-empty-cells');
 
                 //send an AJAX request to create the new component on the page
                 var cid = '';
@@ -249,7 +249,7 @@
                         S.editor.components.hovered.css({ 'position': 'absolute', left: pos.left, top: pos.top });
                         S.editor.components.select.hide();
                         this.trigdrag = true;
-                        $('body').addClass('drag-component');
+                        $('body').addClass('show-empty-cells');
                         //start component tracking
                         S.editor.components.track.drag.start.call(S.editor.components.track);
                     }
@@ -268,7 +268,7 @@
                     S.editor.components.track.drag.end();
 
                     //update body tag
-                    $('body').removeClass('drag-component');
+                    $('body').removeClass('show-empty-cells');
 
                     //move component
                     var e = S.editor.components.hovered;

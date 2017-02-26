@@ -83,12 +83,14 @@ namespace Websilk
         //panel properties /////////////////
         [JsonIgnore]
         private Core S;
-
-        public string name = ""; //a human-readable name for human reference only
-        public string id = ""; //a unique ID
-        public string layout = ""; //name of layout section to load into
         [JsonIgnore]
-        public int pageId = 0;
+        private Page page;
+
+        public string name = ""; //a human-readable name for reference only
+        public string id = ""; //a unique ID
+        public bool isPageBlock = false;
+        public string areaName = ""; //name of layout area this panel belongs to
+        public string blockName = ""; //name of block section to load into
         public structArrangement arrangement;
         public List<structCell> cells;
 
@@ -97,12 +99,15 @@ namespace Websilk
         [JsonIgnore]
         public string foot = "";
         
-        public Panel(Core WebsilkCore, string Id = "", string Name = "", string Layout = "")
+        public Panel(Core WebsilkCore, Page page, string Id = "", string Name = "", string AreaName = "", string BlockName = "", bool IsPageBlock = false)
         {
             S = WebsilkCore;
             id = Id;
             name = Name;
-            layout = Layout;
+            areaName = AreaName;
+            blockName = BlockName;
+            isPageBlock = IsPageBlock;
+            this.page = page;
         }
 
         public void AddCell(string cellId = "")
@@ -144,6 +149,14 @@ namespace Websilk
             }
 
             div.Classes.Add("is-panel");
+            if(isPageBlock) {
+                div.Classes.Add("is-block");
+                if (page.isEditable)
+                {
+                    div.Attributes.Add("data-area", areaName);
+                    div.Attributes.Add("data-block", blockName);
+                }
+            }
             div.id = "panel_" + id.Replace("-", "_");
             div.innerHTML = head + htm.ToString() + foot;
 

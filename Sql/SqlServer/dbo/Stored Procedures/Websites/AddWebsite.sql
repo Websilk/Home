@@ -63,15 +63,15 @@ BEGIN
 	END
 
 	-- create default pages
-	EXEC @dashId = AddWebsitePage @ownerId=@ownerId, @websiteId=@websiteId, @parentId=0, @title='Dashboard', @description=@description, @pagetype=1, @service='Dashboard', @security=1, @enabled=1
-	EXEC @homeId = AddWebsitePage @ownerId=@ownerId, @websiteId=@websiteId, @parentId=0, @title='Home', @description=@description, @pagetype=0, @security=0, @enabled=1
-	EXEC @loginId = AddWebsitePage @ownerId=@ownerId, @websiteId=@websiteId, @parentId=0, @title='Login', @description=@description, @pagetype=0, @security=0, @enabled=1
-	EXEC @aboutId = AddWebsitePage @ownerId=@ownerId, @websiteId=@websiteId, @parentId=0, @title='About', @description=@description, @pagetype=0, @security=0, @enabled=1
-	EXEC @contactId = AddWebsitePage @ownerId=@ownerId, @websiteId=@websiteId, @parentId=0, @title='Contact', @description=@description, @pagetype=0, @security=0, @enabled=1
-	EXEC @supportId = AddWebsitePage @ownerId=@ownerId, @websiteId=@websiteId, @parentId=0, @title='Support', @description=@description, @pagetype=0, @security=0, @enabled=1
-	EXEC @404Id = AddWebsitePage @ownerId=@ownerId, @websiteId=@websiteId, @parentId=0, @title='Error 404', @description=@description, @pagetype=0, @security=0, @enabled=1
-	EXEC @deniedId = AddWebsitePage @ownerId=@ownerId, @websiteId=@websiteId, @parentId=0, @title='Access Denied', @description=@description, @pagetype=0, @security=0, @enabled=1
-	EXEC @templateId = AddWebsitePage @ownerId=@ownerId, @websiteId=@websiteId, @parentId=0, @title='Template', @description=@description, @pagetype=4, @security=1, @enabled=0
+	EXEC @dashId = AddPage @ownerId=@ownerId, @websiteId=@websiteId, @parentId=0, @title='Dashboard', @description=@description, @pagetype=1, @service='Dashboard', @security=1, @enabled=1
+	EXEC @homeId = AddPage @ownerId=@ownerId, @websiteId=@websiteId, @parentId=0, @title='Home', @description=@description, @pagetype=0, @security=0, @enabled=1
+	EXEC @loginId = AddPage @ownerId=@ownerId, @websiteId=@websiteId, @parentId=0, @title='Login', @description=@description, @pagetype=0, @security=0, @enabled=1
+	EXEC @aboutId = AddPage @ownerId=@ownerId, @websiteId=@websiteId, @parentId=0, @title='About', @description=@description, @pagetype=0, @security=0, @enabled=1
+	EXEC @contactId = AddPage @ownerId=@ownerId, @websiteId=@websiteId, @parentId=0, @title='Contact', @description=@description, @pagetype=0, @security=0, @enabled=1
+	EXEC @supportId = AddPage @ownerId=@ownerId, @websiteId=@websiteId, @parentId=0, @title='Support', @description=@description, @pagetype=0, @security=0, @enabled=1
+	EXEC @404Id = AddPage @ownerId=@ownerId, @websiteId=@websiteId, @parentId=0, @title='Error 404', @description=@description, @pagetype=0, @security=0, @enabled=1
+	EXEC @deniedId = AddPage @ownerId=@ownerId, @websiteId=@websiteId, @parentId=0, @title='Access Denied', @description=@description, @pagetype=0, @security=0, @enabled=1
+	EXEC @templateId = AddPage @ownerId=@ownerId, @websiteId=@websiteId, @parentId=0, @title='Template', @description=@description, @pagetype=4, @security=1, @enabled=0
 	
 	-- save default pages IDs to website table
 	UPDATE WebSites SET 

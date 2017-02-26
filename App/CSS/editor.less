@@ -2,17 +2,16 @@
     position:fixed; right:0; padding:7px 0 0 7px; margin:6px; border-radius:50px; width:36px; height:36px; box-sizing:border-box; display:none; z-index:5000;
     > a > svg{width:22px; height:22px;}
 }
-.editor > .fixed{
-    width:100%; height:0; z-index:5000; display:none;
-    > .toolbar{
+.editor > .fixed{ width:100%; height:0; z-index:5000; display:none;}
+.editor{
+    .toolbar{
         position:absolute; width:100%; height:50px; cursor:default;
-        > .container{
-            max-width:1920px; padding:0 10px; box-sizing:border-box; text-align:center; white-space:nowrap;
-            > nav.menu{
-                display:inline-block; white-space:nowrap; padding-top:12px;
-                > a{display:inline-block; margin:0 10px;}
-            }
+        .container{ max-width:1920px; padding:0 10px; box-sizing:border-box; text-align:center; white-space:nowrap;}
+        nav.menu{
+            display:inline-block; white-space:nowrap; padding-top:12px;
+            > a{display:inline-block; margin:0 10px;}
         }
+        .dialog{display:none; max-width:1920px; padding:0 10px; box-sizing:border-box; text-align:center; white-space:nowrap;}
         a.logo{
             position:absolute;left:10px; top:7px;
             svg{width:100px; height:36px;}
@@ -20,8 +19,24 @@
         .right-side{position:absolute; right:0;}
         .save-page{padding:3px 5px 0 0;}
     }
+
+    > .temp{
+        position:absolute; z-index:3000; 
+        .cellbox{position:absolute; outline-style:dashed; outline-width:10px; outline-offset:-10px; box-sizing:border-box;}
+        .compline{position:absolute; border-left-style:dashed; border-left-width:2px;}
+        .layout-area{
+            position:absolute; /*outline-style:dashed; outline-width:4px; outline-offset:-4px; */ box-sizing:border-box;
+            .options{display:none; width:100%; text-align:center; position:relative; top:20%;}
+        }
+        .layout-area:hover{
+            .options{display:block;}
+        }
+    }
+    > .clone{
+        position:absolute; z-index:5001;
+    }
     
-    > .windows{width:0; height:0;} 
+    .windows{width:0; height:0;} 
     .window{
         position:absolute;
         .titlebar{
@@ -35,17 +50,6 @@
 
     #winDashboard{
         .page-title{width:200px; cursor:default;}
-    }
-}
-
-.editor{
-    > .temp{
-        position:absolute; z-index:3000; 
-        .cellbox{position:absolute; outline-style:dashed; outline-width:10px; outline-offset:-10px; box-sizing:border-box;}
-        .compline{position:absolute; border-left-style:dashed; border-left-width:2px;}
-    }
-    > .clone{
-        position:absolute; z-index:5001;
     }
 
     > .component-hover{position:absolute; display:none; border:2px dashed transparent; cursor:move; z-index:3000;}
@@ -70,15 +74,15 @@
     }
 }
 
-.drag-component {
+.show-empty-cells {
     .webpage {
-        .is-cell{min-height:50px; outline-style:dashed; outline-width:2px; outline-offset:-1px;}
+        .is-cell{min-height:50px; outline-style:dashed; outline-width:4px; outline-offset:-2px;}
     }
 }
 
 @media(max-width:1920px){
     .editor{
-        > .toolbar{
+        .toolbar{
             > .container{ width:100%; }
         }
     }

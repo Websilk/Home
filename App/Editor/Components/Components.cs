@@ -31,7 +31,7 @@ namespace Websilk.Services.Editor
             return ui.Render();
         }
 
-        public Inject Create(string name, int layerId, string panelId, string cellId, string componentId, int append)
+        /*public Inject Create(string name, int layerId, string panelId, string cellId, string componentId, int append)
         {
             //create a new component on the page
             var inject = new Inject();
@@ -44,10 +44,7 @@ namespace Websilk.Services.Editor
             var scaffold = tuple.Item1;
 
             //load page(s) from file/cache
-            var pages = tuple.Item2;
-
-            //get a list of panels from the layout HTML
-            var panels = tuple.Item3;
+            var pages = tuple.Item3;
 
             //find the correct panel to load the component into
             var panel = page.GetPanelById(panels, panelId);
@@ -136,5 +133,6 @@ namespace Websilk.Services.Editor
             }
             return inject;
         }
+        */
     }
 }

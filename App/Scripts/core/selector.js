@@ -951,9 +951,13 @@
         this.elements.forEach(function (e) {
             var el = e.parentNode;
             if (selector == null || selector == '') {
-                elems.push(el);
+                if (elems.indexOf(el) < 0) {
+                    elems.push(el);
+                }
             } else if (el.matches(selector)) {
-                elems.push(el);
+                if (elems.indexOf(el) < 0) {
+                    elems.push(el);
+                }
             }
             
         });
@@ -968,19 +972,24 @@
             var el = e.parentNode;
             while (el) {
                 if (selector == null || selector == '') {
-                    elems.push(el);
+                    if (elems.indexOf(el) < 0) {
+                        elems.push(el);
+                    }
                 } else {
                     if (el.matches) {
                         if (el.matches(selector)) {
-                            elems.push(el);
+                            if (elems.indexOf(el) < 0) {
+                                elems.push(el);
+                            }
                         }
                     } else if (el.matchesSelector) {
                         if (el.matchesSelector(selector)) {
-                            elems.push(el);
+                            if (elems.indexOf(el) < 0) {
+                                elems.push(el);
+                            }
                         }
                     }
                 }
-                    
                 el = el.parentNode;
             }
         });

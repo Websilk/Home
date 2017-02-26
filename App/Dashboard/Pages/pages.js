@@ -61,7 +61,7 @@
             'summary': e.getAttribute('data-summary'),
             'created': 'created on ' + e.getAttribute('data-created'),
             'url': S.website.protocol + S.website.host + link.substr(1),
-            'url-name': S.website.host + link.substr(1),
+            'url-name': link.substr(1),
             'link-create': 'S.dashboard.pages.create.view(this, ' + pageid + ')'
         }
         this.current_page = pageid;

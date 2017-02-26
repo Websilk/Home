@@ -48,10 +48,14 @@ body{font-family: Jaldi;}
 }
 
 
-.drag-component .webpage .is-cell{outline-color:#03d6d9;}
+.show-empty-cells .webpage .is-cell{outline-color:#00acae;}
 .editor{
-    > .temp > .cellbox{outline-color:fade(#9700ff, 50%);}
-    > .temp > .compline{border-left-color:#ff6a00;}
+    > .temp{
+        > .cellbox{outline-color:fade(#9700ff, 50%);}
+        > .compline{border-left-color:#ff6a00;}
+        > .layout-area{outline-color:fade(#9700ff, 50%);}
+        > .layout-area:hover{background-color:fade(#000, 70%);}
+    }
     > .component-hover{border-color:#ff6a00;}
     > .component-select{
         .resize.side{background-color:@bg;} 

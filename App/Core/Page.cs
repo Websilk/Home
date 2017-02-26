@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using Newtonsoft.Json;
 
 namespace Websilk
@@ -25,19 +26,26 @@ namespace Websilk
         {
             //structure used to save page content to JSON file
             public int pageId;
-            public int pageType;
-            public List<Component> components;
-            public List<Panel> panels;
-            public List<int> layers;
-            public List<structLayout> layout;
+            public string layout;
+            public List<structArea> areas;
             [JsonIgnore]
             public bool changed;
         }
 
-        public struct structLayout
+        public struct structArea
         {
             public string name;
-            public List<string> panels;
+            public List<structBlock> blocks;
+        }
+
+        public struct structBlock
+        {
+            public string name;
+            public int id;
+            public bool isPage;
+            public List<Component> components;
+            [JsonIgnore]
+            public Panel panel;
         }
 
         public enum enumDomainProtocols
@@ -283,29 +291,27 @@ namespace Websilk
 
         #region "Dynamic Page"
 
-        public List<Panel> loadLayout(Scaffold scaffold)
+        public List<structArea> loadLayout(Scaffold scaffold)
         {
-            var panels = new List<Panel>();
+            var areas = new List<structArea>();
             foreach (var item in scaffold.elements)
             {
                 if (item.name != "")
                 {
-                    //create a new panel for the layout
-                    var p = new Panel(S, item.name, item.name, item.name);
-                    p.cells = new List<Panel.structCell>();
-                    p.arrangement = new Panel.structArrangement();
-                    p.AddCell(item.name);
-                    panels.Add(p);
+                    areas.Add(new structArea() {
+                        name = item.name,
+                        blocks = new List<structBlock>()
+                    });
                 }
             }
-            return panels;
+            return areas;
         }
 
-        public string GetPageFilePath(string folderType = "pages", int pageid = 0, string specialFolder = "", string pageType = "", bool checkIfExists = false)
+        public string GetPageFilePath(int pageid = 0, string specialFolder = "", string pageType = "", bool checkIfExists = false)
         {
 
             var path = "/App/Content/websites/" + 
-                websiteId + "/" + folderType + "/" + pageid.ToString() + "/" + 
+                websiteId + "/pages/" + pageid.ToString() + "/" + 
                 (specialFolder != "" ? specialFolder + "/" : "") + 
                 (pageType != "" ? pageType + "_" : "") + "page.json";
 
@@ -314,50 +320,77 @@ namespace Websilk
                 return path;
             }else
             {
-                return "/App/Content/websites/" + websiteId + "/" + folderType + "/" + pageid.ToString() + "/" + "page.json";
+                return "/App/Content/websites/" + websiteId + "/pages/" + pageid.ToString() + "/" + "page.json";
             }
         }
 
-        public List<structPage> loadPage(int pageid, string folderType = "pages")
+        public string GetBlockFilePath(int blockid = 0, string specialFolder = "", string blockType = "", bool checkIfExists = false)
+        {
+
+            var path = "/App/Content/websites/" +
+                websiteId + "/blocks/" + blockid.ToString() + "/" +
+                (specialFolder != "" ? specialFolder + "/" : "") +
+                (blockType != "" ? blockType + "_" : "") + "block.json";
+
+            if (File.Exists(S.Server.MapPath(path)))
+            {
+                return path;
+            }
+            else
+            {
+                return "/App/Content/websites/" + websiteId + "/blocks/" + blockid.ToString() + "/" + "block.json";
+            }
+        }
+
+        public structPage loadPage(int pageid)
         {
             //get a list of components to load onto the page
-            var page = new List<structPage>();
-            var file = S.Server.LoadFileFromCache(GetPageFilePath(folderType, pageid, editFolder, editType, true));
+            var page = new structPage();
+            var file = S.Server.LoadFileFromCache(GetPageFilePath(pageid, editFolder, editType, true));
             if(file != "")
             {
-                page.Add((structPage)S.Util.Serializer.ReadObject(file, typeof(structPage)));
+                page = (structPage)S.Util.Serializer.ReadObject(file, typeof(structPage));
             }
-            if(page.Count == 0)
+            else
             {
-                //load empty page
-                var p = new structPage();
-                p.components = new List<Component>();
-                p.layers = new List<int>();
-                p.panels = new List<Panel>();
-                page.Add(p);
-
+                //initialize a new page
+                page = new structPage();
+                page.areas = new List<structArea>();
             }
 
-            if(page[0].layers.Count > 0)
+            if (page.areas.Count > 0)
             {
-                //load page layers associated with this page
-                foreach(var id in page[0].layers)
+                foreach (var area in page.areas)
                 {
-                    //load page layer from cache or file
-                    var layers = loadPage(id, "layers");
-                    foreach(var layer in layers)
+                    //load blocks associated with this page
+                    for (var x = 0; x < area.blocks.Count; x++)
                     {
-                        //check for duplicate page layers
-                        if(page.FindIndex(a => a.pageId == layer.pageId) == 0)
+                        if(area.blocks[x].components == null)
                         {
-                            //add page layer
-                            page.Add(layer); 
+                            //external block
+                            area.blocks[x] = loadBlock(area.blocks[x].id);
                         }
                     }
                 }
             }
-
             return page;
+        }
+
+        public structBlock loadBlock(int blockid)
+        {
+            var block = new structBlock();
+            var file = S.Server.LoadFileFromCache(GetBlockFilePath(blockid, editFolder, editType, true));
+            if (file != "")
+            {
+                block = (structBlock)S.Util.Serializer.ReadObject(file, typeof(structBlock));
+            }
+            else
+            {
+                //initialize a new block
+                var p = new structPage();
+                p.areas = new List<structArea>();
+            }
+            return block;
         }
 
         /// <summary>
@@ -365,53 +398,90 @@ namespace Websilk
         /// </summary>
         /// <param name="pageid">the page to load</param>
         /// <returns></returns>
-        public Tuple<Scaffold, List<structPage>, List<Panel>> loadPageAndLayout(int pageid, bool noExecution = false)
+        public Tuple<Scaffold, List<structArea>, structPage> loadPageAndLayout(int pageid, bool noExecution = false)
         {
             //load page layout scaffolding
             var scaffold = new Scaffold(S, "/App/Content/themes/" + websiteTheme + "/layouts/" + pageLayout + ".html");
 
             //load page(s) from file/cache
-            var pages = loadPage(pageId);
+            var page = loadPage(pageId);
 
-            //get a list of panels in the layout HTML
-            var panels = loadLayout(scaffold);
+            //get a list of areas in the layout HTML
+            var areas = loadLayout(scaffold);
 
-            //load extra panels from page layout
-            foreach(var page in pages)
+            //add missing areas from layout into page
+            foreach (var area in areas)
             {
-                if (page.layout != null)
+                var found = false;
+                if (page.areas.Count > 0)
                 {
-                    foreach(var section in page.layout)
+                    //check for missing area in page
+                    for(var x = 0; x < page.areas.Count; x++)
                     {
-                        foreach(var pan in section.panels)
+                        if(page.areas[x].name == area.name)
                         {
-                            var p = new Panel(S, pan, pan, section.name);
-                            p.cells = new List<Panel.structCell>();
-                            p.arrangement = new Panel.structArrangement();
-                            p.AddCell(pan);
-                            panels.Add(p);
+                            //set up page-level blocks
+                            found = true;
                         }
                     }
                 }
-            }
-
-            //add components to layout panels (from layer pages first, then main page last)
-            for (var y = pages.Count == 1 ? 0 : 1; y < pages.Count; y = y == pages.Count - 1 && pages.Count > 1 ? 0 : (y == 0 ? pages.Count : y++))
-            {
-                for (var x = 0; x < panels.Count; x++)
+                if(found == false)
                 {
-                    foreach (var c in pages[y].components)
-                    {
-                        if (c.panelId == panels[x].id)
-                        {
-                            //add component to layout panel cell
-                            c.pageId = pages[y].pageId;
-                            loadComponent(c, panels[x], panels[x].cells[0], false, noExecution);
-                        }
-                    }
+                    //add missing layout area to page
+                    page.areas.Add(area);
                 }
             }
-            return Tuple.Create(scaffold, pages, panels);
+
+            //load panels within page area blocks
+            for (var x = 0; x < page.areas.Count; x++)
+            {
+                var area = page.areas[x];
+                if(area.blocks.Count == 0)
+                {
+                    //add page-level block to empty area
+                    area.blocks.Add(new structBlock()
+                    {
+                        id = 0,
+                        name = "Page " + S.Util.Str.Capitalize(area.name),
+                        isPage = true,
+                        components = new List<Component>()
+                    });
+                }
+
+                for(var y = 0; y < area.blocks.Count; y++)
+                {
+                    //create a panel for each block within the area
+                    var block = area.blocks[y];
+                    var name = block.name.Replace(" ", "-").ToLower();
+                    var panel = new Panel(S, this, name, block.name, S.Util.Str.Capitalize(area.name.Replace("-"," ")), block.name, block.isPage );
+                    panel.cells = new List<Panel.structCell>();
+                    panel.arrangement = new Panel.structArrangement();
+                    panel.AddCell(name);
+
+
+                    //add components to panels
+                    if(block.components.Count > 0)
+                    {
+                        foreach(var comp in block.components)
+                        {
+                            if(comp.panelId == panel.id)
+                            {
+                                //load component into layout panel
+                                loadComponent(comp, panel, panel.cells[0]);
+                            }else
+                            {
+                                //TODO: load component into component panel instead
+                            }
+
+                        }
+                    }
+                    block.panel = panel;
+                    area.blocks[y] = block;
+                }
+                page.areas[x] = area;
+            }
+
+            return Tuple.Create(scaffold, areas, page);
         }
         #endregion
 
@@ -444,23 +514,25 @@ namespace Websilk
             else
             {
                 //load a Dynamic Page //////////////////
-
+                var htm = new StringBuilder();
                 var tuple = loadPageAndLayout(pageId);
 
                 //load page layout scaffolding
                 var scaffold = tuple.Item1;
 
-                //load page(s) from file/cache
-                var pages = tuple.Item2;
-
-                //get a list of panels in the layout HTML
-                var panels = tuple.Item3;
+                //load page from file/cache
+                var page = tuple.Item3;
                 
-                //finally, render each layout panel
+                //finally, render each layout area
                 //this will force all components & panels within the hierarchy to render as well
-                foreach (var panel in panels)
+                foreach (var area in page.areas)
                 {
-                    scaffold.Data[panel.id] = panel.Render();
+                    htm = new StringBuilder();
+                    foreach(var block in area.blocks)
+                    {
+                        htm.Append(block.panel.Render());
+                    }
+                    scaffold.Data[area.name] = htm.ToString();
                 }
                 return scaffold.Render();
             }
@@ -688,13 +760,16 @@ namespace Websilk
         #region "Save"
         public void SavePage(structPage page, bool saveToDisk = false)
         {
-            var type = "pages";
-            switch (page.pageType)
-            {
-                case 1: type = "layers"; break;
-            }
-            var path = GetPageFilePath(type, page.pageId, editFolder, editType);
+            var path = GetPageFilePath(page.pageId, editFolder, editType);
             var serialize = S.Util.Serializer.WriteObjectAsString(page, Newtonsoft.Json.Formatting.None);
+            S.Server.SaveToCache(path, serialize);
+            if (saveToDisk == true) { File.WriteAllText(S.Server.MapPath(path), serialize); }
+        }
+
+        public void SaveBlock(structBlock block, bool saveToDisk = false)
+        {
+            var path = GetBlockFilePath(block.id, editFolder, editType);
+            var serialize = S.Util.Serializer.WriteObjectAsString(block, Newtonsoft.Json.Formatting.None);
             S.Server.SaveToCache(path, serialize);
             if (saveToDisk == true) { File.WriteAllText(S.Server.MapPath(path), serialize); }
         }

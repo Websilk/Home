@@ -308,12 +308,26 @@
 
     hideDialog: function (id) {
         var win = this.items[id];
-        $(win.elem).hide();
+        if (win.isDialog) { $(win.elem).hide(); }
     },
 
     hideMenu: function (id) {
         var win = this.items[id];
-        $(win.elem).hide();
+        if (win.isMenu) { $(win.elem).hide(); }
+    },
+
+    hideMenus: function () {
+        for (var id in this.items) {
+            var win = this.items[id];
+            if (win.isMenu) { $(win.elem).hide(); }
+        }
+    },
+
+    hideDialogs: function () {
+        for (var id in this.items) {
+            var win = this.items[id];
+            if (win.isDialog) { $(win.elem).hide(); }
+        }
     }
 
 

@@ -25,9 +25,15 @@
         S.editor.window.load('Dashboard', {
             left: 0, top: 0, width: 300, height: 100, title: '', html: $('#template_dashboard').html(),
             alignTarget: this, alignTo: 'bottom-center', alignAt: 'top-center', alignPadding: 10, hasArrow: true,
-            hasTitleBar: false, canDrag: false, isMenu: true, autoHide: true
+            hasTitleBar: false, canDrag: false, isMenu: true, autoHide: true, 
+            onLoad: function () {
+                //set up dashboard model window button events
+                S.editor.dashboard.init();
+            }
         });
     });
+
+    
 
     $('.editor .save-page a').on('click', function () { S.editor.save.click.call(S.editor.save); });
 
@@ -90,6 +96,3 @@ S.editor.resize = {
     }
 }
 
-S.editor.toolbar = {
-    height:50
-}

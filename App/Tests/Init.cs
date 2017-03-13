@@ -42,9 +42,10 @@ namespace Websilk.Services
             var tuple = P.loadPageAndLayout(P.pageId);
 
             var page = tuple.Item3;
-            var panelHead = page.areas[0].blocks[0].panel;
-            var panelBody = page.areas[1].blocks[0].panel;
-            var panelFoot = page.areas[2].blocks[0].panel;
+            var panels = tuple.Item4;
+            var panelHead = panels[0];
+            var panelBody = panels[1];
+            var panelFoot = panels[2];
 
             if (name == "home")
             {
@@ -75,9 +76,8 @@ namespace Websilk.Services
             //save components from header area
             var area = page.areas[0];
             var block = area.blocks[0];
-            block.panel = panelHead;
             block.components = new List<Component>();
-            foreach(var cell in block.panel.cells)
+            foreach(var cell in panelHead.cells)
             {
                 foreach(var comp in cell.components)
                 {
@@ -90,9 +90,8 @@ namespace Websilk.Services
             //save components from body area
             area = page.areas[1];
             block = area.blocks[0];
-            block.panel = panelBody;
             block.components = new List<Component>();
-            foreach (var cell in block.panel.cells)
+            foreach (var cell in panelBody.cells)
             {
                 foreach (var comp in cell.components)
                 {
@@ -105,9 +104,8 @@ namespace Websilk.Services
             //save components from footer area
             area = page.areas[2];
             block = area.blocks[0];
-            block.panel = panelFoot;
             block.components = new List<Component>();
-            foreach (var cell in block.panel.cells)
+            foreach (var cell in panelFoot.cells)
             {
                 foreach (var comp in cell.components)
                 {

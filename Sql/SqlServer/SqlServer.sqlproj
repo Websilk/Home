@@ -76,6 +76,7 @@
     <Folder Include="dbo\Stored Procedures\Security" />
     <Folder Include="dbo\Stored Procedures\Applications" />
     <Folder Include="dbo\Stored Procedures\Log" />
+    <Folder Include="dbo\Stored Procedures\Blocks" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="dbo\Tables\ErrorLog.sql" />
@@ -164,6 +165,10 @@
     <Build Include="dbo\Stored Procedures\Security\UpdateWebsiteSecurity.sql" />
     <Build Include="dbo\Stored Procedures\Websites\UpdateWebsiteStatus.sql" />
     <Build Include="dbo\Stored Procedures\Websites\UpdateWebsiteTitle.sql" />
+    <Build Include="dbo\Tables\Blocks.sql" />
+    <Build Include="dbo\Stored Procedures\Blocks\CreateBlock.sql" />
+    <Build Include="dbo\Sequences\SequenceBlock.sql" />
+    <Build Include="dbo\Stored Procedures\Blocks\GetBlocks.sql" />
   </ItemGroup>
   <ItemGroup>
     <ArtifactReference Include="$(DacPacRootPath)\Extensions\Microsoft\SQLDB\Extensions\SqlServer\110\SqlSchemas\master.dacpac">

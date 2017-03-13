@@ -44,8 +44,6 @@ namespace Websilk
             public int id;
             public bool isPage;
             public List<Component> components;
-            [JsonIgnore]
-            public Panel panel;
         }
 
         public enum enumDomainProtocols
@@ -398,7 +396,7 @@ namespace Websilk
         /// </summary>
         /// <param name="pageid">the page to load</param>
         /// <returns></returns>
-        public Tuple<Scaffold, List<structArea>, structPage> loadPageAndLayout(int pageid, bool noExecution = false)
+        public Tuple<Scaffold, List<structArea>, structPage, List<Panel>> loadPageAndLayout(int pageid, bool noExecution = false)
         {
             //load page layout scaffolding
             var scaffold = new Scaffold(S, "/App/Content/themes/" + websiteTheme + "/layouts/" + pageLayout + ".html");
@@ -408,6 +406,9 @@ namespace Websilk
 
             //get a list of areas in the layout HTML
             var areas = loadLayout(scaffold);
+
+            //initialize panel list
+            var panels = new List<Panel>();
 
             //add missing areas from layout into page
             foreach (var area in areas)
@@ -453,11 +454,10 @@ namespace Websilk
                     //create a panel for each block within the area
                     var block = area.blocks[y];
                     var name = block.name.Replace(" ", "-").ToLower();
-                    var panel = new Panel(S, this, name, block.name, S.Util.Str.Capitalize(area.name.Replace("-"," ")), block.name, block.isPage );
+                    var panel = new Panel(S, this, name, block.name, S.Util.Str.Capitalize(area.name.Replace("-"," ")), block.id, block.name, block.isPage );
                     panel.cells = new List<Panel.structCell>();
                     panel.arrangement = new Panel.structArrangement();
                     panel.AddCell(name);
-
 
                     //add components to panels
                     if(block.components.Count > 0)
@@ -467,21 +467,27 @@ namespace Websilk
                             if(comp.panelId == panel.id)
                             {
                                 //load component into layout panel
-                                loadComponent(comp, panel, panel.cells[0]);
+                                loadComponent(comp, panel, panel.cells[0], false, noExecution);
                             }else
                             {
-                                //TODO: load component into component panel instead
+                                //load component into component panel instead
+                                var p = GetPanelById(panels, comp.panelId);
+                                foreach(var cell in p.cells)
+                                {
+                                    if(cell.id == comp.panelCellId)
+                                    {
+                                        loadComponent(comp, p, cell, false, noExecution);
+                                    }
+                                }
                             }
 
                         }
                     }
-                    block.panel = panel;
-                    area.blocks[y] = block;
+                    panels.Add(panel);
                 }
-                page.areas[x] = area;
             }
 
-            return Tuple.Create(scaffold, areas, page);
+            return Tuple.Create(scaffold, areas, page, panels);
         }
         #endregion
 
@@ -522,6 +528,9 @@ namespace Websilk
 
                 //load page from file/cache
                 var page = tuple.Item3;
+
+                //load list of panels
+                var panels = tuple.Item4;
                 
                 //finally, render each layout area
                 //this will force all components & panels within the hierarchy to render as well
@@ -530,13 +539,12 @@ namespace Websilk
                     htm = new StringBuilder();
                     foreach(var block in area.blocks)
                     {
-                        htm.Append(block.panel.Render());
+                        htm.Append(GetPanelById(panels, block.name.Replace(" ", "-").ToLower()).Render());
                     }
                     scaffold.Data[area.name] = htm.ToString();
                 }
                 return scaffold.Render();
             }
-
         }
 
         public string Render()
@@ -611,6 +619,57 @@ namespace Websilk
                                        ;
             //finally, render web page
             return scaffold.Render();
+        }
+        #endregion
+
+        #region "Blocks"
+        public List<structBlock> GetBlocks(structPage page)
+        {
+            var blocks = new List<structBlock>();
+            foreach(var area in page.areas)
+            {
+                foreach(var block in area.blocks)
+                {
+                    blocks.Add(block);
+                }
+            }
+            return blocks;
+        }
+
+        /// <summary>
+        /// Removes references to components from all custom blocks,
+        /// leaving page-level blocks untouched
+        /// </summary>
+        /// <param name="page"></param>
+        /// <returns></returns>
+        public void StripCustomBlocks(structPage page)
+        {
+            for(var x = 0; x < page.areas.Count; x++)
+            {
+                for(var y = 0; y < page.areas[x].blocks.Count; y++)
+                {
+                    if(page.areas[x].blocks[y].isPage == false)
+                    {
+                        var block = page.areas[x].blocks[y];
+                        block.components = new List<Component>();
+                        page.areas[x].blocks[y] = block;
+                    }
+                }
+            }
+        }
+
+        public void UpdateBlock(structPage page, structBlock block)
+        {
+            for (var x = 0; x < page.areas.Count; x++)
+            {
+                for (var y = 0; y < page.areas[x].blocks.Count; y++)
+                {
+                    if (page.areas[x].blocks[y].name == block.name)
+                    {
+                        page.areas[x].blocks[y] = block;
+                    }
+                }
+            }
         }
         #endregion
 
@@ -698,6 +757,8 @@ namespace Websilk
                 //component is new
                 component.id = S.Util.Str.CreateID();
             }
+            component.Page = this;
+            component.blockId = panel.blockId;
             component.panelId = panel.id;
             component.panelCellId = cell.id;
 
@@ -728,13 +789,14 @@ namespace Websilk
         /// <param name="panel">instance of the panel which contains the cell instance</param>
         /// <param name="cell">panel cell instance to load the component into</param>
         /// <returns></returns>
-        public Component createNewComponent(string name, string panelId, string cellId)
+        public Component createNewComponent(string name, string panelId, string cellId, int blockId)
         {
             //first, find component class by name
             string className = "Websilk.Components." + name;
             Type type = Type.GetType(className);
             var component = (Component)Activator.CreateInstance(type);
             component.id = S.Util.Str.CreateID();
+            component.blockId = blockId;
             component.panelId = panelId;
             component.panelCellId = cellId;
             component.Initialize(S, this);

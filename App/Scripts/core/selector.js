@@ -5,7 +5,7 @@
 (function () {
 
     //global variables
-    var pxStyles = ['top', 'right', 'bottom', 'left', 'width', 'height'];
+    var pxStyles = ['top', 'right', 'bottom', 'left', 'width', 'height', 'maxWidth', 'maxHeight'];
     var pxStylesPrefix = ['border', 'padding', 'margin'];
     var pxStylesSuffix = ['Top', 'Right', 'Bottom', 'Left'];
     var listeners = []; //used for capturing event listeners from $('').on 
@@ -33,6 +33,7 @@
                 var s = sels[x];
                 if (s.indexOf('#') == 0 && s.indexOf(' ') < 0 && elem == document && s.indexOf(':') < 0) {
                 } else if (s.indexOf('#') < 0 && s.indexOf('.') < 0 && s.indexOf(' ') < 0 && s.indexOf(':') < 0) {
+                    if (s.indexOf("[") >= 0 && elem != document) { optimize = false;}
                 } else if (s.indexOf('.') == 0 && s.indexOf('.', 1) < 0 && s.indexOf(' ') < 0 && s.indexOf(':') < 0) {
                 }else if(s == '*'){
                 }else{optimize = false; break;}
@@ -164,23 +165,25 @@
         //properly set a style for an element
         if (e.nodeName == '#text') { return;}
         var v = val;
+        var n = name;
 
         //check for empty value
-        if (v == '' || v == null) { e.style[name] = v == '' ? null : v; return; }
+        if (v == '' || v == null) { e.style[n] = v == '' ? null : v; return; }
 
         //check for numbers that should be using 'px';
+
         if (Number(v) == v) {
-            if (pxStyles.indexOf(name) >= 0) {
+            if (pxStyles.indexOf(n) >= 0) {
                 v = val + 'px';
-            } else if (pxStylesPrefix.some(function (a) { return name.indexOf(a) == 0 })) {
-                if (pxStylesSuffix.some(function (a) { return name.indexOf(a) > 0 })) {
+            } else if (pxStylesPrefix.some(function (a) { return n.indexOf(a) == 0 })) {
+                if (pxStylesSuffix.some(function (a) { return n.indexOf(a) > 0 })) {
                     v = val + 'px';
                 }
             }
         }
 
         //last resort, set style to string value
-        e.style[name] = v;
+        e.style[n] = v;
     }
 
     function getObj(obj) {
@@ -407,7 +410,7 @@
         //Multiple properties can be set by passing an object to the method.
 
         //When a value for a property is blank  = function(empty string, null, or undefined), that property is removed. 
-        //When a unitless number value is given, “px” is appended to it for properties that require units.
+        //When a unitless number value is given, "px" is appended to it for properties that require units.
         if (typeof params == "object") {
             var hasKeys = false;
             for (var prop in params) {
@@ -664,6 +667,8 @@
         if (obj == null) {
             if (this.elements.length > 0) {
                 return this.elements[0].innerHTML;
+            } else {
+                return '';
             }
         } else {
             this.elements.forEach(function (e) {
@@ -762,7 +767,7 @@
     }
 
     select.prototype.next = function(selector) {
-        //Get the next sibling–optionally filtered by selector–of each element in the collection.
+        //Get the next sibling optionally filtered by selector of each element in the collection.
         var elems = [];
         if(selector != null){
             //use selector
@@ -784,7 +789,7 @@
     }
 
     select.prototype.not = function(selector) {
-        //Filter the current collection to get a new collection of elements that don’t match the CSS select. 
+        //Filter the current collection to get a new collection of elements that don't match the CSS select. 
         //If another collection is given instead of selector, return only elements not present in it. 
         //If a select.prototype.is given, return only elements for which the select.prototype.returns a falsy value. 
         //Inside the function, the this keyword refers to the current element.
@@ -889,7 +894,7 @@
 
     select.prototype.offsetParent = function() {
         //Find the first ancestor element that is positioned, 
-        //meaning its CSS position value is “relative”, “absolute” or “fixed”.
+        //meaning its CSS position value is "relative", "absolute"" or "fixed".
         if (this.elements.length > 0) {
             return this.elements[0].offsetParent;
         }
@@ -898,37 +903,42 @@
 
     select.prototype.on = function (event, func, func2) {
         //Attach an event handler function for one or more events to the selected elements.
-        this.elements.forEach(function (e) {
-            if (event == "hover") {
-                hover(e, func, func2);
-            } else {
-                e.addEventListener(event, func, true);
-                var listen = false;
-                for (var x = 0; x < listeners.length; x++) {
-                    if (listeners[x].elem == e) {
-                        //found element, now find specific event
-                        var events = listeners[x].events;
-                        var f = false;
-                        for (var y = 0; y < events.length; y++) {
-                            if (events[y].name == event) {
-                                //found existing event in list
-                                listeners[x].events[y].list.push(func);
-                                f = true;
-                                break;
+        var events = event.replace(/\s/g, '').split(',');
+        for (var i = 0; i < events.length; i++) {
+            var ev = events[i];
+            this.elements.forEach(function (e) {
+                if (ev == "hover") {
+                    hover(e, func, func2);
+                } else {
+                    e.addEventListener(ev, func, true);
+                    var listen = false;
+                    for (var x = 0; x < listeners.length; x++) {
+                        if (listeners[x].elem == e) {
+                            //found element, now find specific event
+                            var events = listeners[x].events;
+                            var f = false;
+                            for (var y = 0; y < events.length; y++) {
+                                if (events[y].name == ev) {
+                                    //found existing event in list
+                                    listeners[x].events[y].list.push(func);
+                                    f = true;
+                                    break;
+                                }
                             }
+                            if (f == false) {
+                                //event doesn't exist yet
+                                var evnt = { name: ev, list: [func] };
+                                listeners[x].events.push(evnt);
+                            }
+                            listen = true;
+                            break;
                         }
-                        if (f == false) {
-                            //event doesn't exist yet
-                            var ev = { name: event, list: [func] };
-                            listeners[x].events.push(ev);
-                        }
-                        listen = true;
-                        break;
                     }
+                    if (listen == false) { listeners.push({ elem: e, events: [{ name: ev, list: [func] }] }); }
                 }
-                if (listen == false) { listeners.push({ elem: e, events: [{ name: event, list: [func] }] }); }
-            }
-        });
+            });
+        }
+        
         return this;
     }
 
@@ -1026,7 +1036,7 @@
     }
 
     select.prototype.prev = function(selector) {
-        //Get the previous sibling–optionally filtered by selector–of each element in the collection.
+        //Get the previous sibling optionally filtered by selector of each element in the collection.
         var elems = [];
         if (selector) {
             //use selector
@@ -1435,7 +1445,7 @@
     }
 
     select.prototype.toggleClass = function (className) {
-        //Add or remove one or more classes from each element in the set of matched elements, depending on either the class’s presence or the value of the state argument
+        //Add or remove one or more classes from each element in the set of matched elements, depending on either the class' presence or the value of the state argument
         var obj = getObj(className);
         if (typeof obj == 'string') {
             obj = obj.split(' ');

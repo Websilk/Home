@@ -154,4 +154,11 @@
     <Property Name="ParentElementType" Value="SqlTable" />
     <Property Name="NewName" Value="ratingcount" />
   </Operation>
+  <Operation Name="Rename Refactor" Key="b4dc55c4-b3fa-4800-8db0-6cd0ed31ec5b" ChangeDateTime="02/26/2017 21:28:01">
+    <Property Name="ElementName" Value="[dbo].[Blocks].[Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[Blocks]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="blockId" />
+  </Operation>
 </Operations>

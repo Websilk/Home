@@ -31,7 +31,7 @@ namespace Websilk.Services.Editor
             return ui.Render();
         }
 
-        /*public Inject Create(string name, int layerId, string panelId, string cellId, string componentId, int append)
+        public Inject Create(string name, int layerId, string panelId, string cellId, string componentId, int append)
         {
             //create a new component on the page
             var inject = new Inject();
@@ -40,90 +40,95 @@ namespace Websilk.Services.Editor
             GetPage();
             var tuple = page.loadPageAndLayout(page.pageId, true);
 
-            //load page layout scaffolding
-            var scaffold = tuple.Item1;
-
             //load page(s) from file/cache
-            var pages = tuple.Item3;
+            var newpage = tuple.Item3;
+
+            //load list of panels
+            var panels = tuple.Item4;
 
             //find the correct panel to load the component into
-            var panel = page.GetPanelById(panels, panelId);
+            var panel = page.GetPanelById(panels, panelId.Replace("_","-"));
             Component component = null;
             if(panel != null)
             {
-                component = page.createNewComponent(name, panel.id, cellId);
+                component = page.createNewComponent(name, panel.id, cellId, panel.blockId);
             }
             if(component != null)
             {
+
+                //get a list of all panels within the page
                 var list = page.GetAllPanels(panels);
-                foreach (var layer in pages)
+                
+                if(panel.blockId == 0)
                 {
-                    //save page layers
-                    if(layer.pageId == pageId)
-                    {
-                        var save = new Page.structPage();
-                        save.pageId = layer.pageId;
-                        save.pageType = layer.pageType;
-                        save.panels = layer.panels;
-                        save.layers = layer.layers;
-                        save.components = new List<Component>();
-
-                        //build list of components
-                        foreach (var p in list)
-                        {
-                            //check if new component should be inserted before any other components in panel
-                            if (append == 0 && p.id == panelId && componentId == "" && layer.pageId == pageId)
-                            {
-                                save.components.Add(component);
-                            }
-
-                            //get all components in all panels
-                            if (p.cells != null)
-                            {
-                                foreach (var cell in p.cells)
-                                {
-                                    if (cell.components != null)
-                                    {
-                                        foreach (var comp in cell.components)
-                                        {
-                                            //check for component to insert new component before
-                                            if (append == 0 && cell.id == cellId && comp.id == componentId && layer.pageId == pageId)
-                                            {
-                                                save.components.Add(component);
-                                                inject.node = "#c" + comp.id;
-                                                inject.inject = enumInjectTypes.beforeNode;
-                                            }
-
-                                            if (comp.pageId == pageId)
-                                            {
-                                                save.components.Add(comp);
-                                            }
-
-                                            //check for component to insert new component after
-                                            if (append == 1 && cell.id == cellId && comp.id == componentId && layer.pageId == pageId)
-                                            {
-                                                save.components.Add(component);
-                                                inject.node = "#c" + comp.id;
-                                                inject.inject = enumInjectTypes.afterNode;
-                                            }
-                                        }
-                                    }else
-                                    {
-                                        if(cell.id == cellId)
-                                        {
-                                            save.components.Add(component);
-                                            inject.inject = enumInjectTypes.append;
-                                        }
-                                    }
-                                }
-                            }
-                        }
-
-                        //finally, save each page to cache (but not to file)
-                        page.SavePage(save);
-                    }
+                    //new component belongs the page-level block, so we should
+                    //strip the page object of all components belonging to custom blocks
+                    page.StripCustomBlocks(newpage);
                 }
 
+                //get a list of blocks that belong to the page
+                var blocks = page.GetBlocks(newpage);
+                foreach (var block in blocks)
+                {
+                    if (block.name == panel.blockName)
+                    {
+                        //add component to block
+                        var newblock = block;
+                        var comps = new List<Component>();
+                        var added = false;
+                        if(append == 0 && componentId == "")
+                        {
+                            //add component to beginning of new list
+                            comps.Add(component);
+                            added = true;
+                        }
+                        foreach(var comp in block.components)
+                        {
+                            if(append == 0 && comp.id == componentId)
+                            {
+                                //add new component to new list before adding current component
+                                comps.Add(component);
+                                inject.node = "#c" + comp.id;
+                                inject.inject = enumInjectTypes.beforeNode;
+                                added = true;
+                            }
+
+                            //add current component to new list
+                            comps.Add(comp);
+
+                            if (append == 1 && comp.id == componentId)
+                            {
+                                //add new component to new list after adding current component
+                                comps.Add(component);
+                                inject.node = "#c" + comp.id;
+                                inject.inject = enumInjectTypes.afterNode;
+                                added = true;
+                            }
+                        }
+                        if(added == false)
+                        {
+                            //add new component to the end of the list
+                            comps.Add(component);
+                            inject.inject = enumInjectTypes.append;
+                        }
+
+                        //update page block
+                        newblock.components = comps;
+                        page.UpdateBlock(newpage, newblock);
+
+                        if(panel.blockId == 0)
+                        {
+                            //save page-level block to page
+                            page.SavePage(newpage);
+                        }else
+                        {
+                            //save custom block
+                            page.SaveBlock(block);
+                        }
+                        break;
+                    }
+                }
+                
                 //render component to inject onto the page
                 inject.element = "#cell_" + cellId;
                 inject.html = component.Render();
@@ -133,6 +138,6 @@ namespace Websilk.Services.Editor
             }
             return inject;
         }
-        */
+        
     }
 }

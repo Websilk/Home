@@ -67,7 +67,7 @@ namespace Websilk
         [JsonIgnore]
         protected Core S;
         [JsonIgnore]
-        protected Page Page;
+        public Page Page;
 
         public string id = ""; //unique ID
         public int blockId = 0;
@@ -342,6 +342,14 @@ namespace Websilk
         public virtual void SetValue(object data)
         {
 
+        }
+
+        public void AddPanel(string id, string name)
+        {
+            var panel = new Panel(S, Page, id, name, "", blockId);
+            panel.cells = new List<Panel.structCell>();
+            panel.arrangement = new Panel.structArrangement();
+            panel.AddCell(name);
         }
         #endregion
 

@@ -589,6 +589,12 @@ namespace Websilk
                 scaffold.Data["svg-icons"] = S.Server.LoadFileFromCache("/App/Content/themes/" + websiteTheme + "/icons.svg");
             }
 
+            if(isEditable == true)
+            {
+                //show grid at left & right sides of page body
+                scaffold.Data["body-sides"] = "<div class=\"body-sides\"><div class=\"left-side\"></div><div class=\"right-side\"></div></div>";
+            }
+
             //setup facebook meta tags
             scaffold.Data["facebook"] = "";
             if (pagePhoto != "")

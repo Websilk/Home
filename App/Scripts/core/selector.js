@@ -172,13 +172,11 @@
 
         //check for numbers that should be using 'px';
 
-        if (Number(v) == v) {
+        if (Number(v) == v && v.toString().indexOf('%') < 0) {
             if (pxStyles.indexOf(n) >= 0) {
                 v = val + 'px';
             } else if (pxStylesPrefix.some(function (a) { return n.indexOf(a) == 0 })) {
-                if (pxStylesSuffix.some(function (a) { return n.indexOf(a) > 0 })) {
-                    v = val + 'px';
-                }
+                v = val + 'px';
             }
         }
 
@@ -351,6 +349,12 @@
                 var attrs = {};
                 n.forEach(function (p) {
                     attrs[p] = e.getAttribute(p);
+                });
+                return attrs;
+            } else {
+                var attrs = {};
+                n.forEach(function (p) {
+                    attrs[p] = '';
                 });
                 return attrs;
             }

@@ -18,6 +18,11 @@
 
         //display layout area outlines
         this.outlines.create();
+        
+        //setup button events for area options
+        $('.layout-area .btn-change').on('click', S.editor.layout.change.dialog);
+        $('.layout-area .btn-add').on('click', S.editor.layout.add.dialog);
+
     },
 
     hide: function () {
@@ -52,21 +57,20 @@
                 pos.width = area.width();
                 pos.height = area.height();
                 div = document.createElement('div');
-                id = 'area_' + area.get().id;
-                div.id = id;
+                id = area.get().id.replace('panel_page_','');
+                div.id = 'area_' + id;
                 div.className = 'layout-area';
                 opts = {
-                    name: area.get().getAttribute('data-area') + ' Area, ' +
-                          area.get().getAttribute('data-block') + ' Block'
+                    name: area.attr('data-area') + ' Area, ' +
+                          area.attr('data-block') + ' Block',
+                    id: id,
+                    area: area.attr('data-area')
                 }
                 scaff = new S.scaffold(htm, opts);
                 div.innerHTML = scaff.render();
 
                 $(div).css({ left: pos.left, top: pos.top, width: pos.width, height: pos.height });
                 tmp.append(div);
-
-                //setup button events for area options
-                $('#' + id + ' .btn-change').on('click', S.editor.layout.change.dialog);
             }
         },
 
@@ -100,6 +104,21 @@
         dialog: function () {
             //show a dialog so the user can add a block to the page 
             //by creating a new block or loading an existing block
+            var id = $(this).parent('.options').attr('data-id');
+            var area = $(this).parent('.options').attr('data-area');
+            var html = $('#template_layout_addblock').html().replace('#id#', id).replace('#area#', area);
+            var options = {
+                offsetTop: '25%',
+                width:300
+            };
+            S.popup.show('Add Block', html, options);
+
+            //get list of blocks for this area
+            S.ajax.post('Editor/Page/GetBlocksList', { area: id },
+                function (data) {
+                    $('#block_list').html(data.d);
+                }
+            );
         },
 
         save: function () {

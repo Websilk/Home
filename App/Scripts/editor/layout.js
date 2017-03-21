@@ -1,10 +1,7 @@
 ﻿S.editor.layout = {
     show: function () {
         //view layout editor
-        var vars = {
-
-        };
-        var scaffold = new S.scaffold($('#template_layout_dialog').html(), vars);
+        var scaffold = new S.scaffold($('#template_layout_dialog').html(), {});
 
         //show toolbar dialog
         S.editor.toolbar.dialog.show(scaffold.render());
@@ -29,7 +26,9 @@
         //hide layout editor
         S.editor.toolbar.dialog.hide();
         //hide layout area outlines
-        S.editor.layout.outlines.remove();
+        if (S.editor.layout.outlines){
+            S.editor.layout.outlines.remove();
+        }
         //remove window resize event
         S.events.doc.resize.callback.remove('layout');
     },
@@ -48,7 +47,7 @@
             var opts = {};
             var id = '';
             //update body tag
-            $('body').addClass('show-empty-cells');
+            $('body').addClass('show-blocks');
 
             //generate panel outlines
             for (var x = 0; x < this.areas.length; x++) {
@@ -68,7 +67,7 @@
                 }
                 scaff = new S.scaffold(htm, opts);
                 div.innerHTML = scaff.render();
-
+                console.log({ left: pos.left, top: pos.top, width: pos.width, height: pos.height });
                 $(div).css({ left: pos.left, top: pos.top, width: pos.width, height: pos.height });
                 tmp.append(div);
             }
@@ -82,14 +81,14 @@
                 pos = area.position();
                 pos.width = area.width();
                 pos.height = area.height();
-                div = $('#area_' + area.get().id);
+                div = $('#area_' + area.get().id.replace('panel_page_', ''));
                 div.css({ left: pos.left, top: pos.top, width: pos.width, height: pos.height });
             }
         },
 
         remove: function () {
             $('.editor .temp .layout-area').remove();
-            $('body').removeClass('show-empty-cells');
+            $('body').removeClass('show-blocks');
         }
 
     },
@@ -104,8 +103,9 @@
         dialog: function () {
             //show a dialog so the user can add a block to the page 
             //by creating a new block or loading an existing block
-            var id = $(this).parent('.options').attr('data-id');
-            var area = $(this).parent('.options').attr('data-area');
+            var opt = $(this).parent('.options');
+            var id = opt.attr('data-id');
+            var area = opt.attr('data-area');
             var html = $('#template_layout_addblock').html().replace('#id#', id).replace('#area#', area);
             var options = {
                 offsetTop: '25%',
@@ -117,12 +117,48 @@
             S.ajax.post('Editor/Page/GetBlocksList', { area: id },
                 function (data) {
                     $('#block_list').html(data.d);
+                    S.editor.layout.add.blockList.change();
                 }
             );
+            $('#block_list').on('change', S.editor.layout.add.blockList.change);
+            $('.popup .btn-done a').on('click', S.editor.layout.add.save);
+        },
+
+        blockList:{
+            change: function () {
+                if ($('#block_list').val() == '0') {
+                    //show New Block fields
+                    $('.add-new-block').removeClass('hide');
+                } else {
+                    //hide New Block fields
+                    $('.add-new-block').addClass('hide');
+                }
+            }
         },
 
         save: function () {
-            //save the new block name & load the block onto the page
+            //load a new or existing block onto the page
+            var id = $(this).parents('.add-block').attr('data-id');
+            var data = {
+                blockId: $('#block_list').val(),
+                name: $('#block_name').val(),
+                area:id
+            }
+
+            //validate
+            if (data.blockId == '0' && data.name == '') {
+                //name required
+
+                return false;
+            }
+
+            //load block onto page via AJAX
+            S.ajax.post('Editor/Page/AddBlock', data,
+                function (data) {
+                    $('#block_list').html(data.d);
+                    S.editor.layout.add.blockList.change();
+                }
+            );
         }
     },
 

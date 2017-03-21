@@ -80,11 +80,16 @@ namespace Websilk
         #region "Cache"
         public string LoadFileFromCache(string filename)
         {
-            if (Cache.ContainsKey(filename)) { return (string)Cache[filename]; }
+            if (Cache.ContainsKey(filename) && environment != enumEnvironment.development) {
+                return (string)Cache[filename];
+            }
             if (File.Exists(MapPath(filename)))
             {
                 var file = File.ReadAllText(MapPath(filename));
-                Cache.Add(filename, file);
+                if(environment != enumEnvironment.development)
+                {
+                    Cache.Add(filename, file);
+                }
                 return file;
             }
             return "";

@@ -8,3 +8,5 @@ DECLARE @id int
 SET @id = NEXT VALUE FOR SequenceBlock
 INSERT INTO Blocks (blockId, websiteId, area, name)
 VALUES(@id, @websiteId, @area, @name)
+
+SELECT @id

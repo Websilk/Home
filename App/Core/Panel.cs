@@ -92,6 +92,10 @@ namespace Websilk
         public bool isPageBlock = false;
         public string areaName = ""; //name of layout area this panel belongs to
         public string blockName = ""; //name of block section to load into
+
+        [JsonIgnore]
+        public bool hasSiblings = false;
+
         public structArrangement arrangement;
         public List<structCell> cells;
 
@@ -141,6 +145,10 @@ namespace Websilk
                 {
                     comps.Append(component.Render());
                 }
+                if(cell.components.Count == 0)
+                {
+                    comps.Append("&nbsp;");
+                }
 
                 //render cell
                 var divcell = new Utility.DOM.Element("div");
@@ -159,6 +167,7 @@ namespace Websilk
                     div.Attributes.Add("data-block", blockName);
                 }
             }
+            if (hasSiblings) { div.Classes.Add("has-siblings"); }
             div.id = "panel_" + id.Replace("-", "_");
             div.innerHTML = head + htm.ToString() + foot;
 

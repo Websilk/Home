@@ -29,6 +29,11 @@ namespace Websilk.Utility
             return Util.Str.GetBytes(WriteObjectAsString(obj, formatting, nameHandling));
         }
 
+        public void WriteObjectToFile(object obj, string file, Formatting formatting = Formatting.Indented, TypeNameHandling nameHandling = TypeNameHandling.Auto)
+        {
+            SaveToFile(obj, file, formatting, nameHandling);
+        }
+        
         public void SaveToFile(object obj, string file, Formatting formatting = Formatting.Indented, TypeNameHandling nameHandling = TypeNameHandling.Auto)
         {
             var path = Util.Str.getFolder(file);

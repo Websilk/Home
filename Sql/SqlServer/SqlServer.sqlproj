@@ -169,6 +169,8 @@
     <Build Include="dbo\Stored Procedures\Blocks\CreateBlock.sql" />
     <Build Include="dbo\Sequences\SequenceBlock.sql" />
     <Build Include="dbo\Stored Procedures\Blocks\GetBlocks.sql" />
+    <Build Include="dbo\Stored Procedures\Blocks\GetBlock.sql" />
+    <Build Include="dbo\Stored Procedures\Blocks\HasBlock.sql" />
   </ItemGroup>
   <ItemGroup>
     <ArtifactReference Include="$(DacPacRootPath)\Extensions\Microsoft\SQLDB\Extensions\SqlServer\110\SqlSchemas\master.dacpac">

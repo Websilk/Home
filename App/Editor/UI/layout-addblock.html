@@ -1,11 +1,19 @@
-﻿<div class="row pad" data-id="#id#">
-    <div class="row text-center">
+﻿<div class="row add-block pad" data-id="#id#">
+    <div class="row">
         <div class="col field-text pad-right">Choose a Block for the <span class="area-name">#area#</span> Area</div>
     </div>
-    <div class="row text-center pad-top-sm">
-        <div class="col field-input pad-right">
-            <select id="block_list"></select>
+    <div class="row input pad-top-sm">
+        <select id="block_list"></select>
+    </div>
+    <div class="add-new-block hide">
+        <div class="row field">
+            New Block Name
         </div>
-        <div class="col field-input pad-right button-done"><a href="javascript:" class="button">Add Block</a></div>
+        <div class="row input">
+            <input type="text" id="block_name" placeholder="Header" />
+        </div>
+    </div>
+    <div class="row text-center pad-top-sm">
+        <div class="col field-input pad-right btn-done"><a href="javascript:" class="button">Add Block</a></div>
     </div>
 </div>

@@ -3,6 +3,7 @@ using System.Text;
 using System.IO;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Threading;
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 
@@ -145,7 +146,15 @@ namespace Websilk.Pipeline
                 }
             }
 
-            object result = method.Invoke(service, paramVals);
+            object result = null;
+
+            try
+            {
+                result = method.Invoke(service, paramVals);
+            }catch(Exception ex)
+            {
+                throw ex.InnerException;
+            }
 
 
             //finally, unload the Websilk Core:

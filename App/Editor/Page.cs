@@ -135,6 +135,64 @@ namespace Websilk.Services.Editor
             }
         }
 
+        public string AddBlock(int blockId, string name, string area, bool isPageLevelBlock = false)
+        {
+            GetPage();
+            var sqlEditor = new SqlQueries.Editor(S);
+            if (blockId == 0 && name != "")
+            {
+                if (sqlEditor.HasBlock(page.websiteId, name) == true){
+                    return "exists";
+                }
+            }
+            var id = blockId;
+            var tuple = page.loadPageAndLayout(page.pageId, true);
+
+            //load page layout scaffolding
+            var scaffold = tuple.Item1;
+
+            //load page(s) from file/cache
+            var newpage = tuple.Item3;
+
+            var block = new Websilk.Page.structBlock() { id = 0 };
+            for(var x = 0; x < newpage.areas.Count; x++)
+            {
+                if (newpage.areas[x].name.ToLower() == area.ToLower())
+                {
+                    //found matching area
+                    if(blockId == 0)
+                    {
+                        //create new block
+                        id = sqlEditor.CreateBlock(page.websiteId, area, name);
+                    }
+                    block = page.loadBlock(id);
+                    newpage.areas[x].blocks.Add(block);
+                    break;
+                }
+            }
+            if(block.id > 0)
+            {
+                //save changes to file
+                page.SavePage(newpage, true);
+
+                //reset cache for block list
+                S.Server.Cache.Remove("blocks-" + page.websiteId + '-' + area);
+
+                //finally, render new block onto the existing page
+                var reader = sqlEditor.GetBlock(blockId);
+                if (reader.Read())
+                {
+                    //load components into block-level panel
+                    var panel = page.CreatePanel(reader.Get("name").Replace(" ", "_"), reader.Get("name"), area, id, reader.Get("name"), isPageLevelBlock);
+                    panel.hasSiblings = true;
+                    page.loadComponents(block, panel, new List<Panel>(), true);
+
+                    //render panel & components
+                    return panel.Render();
+                }
+            }
+            return "error";
+        }
         #endregion
     }
 }

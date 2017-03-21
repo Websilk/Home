@@ -1,11 +1,22 @@
-﻿<div class="options row text-center nowrap" data-id="#id#" data-area="#area#">
-    <div class="col field-text pad-right">
-        #name#
+﻿<div class="options row" data-id="#id#" data-area="#area#">
+    <div class="row text-center nowrap">
+        <div class="col field-text pad-right">
+            #name#
+        </div>
     </div>
-    <div class="col field-input btn-change pad-right">
-        <a href="javascript:" class="button">Change</a>
-    </div>
-    <div class="col field-input btn-add pad-right">
-        <a href="javascript:" class="button">Add Block</a>
+    <div class="row text-center nowrap pad-top-sm">
+        <div class="col field-input btn-change pad-right">
+            <a href="javascript:" class="button" title="Replace this block with another">Change</a>
+        </div>
+        <div class="col field-input btn-add pad-right">
+            <a href="javascript:" class="button" title="Add a new block below this one">Add Block</a>
+        </div>
+        <div class="col field-input btn-remove pad-right">
+            <a class="icon small" href="javascript:" title="Remove this block from the page">
+                <svg viewBox="0 0 36 36">
+                    <use xlink:href="#icon-close" x="0" y="0" width="36" height="36"></use>
+                </svg>
+            </a>
+        </div>
     </div>
 </div>

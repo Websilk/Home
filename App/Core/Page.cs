@@ -322,24 +322,6 @@ namespace Websilk
             }
         }
 
-        public string GetBlockFilePath(int blockid = 0, string specialFolder = "", string blockType = "", bool checkIfExists = false)
-        {
-
-            var path = "/App/Content/websites/" +
-                websiteId + "/blocks/" + blockid.ToString() + "/" +
-                (specialFolder != "" ? specialFolder + "/" : "") +
-                (blockType != "" ? blockType + "_" : "") + "block.json";
-
-            if (File.Exists(S.Server.MapPath(path)))
-            {
-                return path;
-            }
-            else
-            {
-                return "/App/Content/websites/" + websiteId + "/blocks/" + blockid.ToString() + "/" + "block.json";
-            }
-        }
-
         public structPage loadPage(int pageid)
         {
             //get a list of components to load onto the page
@@ -372,23 +354,6 @@ namespace Websilk
                 }
             }
             return page;
-        }
-
-        public structBlock loadBlock(int blockid)
-        {
-            var block = new structBlock();
-            var file = S.Server.LoadFileFromCache(GetBlockFilePath(blockid, editFolder, editType, true));
-            if (file != "")
-            {
-                block = (structBlock)S.Util.Serializer.ReadObject(file, typeof(structBlock));
-            }
-            else
-            {
-                //initialize a new block
-                var p = new structPage();
-                p.areas = new List<structArea>();
-            }
-            return block;
         }
 
         /// <summary>
@@ -453,36 +418,13 @@ namespace Websilk
                 {
                     //create a panel for each block within the area
                     var block = area.blocks[y];
-                    var name = block.name.Replace(" ", "-").ToLower();
-                    var panel = new Panel(S, this, name, block.name, S.Util.Str.Capitalize(area.name.Replace("-"," ")), block.id, block.name, block.isPage );
-                    panel.cells = new List<Panel.structCell>();
-                    panel.arrangement = new Panel.structArrangement();
-                    panel.AddCell(name);
+                    var id = block.name.Replace(" ", "_").ToLower();
+                    var panel = CreatePanel(id, block.name, area.name, block.id, block.name, block.isPage);
 
                     //add components to panels
-                    if(block.components.Count > 0)
-                    {
-                        foreach(var comp in block.components)
-                        {
-                            if(comp.panelId == panel.id)
-                            {
-                                //load component into layout panel
-                                loadComponent(comp, panel, panel.cells[0], false, noExecution);
-                            }else
-                            {
-                                //load component into component panel instead
-                                var p = GetPanelById(panels, comp.panelId);
-                                foreach(var cell in p.cells)
-                                {
-                                    if(cell.id == comp.panelCellId)
-                                    {
-                                        loadComponent(comp, p, cell, false, noExecution);
-                                    }
-                                }
-                            }
+                    panels = loadComponents(block, panel, panels, noExecution);
 
-                        }
-                    }
+                    //add block-level panel to page
                     panels.Add(panel);
                 }
             }
@@ -531,15 +473,20 @@ namespace Websilk
 
                 //load list of panels
                 var panels = tuple.Item4;
+                Panel panel;
+                var hasSiblings = false;
                 
                 //finally, render each layout area
                 //this will force all components & panels within the hierarchy to render as well
                 foreach (var area in page.areas)
                 {
                     htm = new StringBuilder();
-                    foreach(var block in area.blocks)
+                    hasSiblings = area.blocks.Count > 1;
+                    foreach (var block in area.blocks)
                     {
-                        htm.Append(GetPanelById(panels, block.name.Replace(" ", "-").ToLower()).Render());
+                        panel = GetPanelById(panels, block.name.Replace(" ", "_").ToLower());
+                        panel.hasSiblings = hasSiblings;
+                        htm.Append(panel.Render());
                     }
                     scaffold.Data[area.name] = htm.ToString();
                 }
@@ -629,6 +576,49 @@ namespace Websilk
         #endregion
 
         #region "Blocks"
+        public string GetBlockFilePath(int blockid = 0, string specialFolder = "", string blockType = "", bool checkIfExists = false)
+        {
+
+            var path = "/App/Content/websites/" +
+                websiteId + "/blocks/" + blockid.ToString() + "/" +
+                (specialFolder != "" ? specialFolder + "/" : "") +
+                (blockType != "" ? blockType + "_" : "") + "block.json";
+
+            if (File.Exists(S.Server.MapPath(path)))
+            {
+                return path;
+            }
+            else
+            {
+                return "/App/Content/websites/" + websiteId + "/blocks/" + blockid.ToString() + "/" + "block.json";
+            }
+        }
+
+        public structBlock loadBlock(int blockid)
+        {
+            var block = new structBlock();
+            var filename = GetBlockFilePath(blockid, editFolder, editType, true);
+            var file = S.Server.LoadFileFromCache(filename);
+            if (file != "")
+            {
+                block = (structBlock)S.Util.Serializer.ReadObject(file, typeof(structBlock));
+            }
+            else
+            {
+                //initialize new block & save to file
+                var sqlEditor = new SqlQueries.Editor(S);
+                var reader = sqlEditor.GetBlock(blockid);
+                if (reader.Read())
+                {
+                    block.components = new List<Component>();
+                    block.id = blockid;
+                    block.name = reader.Get("name");
+                    SaveBlock(block, true);
+                }
+            }
+            return block;
+        }
+
         public List<structBlock> GetBlocks(structPage page)
         {
             var blocks = new List<structBlock>();
@@ -680,6 +670,15 @@ namespace Websilk
         #endregion
 
         #region "Panels"
+
+        public Panel CreatePanel(string id, string name, string area, int blockId, string blockName = "", bool isPageLevelBlock = false)
+        {
+            var panel = new Panel(S, this, id, name, S.Util.Str.Capitalize(area.Replace("-", " ")), blockId, blockName, isPageLevelBlock);
+            panel.cells = new List<Panel.structCell>();
+            panel.arrangement = new Panel.structArrangement();
+            panel.AddCell(name);
+            return panel;
+        }
 
         /// <summary>
         /// Find a specific panel instance based on the given panel id
@@ -788,6 +787,40 @@ namespace Websilk
             return panel.cells[cellIndex].components[compIndex];
         }
 
+
+        public List<Panel> loadComponents(structBlock block, Panel blockPanel, List<Panel> panels, bool noExecution = false)
+        {
+            var panelList = panels;
+            foreach (var comp in block.components)
+            {
+                if (comp.panelId == blockPanel.id)
+                {
+                    //load component into layout panel
+                    loadComponent(comp, blockPanel, blockPanel.cells[0], false, noExecution);
+                }
+                else
+                {
+                    //load component into component panel instead
+                    var p = GetPanelById(panelList, comp.panelId);
+                    foreach (var cell in p.cells)
+                    {
+                        if (cell.id == comp.panelCellId)
+                        {
+                            loadComponent(comp, p, cell, false, noExecution);
+                        }
+                    }
+                }
+                //check for panels within component and add them to panel list
+                if(comp.panels != null)
+                {
+                    for(var x = 0; x < comp.panels.Count; x++)
+                    {
+                        panelList.Add(comp.panels[x]);
+                    }
+                }
+            }
+            return panelList;
+        }
         /// <summary>
         /// Create a new component on the page (from within the Editor)
         /// </summary>
@@ -828,8 +861,9 @@ namespace Websilk
         #region "Save"
         public void SavePage(structPage page, bool saveToDisk = false)
         {
+            StripCustomBlocks(page);
             var path = GetPageFilePath(page.pageId, editFolder, editType);
-            var serialize = S.Util.Serializer.WriteObjectAsString(page, Newtonsoft.Json.Formatting.None);
+            var serialize = S.Util.Serializer.WriteObjectAsString(page, Formatting.None);
             S.Server.SaveToCache(path, serialize);
             if (saveToDisk == true) { File.WriteAllText(S.Server.MapPath(path), serialize); }
         }
@@ -837,9 +871,15 @@ namespace Websilk
         public void SaveBlock(structBlock block, bool saveToDisk = false)
         {
             var path = GetBlockFilePath(block.id, editFolder, editType);
-            var serialize = S.Util.Serializer.WriteObjectAsString(block, Newtonsoft.Json.Formatting.None);
+            var serialize = S.Util.Serializer.WriteObjectAsString(block, Formatting.None);
             S.Server.SaveToCache(path, serialize);
-            if (saveToDisk == true) { File.WriteAllText(S.Server.MapPath(path), serialize); }
+            if (saveToDisk == true) {
+                if(File.Exists(S.Server.MapPath(path)) == false)
+                {
+                    Directory.CreateDirectory(S.Util.Str.getFolder(S.Server.MapPath(path)));
+                }
+                File.WriteAllText(S.Server.MapPath(path), serialize);
+            }
         }
         #endregion
 

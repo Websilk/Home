@@ -17,7 +17,8 @@ S.editor.hide = function () {
     $('body').removeClass('is-editing');
     S.editor.visible = false;
     S.editor.components.hovered = null;
-
+    S.editor.layout.hide();
+    S.popup.hide();
     //remove window resize event
     S.events.doc.resize.callback.remove('editor');
 }

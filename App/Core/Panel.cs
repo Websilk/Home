@@ -153,7 +153,7 @@ namespace Websilk
                 //render cell
                 var divcell = new Utility.DOM.Element("div");
                 divcell.Classes.Add("is-cell");
-                divcell.id = "cell_" + cell.id.Replace("-", "_");
+                divcell.id = "cell_" + cell.id.Replace("-", "_").Replace(" ","_");
                 divcell.innerHTML = cell.head + comps.ToString() + cell.foot;
                 htm.Append(divcell.Render());
             }
@@ -168,7 +168,7 @@ namespace Websilk
                 }
             }
             if (hasSiblings) { div.Classes.Add("has-siblings"); }
-            div.id = "panel_" + id.Replace("-", "_");
+            div.id = "panel_" + id.Replace("-", "_").Replace(" ", "_");
             div.innerHTML = head + htm.ToString() + foot;
 
             return div.Render();

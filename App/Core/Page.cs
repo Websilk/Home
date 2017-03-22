@@ -322,11 +322,11 @@ namespace Websilk
             }
         }
 
-        public structPage loadPage(int pageid)
+        public structPage loadPage()
         {
             //get a list of components to load onto the page
             var page = new structPage();
-            var file = S.Server.LoadFileFromCache(GetPageFilePath(pageid, editFolder, editType, true));
+            var file = S.Server.LoadFileFromCache(GetPageFilePath(pageId, editFolder, editType, true));
             if(file != "")
             {
                 page = (structPage)S.Util.Serializer.ReadObject(file, typeof(structPage));
@@ -367,7 +367,7 @@ namespace Websilk
             var scaffold = new Scaffold(S, "/App/Content/themes/" + websiteTheme + "/layouts/" + pageLayout + ".html");
 
             //load page(s) from file/cache
-            var page = loadPage(pageId);
+            var page = loadPage();
 
             //get a list of areas in the layout HTML
             var areas = loadLayout(scaffold);

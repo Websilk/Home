@@ -119,7 +119,7 @@ namespace Websilk.Services.Editor
             if (!S.Server.Cache.ContainsKey("blocks-" + page.websiteId + '-' + area))
             {
                 //get list of layouts for page theme (from disk)
-                var reader = sql.GetBlockList(page.websiteId, area);
+                var reader = sql.GetBlockList(page.websiteId, area.ToLower());
                 while (reader.Read())
                 {
                     htm.Append("<option value=\"" + reader.GetInt("blockId") + "\">" +
@@ -163,7 +163,7 @@ namespace Websilk.Services.Editor
                     if(blockId == 0)
                     {
                         //create new block
-                        id = sqlEditor.CreateBlock(page.websiteId, area, name);
+                        id = sqlEditor.CreateBlock(page.websiteId, area.ToLower(), name);
                     }
                     block = page.loadBlock(id);
                     newpage.areas[x].blocks.Add(block);
@@ -179,17 +179,14 @@ namespace Websilk.Services.Editor
                 S.Server.Cache.Remove("blocks-" + page.websiteId + '-' + area);
 
                 //finally, render new block onto the existing page
-                var reader = sqlEditor.GetBlock(blockId);
-                if (reader.Read())
-                {
-                    //load components into block-level panel
-                    var panel = page.CreatePanel(reader.Get("name").Replace(" ", "_"), reader.Get("name"), area, id, reader.Get("name"), isPageLevelBlock);
-                    panel.hasSiblings = true;
-                    page.loadComponents(block, panel, new List<Panel>(), true);
 
-                    //render panel & components
-                    return panel.Render();
-                }
+                //load components into block-level panel
+                var panel = page.CreatePanel(block.name.Replace(" ", "_").ToLower(), block.name, area, block.id, block.name, block.isPage);
+                panel.hasSiblings = true;
+                page.loadComponents(block, panel, new List<Panel>(), true);
+
+                //render panel & components
+                return panel.Render();
             }
             return "error";
         }

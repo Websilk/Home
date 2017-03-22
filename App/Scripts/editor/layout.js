@@ -67,7 +67,6 @@
                 }
                 scaff = new S.scaffold(htm, opts);
                 div.innerHTML = scaff.render();
-                console.log({ left: pos.left, top: pos.top, width: pos.width, height: pos.height });
                 $(div).css({ left: pos.left, top: pos.top, width: pos.width, height: pos.height });
                 tmp.append(div);
             }
@@ -100,13 +99,14 @@
     },
 
     add: {
+
         dialog: function () {
             //show a dialog so the user can add a block to the page 
             //by creating a new block or loading an existing block
-            var opt = $(this).parent('.options');
+            var opt = $(this).parents('.options');
             var id = opt.attr('data-id');
             var area = opt.attr('data-area');
-            var html = $('#template_layout_addblock').html().replace('#id#', id).replace('#area#', area);
+            var html = $('#template_layout_addblock').html().replace(/\#id\#/g, id).replace(/\#area\#/g, area);
             var options = {
                 offsetTop: '25%',
                 width:300
@@ -114,7 +114,7 @@
             S.popup.show('Add Block', html, options);
 
             //get list of blocks for this area
-            S.ajax.post('Editor/Page/GetBlocksList', { area: id },
+            S.ajax.post('Editor/Page/GetBlocksList', { area: area.toLowerCase() },
                 function (data) {
                     $('#block_list').html(data.d);
                     S.editor.layout.add.blockList.change();
@@ -138,25 +138,38 @@
 
         save: function () {
             //load a new or existing block onto the page
-            var id = $(this).parents('.add-block').attr('data-id');
+            var opt = $('.popup .add-block');
+            var id = opt.attr('data-id');
+            var area = opt.attr('data-area');
             var data = {
                 blockId: $('#block_list').val(),
                 name: $('#block_name').val(),
-                area:id
+                area:area
             }
 
             //validate
             if (data.blockId == '0' && data.name == '') {
                 //name required
+                return false;
+            }
 
+            if (data.area == '') {
+                //area required
                 return false;
             }
 
             //load block onto page via AJAX
             S.ajax.post('Editor/Page/AddBlock', data,
                 function (data) {
-                    $('#block_list').html(data.d);
-                    S.editor.layout.add.blockList.change();
+                    if (data.d == 'error') {
+                        alert('an error has occurred');
+                        return;
+                    }
+                    //load new block onto the page
+                    $('#' + id).after(data.d);
+                    S.popup.hide();
+                    S.editor.layout.hide();
+                    S.editor.layout.show();
                 }
             );
         }

@@ -1,4 +1,4 @@
-﻿CREATE PROCEDURE [dbo].[HasBlockName]
+﻿CREATE PROCEDURE [dbo].[HasBlock]
 	@websiteId int,
 	@name nvarchar(30)
 AS

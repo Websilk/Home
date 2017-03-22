@@ -165,6 +165,11 @@ namespace Websilk
                 {
                     div.Attributes.Add("data-area", areaName);
                     div.Attributes.Add("data-block", blockName);
+                    div.Attributes.Add("data-block-id", blockId.ToString());
+                    if(isPageBlock == true)
+                    {
+                        div.Attributes.Add("data-page-level", "true");
+                    }
                 }
             }
             if (hasSiblings) { div.Classes.Add("has-siblings"); }

@@ -690,7 +690,16 @@
         var i = -1;
         if (this.elements.length > 0) {
             elem = this.elements[0];
-            while ((elem = elem.previousSibling) != null) { i++;}
+            if (Array.prototype.indexOf) {
+                var p = elem.parentNode;
+                if (p != null) {
+                    return Array.prototype.indexOf.call(p.children, elem);
+                }
+            } else {
+                //fallback
+                while (elem != null) { i++; }
+            }
+            
             return i;
         }
         return i;

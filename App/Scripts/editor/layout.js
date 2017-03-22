@@ -19,6 +19,7 @@
         //setup button events for area options
         $('.layout-area .btn-change').on('click', S.editor.layout.change.dialog);
         $('.layout-area .btn-add').on('click', S.editor.layout.add.dialog);
+        $('.layout-area .btn-remove').on('click', S.editor.layout.remove);
 
     },
 
@@ -56,18 +57,24 @@
                 pos.width = area.width();
                 pos.height = area.height();
                 div = document.createElement('div');
-                id = area.get().id.replace('panel_page_','');
-                div.id = 'area_' + id;
+                id = area.get().id;
+                div.id = 'area_' + id.replace('panel_','');
                 div.className = 'layout-area';
                 opts = {
                     name: area.attr('data-area') + ' Area, ' +
                           area.attr('data-block') + ' Block',
                     id: id,
-                    area: area.attr('data-area')
+                    area: area.attr('data-area'),
+                    block: area.attr('data-block-id')
                 }
                 scaff = new S.scaffold(htm, opts);
                 div.innerHTML = scaff.render();
-                $(div).css({ left: pos.left, top: pos.top, width: pos.width, height: pos.height });
+                var d = $(div);
+                if (area.attr('data-page-level') === 'true') {
+                    //block is a page-level block and cannot be removed
+                    d.find('.btn-remove').hide();
+                }
+                d.css({ left: pos.left, top: pos.top, width: pos.width, height: pos.height });
                 tmp.append(div);
             }
         },
@@ -80,7 +87,7 @@
                 pos = area.position();
                 pos.width = area.width();
                 pos.height = area.height();
-                div = $('#area_' + area.get().id.replace('panel_page_', ''));
+                div = $('#area_' + area.get().id.replace('panel_', ''));
                 div.css({ left: pos.left, top: pos.top, width: pos.width, height: pos.height });
             }
         },
@@ -106,12 +113,15 @@
             var opt = $(this).parents('.options');
             var id = opt.attr('data-id');
             var area = opt.attr('data-area');
-            var html = $('#template_layout_addblock').html().replace(/\#id\#/g, id).replace(/\#area\#/g, area);
+            var index = $('#' + id).index()+1;
+            var scaffold = new S.scaffold($('#template_layout_addblock').html(), {
+                id: id, area: area, index: index
+            });
             var options = {
                 offsetTop: '25%',
                 width:300
             };
-            S.popup.show('Add Block', html, options);
+            S.popup.show('Add Block', scaffold.render(), options);
 
             //get list of blocks for this area
             S.ajax.post('Editor/Page/GetBlocksList', { area: area.toLowerCase() },
@@ -141,9 +151,11 @@
             var opt = $('.popup .add-block');
             var id = opt.attr('data-id');
             var area = opt.attr('data-area');
+            var index = opt.attr('data-index');
             var data = {
                 blockId: $('#block_list').val(),
                 name: $('#block_name').val(),
+                insertAt: index,
                 area:area
             }
 
@@ -166,13 +178,57 @@
                         return;
                     }
                     //load new block onto the page
-                    $('#' + id).after(data.d);
+                    $('#' + id).addClass('has-siblings').after(data.d);
                     S.popup.hide();
                     S.editor.layout.hide();
                     S.editor.layout.show();
                 }
             );
         }
+    },
+
+    remove: function () {
+        //load a new or existing block onto the page
+        if (!confirm('Do you really want to remove this block from the page?')) { return false; }
+
+        var opt = $(this).parents('.options');
+        var blockid = opt.attr('data-block-id');
+        var id = opt.attr('data-id');
+        var area = opt.attr('data-area');
+        var data = {
+            blockId: blockid,
+            area: area
+        }
+
+        //validate
+        if (data.blockId == '0' && data.name == '') {
+            //name required
+            return false;
+        }
+
+        if (data.area == '') {
+            //area required
+            return false;
+        }
+
+        //load block onto page via AJAX
+        S.ajax.post('Editor/Page/RemoveBlock', data,
+            function (data) {
+                if (data.d == 'error') {
+                    alert('an error has occurred');
+                    return;
+                }
+                //remove existing block from the page
+                var parent = $('#' + id).parent();
+                $('#' + id).remove();
+                if (parent.children().length == 1) {
+                    parent.children().removeClass('has-siblings');
+                }
+                S.popup.hide();
+                S.editor.layout.hide();
+                S.editor.layout.show();
+            }
+        );
     },
 
     change: {

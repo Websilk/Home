@@ -123,6 +123,7 @@ namespace Websilk.Pipeline
                     if(item.Key == methodParams[x].Name.ToLower())
                     {
                         param = item.Value;
+                        break;
                     }
                 }
                 //cast params to correct (supported) types

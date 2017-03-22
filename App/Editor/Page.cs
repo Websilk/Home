@@ -135,7 +135,7 @@ namespace Websilk.Services.Editor
             }
         }
 
-        public string AddBlock(int blockId, string name, string area, bool isPageLevelBlock = false)
+        public string AddBlock(int blockId, int insertAt, string name, string area, bool isPageLevelBlock = false)
         {
             GetPage();
             var sqlEditor = new SqlQueries.Editor(S);
@@ -166,7 +166,7 @@ namespace Websilk.Services.Editor
                         id = sqlEditor.CreateBlock(page.websiteId, area.ToLower(), name);
                     }
                     block = page.loadBlock(id);
-                    newpage.areas[x].blocks.Add(block);
+                    newpage.areas[x].blocks.Insert(insertAt, block);
                     break;
                 }
             }
@@ -189,6 +189,41 @@ namespace Websilk.Services.Editor
                 return panel.Render();
             }
             return "error";
+        }
+
+        public string RemoveBlock(int blockId, string area)
+        {
+            if(blockId == 0) { return "error"; }
+            GetPage();
+            var id = blockId;
+            var tuple = page.loadPageAndLayout(page.pageId, true);
+
+            //load page layout scaffolding
+            var scaffold = tuple.Item1;
+
+            //load page(s) from file/cache
+            var newpage = tuple.Item3;
+
+            var block = new Websilk.Page.structBlock() { id = 0 };
+            for (var x = 0; x < newpage.areas.Count; x++)
+            {
+                if (newpage.areas[x].name.ToLower() == area.ToLower())
+                {
+                    //found matching area
+                    for(var y = 0; y < newpage.areas[x].blocks.Count; y++)
+                    {
+                        if(newpage.areas[x].blocks[y].id == blockId)
+                        {
+                            newpage.areas[x].blocks.RemoveAt(y);
+                        }
+                    }
+                    break;
+                }
+            }
+
+            //save changes to file
+            page.SavePage(newpage, true);
+            return "success";
         }
         #endregion
     }

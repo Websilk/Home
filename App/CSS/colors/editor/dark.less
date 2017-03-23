@@ -40,11 +40,23 @@ body{font-family: Jaldi;}
     .message(confirm, #92e061, transparent, #228f4b); 
     > .arrow.top{border-color: transparent transparent @bg transparent;}
     > .arrow.bottom{border-color: @bg transparent transparent transparent;}
+    &.arrow:after, .arrow:after{border-left-color:@bg;}
 
     .sub-section{
         .box(#214345, transparent, @color);
         .row(transparent, #223235, #173b42, @color, @color-hover, @color, @link, @link-hover, @link-hover, @link, @link, @color, @color-hover, @color-hover, @color);
     }
+}
+
+.box.blue{
+    @bg: #0060b2;
+    .box(@bg, transparent, @color);
+    &.arrow:after, .arrow:after{border-left-color:@bg;}
+}
+.box.green{
+    @bg: #00815b;
+    .box(@bg, transparent, @color);
+    &.arrow:after, .arrow:after{border-left-color:@bg;}
 }
 
 /* Editor-specific UI elements ///////////////////////////////////*/
@@ -55,8 +67,12 @@ body{font-family: Jaldi;}
     > .temp{
         > .cellbox{outline-color:fade(#9700ff, 50%);}
         > .compline{border-left-color:#ff6a00;}
-        > .layout-area{outline-color:fade(#9700ff, 50%);}
-        > .layout-area:hover{background-color:fade(#000, 70%);}
+        > .layout-area{
+            outline-color:fade(#9700ff, 50%);background-color:fade(#000, 40%); 
+            .button(default, #9b45ec, #c200ff, #c200ff, #c200ff, transparent, transparent, transparent, transparent, transparent, transparent, transparent, transparent, #fff, #fff, #fff, #fff);
+    
+            &:hover > .content{background-color:fade(#000, 50%); }
+        }
     }
     > .component-hover{border-color:#ff6a00;}
     > .component-select{

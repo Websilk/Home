@@ -17,9 +17,9 @@
         this.outlines.create();
         
         //setup button events for area options
-        $('.layout-area .btn-change').on('click', S.editor.layout.change.dialog);
-        $('.layout-area .btn-add').on('click', S.editor.layout.add.dialog);
-        $('.layout-area .btn-remove').on('click', S.editor.layout.remove);
+        $('.layout-area .btn-change a').on('click', S.editor.layout.change.dialog);
+        $('.layout-area .btn-add a').on('click', S.editor.layout.add.dialog);
+        $('.layout-area .btn-remove a').on('click', S.editor.layout.remove);
 
     },
 
@@ -47,6 +47,7 @@
             var scaff = null;
             var opts = {};
             var id = '';
+            var ispagelvl = false;
             //update body tag
             $('body').addClass('show-blocks');
 
@@ -58,21 +59,23 @@
                 pos.height = area.height();
                 div = document.createElement('div');
                 id = area.get().id;
+                ispagelvl = area.attr('data-page-level') === 'true';
                 div.id = 'area_' + id.replace('panel_','');
                 div.className = 'layout-area';
                 opts = {
-                    name: area.attr('data-area') + ' Area, ' +
-                          area.attr('data-block') + ' Block',
+                    'area-name': '<b>' + area.attr('data-area') + '</b> Area',
+                    'block-name': '<b>' + area.attr('data-block') + '</b> Block',
                     id: id,
                     area: area.attr('data-area'),
-                    block: area.attr('data-block-id')
+                    block: area.attr('data-block-id'),
+                    'color': ispagelvl ? 'green' : 'blue'
                 }
                 scaff = new S.scaffold(htm, opts);
                 div.innerHTML = scaff.render();
                 var d = $(div);
-                if (area.attr('data-page-level') === 'true') {
+                if (ispagelvl) {
                     //block is a page-level block and cannot be removed
-                    d.find('.btn-remove').hide();
+                    d.find('.btn-change, .btn-remove').hide();
                 }
                 d.css({ left: pos.left, top: pos.top, width: pos.width, height: pos.height });
                 tmp.append(div);
@@ -107,7 +110,7 @@
 
     add: {
 
-        dialog: function () {
+        dialog: function (changeOnly) {
             //show a dialog so the user can add a block to the page 
             //by creating a new block or loading an existing block
             var opt = $(this).parents('.options');
@@ -121,7 +124,11 @@
                 offsetTop: '25%',
                 width:300
             };
-            S.popup.show('Add Block', scaffold.render(), options);
+            S.popup.show(changeOnly === true ? 'Change Existing Block' : 'Add Block', scaffold.render(), options);
+
+            if (changeOnly === true) {
+                $('.popup .add-block').attr('data-change-only', 'true');
+            }
 
             //get list of blocks for this area
             S.ajax.post('Editor/Page/GetBlocksList', { area: area.toLowerCase() },
@@ -152,6 +159,7 @@
             var id = opt.attr('data-id');
             var area = opt.attr('data-area');
             var index = opt.attr('data-index');
+            var changeOnly = opt.attr('data-change-only') === 'true';
             var data = {
                 blockId: $('#block_list').val(),
                 name: $('#block_name').val(),
@@ -171,14 +179,22 @@
             }
 
             //load block onto page via AJAX
-            S.ajax.post('Editor/Page/AddBlock', data,
+            S.ajax.post(changeOnly === true ? 'Editor/Page/ChangeBlock' : 'Editor/Page/AddBlock', data,
                 function (data) {
                     if (data.d == 'error') {
                         alert('an error has occurred');
                         return;
                     }
+                    if (data.d == 'duplicate') {
+                        alert('This block is already loaded onto the page');
+                        return;
+                    }
                     //load new block onto the page
                     $('#' + id).addClass('has-siblings').after(data.d);
+
+                    if (changeOnly === true) {
+                        $('#' + id).remove();
+                    }
                     S.popup.hide();
                     S.editor.layout.hide();
                     S.editor.layout.show();
@@ -235,6 +251,7 @@
         dialog: function(){
             //show a list of blocks the user can select from 
             //with the option to create a new block
+            S.editor.layout.add.dialog.call(this, true);
         },
 
         save: function () {

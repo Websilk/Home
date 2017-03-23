@@ -135,7 +135,7 @@ namespace Websilk.Services.Editor
             }
         }
 
-        public string AddBlock(int blockId, int insertAt, string name, string area, bool isPageLevelBlock = false)
+        public string AddBlock(int blockId, int insertAt, string name, string area, bool isPageLevelBlock = false, bool changeOnly = false)
         {
             GetPage();
             var sqlEditor = new SqlQueries.Editor(S);
@@ -154,6 +154,18 @@ namespace Websilk.Services.Editor
             //load page(s) from file/cache
             var newpage = tuple.Item3;
 
+            //check if block already exists on the page
+            for (var x = 0; x < newpage.areas.Count; x++)
+            {
+                for(var y = 0; y < newpage.areas[x].blocks.Count; y++)
+                {
+                    if(newpage.areas[x].blocks[y].id == blockId)
+                    {
+                        return "duplicate";
+                    }
+                }
+            }
+
             var block = new Websilk.Page.structBlock() { id = 0 };
             for(var x = 0; x < newpage.areas.Count; x++)
             {
@@ -167,6 +179,11 @@ namespace Websilk.Services.Editor
                     }
                     block = page.loadBlock(id);
                     newpage.areas[x].blocks.Insert(insertAt, block);
+                    if(changeOnly == true)
+                    {
+                        //remove existing block
+                        newpage.areas[x].blocks.RemoveAt(insertAt - 1);
+                    }
                     break;
                 }
             }
@@ -189,6 +206,11 @@ namespace Websilk.Services.Editor
                 return panel.Render();
             }
             return "error";
+        }
+
+        public string ChangeBlock(int blockId, int insertAt, string name, string area, bool isPageLevelBlock = false)
+        {
+            return AddBlock(blockId, insertAt, name, area, isPageLevelBlock = false, true);
         }
 
         public string RemoveBlock(int blockId, string area)

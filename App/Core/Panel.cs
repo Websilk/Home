@@ -145,10 +145,6 @@ namespace Websilk
                 {
                     comps.Append(component.Render());
                 }
-                if(cell.components.Count == 0)
-                {
-                    comps.Append("&nbsp;");
-                }
 
                 //render cell
                 var divcell = new Utility.DOM.Element("div");

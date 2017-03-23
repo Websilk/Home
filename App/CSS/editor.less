@@ -29,11 +29,16 @@
         .cellbox{position:absolute; outline-style:dashed; outline-width:10px; outline-offset:-10px; box-sizing:border-box;}
         .compline{position:absolute; border-left-style:dashed; border-left-width:2px;}
         .layout-area{
-            position:absolute; /*outline-style:dashed; outline-width:4px; outline-offset:-4px; */ box-sizing:border-box;
-            .options{display:none; width:100%; text-align:center; position:relative; top:10%;}
+            position:absolute; box-sizing:border-box; padding:5px;
+            .content{width:100%; box-sizing:border-box; height:100%;}
+            .options{display:none; width:100%; text-align:center;}
+            .area-label{
+                width:100%; text-align:center;
+            }
         }
         .layout-area:hover{
             .options{display:block;}
+            .area-label{display:none;}
         }
     }
     > .clone{
@@ -86,6 +91,7 @@
 .show-blocks {
     .webpage {
         .is-block{min-height:115px; outline-style:dashed; outline-width:4px; outline-offset:-2px;}
+        .is-panel.has-siblings{height:auto; min-height:120px;}
     }
 }
 

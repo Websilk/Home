@@ -119,13 +119,16 @@
             var win = S.window.pos();
             var rightspace = (win.w + win.scrollx) - (pos.left - this.pad + maxw);
             var bottomspace = (win.h + win.scrolly) - (pos.top - this.pad + maxh);
+            var topspace = pos.top - this.pad;
+            var toolh = S.editor.toolbar.height;
 
             //set up select box dimensions (with window-bound constraints)
             var box = {
                 x: pos.left - this.pad < 0 ? 0 : pos.left - this.pad, 
-                y: pos.top - this.pad < S.editor.toolbar.height ? S.editor.toolbar.height : pos.top - this.pad,
+                y: topspace < toolh ? toolh : topspace,
                 w: rightspace < 0 ? maxw + rightspace : maxw, 
-                h: bottomspace < 0 ? maxh + bottomspace : maxh };
+                h: (bottomspace < 0 ? maxh + bottomspace : maxh) + (topspace < toolh ? topspace - toolh : 0)
+            };
 
             //reposition component select box container
             this.elem.compSel.css({ top: box.y, left: box.x });
@@ -183,13 +186,15 @@
         mouseover: function(e){
             //make sure target is the next element in the hierarchy to be hovered
             if (S.editor.visible == false) { return; }
-            if (this.isdragging == true) { return;}
+            if (this.isdragging == true) { return; }
             var el = $(e);
-            var sel = null;
-            if (S.editor.components.selected !== null) {
-                sel = S.editor.components.selected.get();
+            if (!el.hasClass('component')) {
+                el = el.parents('.component').first();
             }
-            if (e == sel) { return; }
+            var sel = S.editor.components.selected;
+            if (sel != null) {
+                if (sel.get() == el.get()) { return; }
+            }
 
             //check for root-level component
             if (el.parents('.component').length == 0) {
@@ -259,6 +264,7 @@
             },
 
             end: function (item) {
+                if (this.isdragging == false) { return false;}
                 this.isdragging = false;
                 if (this.trigdrag == false) {
                     //register click event instead of drag event
@@ -316,6 +322,13 @@
     click: function (target, type) {
         if (type != 'component-select' && type != 'component-hover' && type != 'window' && type != 'toolbar') {
             //deselect component
+            var c = $(target);
+            if (!c.hasClass('component')) { c = c.parents('.component'); }
+            if(c.length > 0){
+                if (S.editor.components.selected != null) {
+                    if (c.get() == S.editor.components.selected.get()) { return; }
+                }
+            }
             S.editor.components.select.hide();
         }
     },

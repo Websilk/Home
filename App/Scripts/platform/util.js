@@ -33,6 +33,12 @@
     }
 }
 
+S.util.str = {
+    isNumeric: function (str) {
+        return !isNaN(parseFloat(str)) && isFinite(str);
+    }
+}
+
 S.math = {
     intersect: function (a, b) {
         //checks to see if rect (a) intersects with rect (b)

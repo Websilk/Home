@@ -5,6 +5,7 @@
         show: function (html) {
             //hide Editor UI elements
             $('.editor .toolbar .container nav.menu').hide();
+            $('.editor .toolbar .right-side').hide();
             S.editor.window.hideMenus();
             S.editor.components.select.hide();
             S.editor.components.hover.hide();
@@ -16,6 +17,7 @@
         hide: function () {
             $('.editor .toolbar .container .dialog').html('').hide();
             $('.editor .toolbar .container nav.menu').show();
+            $('.editor .toolbar .right-side').show();
         }
     }
 }

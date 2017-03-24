@@ -247,6 +247,11 @@ namespace Websilk.Services.Editor
             page.SavePage(newpage, true);
             return "success";
         }
+
+        public string MoveBlock(int blockId, string area, int index, string direction)
+        {
+            return "success";
+        }
         #endregion
     }
 }

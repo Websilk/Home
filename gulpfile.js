@@ -122,6 +122,13 @@ gulp.task('js:platform', function () {
     return p.pipe(gulp.dest('.', { overwrite: true }));
 });
 
+gulp.task('js:selector', function () {
+    var p = gulp.src(paths.scripts + 'core/selector.js', { base: '.' })
+            .pipe(concat(paths.compiled.js + 'selector.js'));
+    if (prod == true) { p = p.pipe(uglify()); }
+    return p.pipe(gulp.dest('.', { overwrite: true }));
+});
+
 gulp.task('js:editor', function () {
     var p = gulp.src(paths.working.js.editor, { base: '.' })
             .pipe(concat(paths.compiled.editor));

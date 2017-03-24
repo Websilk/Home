@@ -11,6 +11,7 @@
     var listeners = []; //used for capturing event listeners from $('').on 
     //listeners = [{ elem: null, events: [{ name: '', list: [] }] }];
 
+    // internal functions ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     function select(sel) {
         //main function, instantiated via $(sel)
         var self = this;
@@ -205,6 +206,8 @@
         return false;
     }
 
+    function isNumeric(str) { return !isNaN(parseFloat(str)) && isFinite(str); }
+
     function diffArray(arr, remove) {
         return arr.filter(function (el) {
             return !remove.includes(el);
@@ -252,7 +255,7 @@
         el = null;
     }
 
-    //prototype functions that are accessable by return object //////////////////////////////////////////////////////////////////////////////////////
+    //prototype functions that are accessable by $(selector) //////////////////////////////////////////////////////////////////////////////////////
     select.prototype.add = function (elems) {
         //Add new (unique) elements to the existing elements array
         var obj = getObj(elems);
@@ -392,10 +395,36 @@
         //Get immediate children of each element in the current collection. 
         //If selector is given, filter the results to only include ones matching the CSS select.
         var elems = [];
-        this.elements.forEach(function (e) {
-            for (var x = 0; x < e.children.length; x++) {
-                elems.push(e.children[x]);
+        var seltype = 0;
+        var sel = '';
+        if (selector != null) {
+            sel = parseInt(selector);
+            if (isNumeric(sel)) {
+                seltype = 1;
+            } else {
+                seltype = 2;
+                sel = selector;
             }
+        }
+        this.elements.forEach(function (e) {
+            if (seltype == 1) {
+                //get child from index
+                elems.push(e.children[sel]);
+            } else {
+                for (var x = 0; x < e.children.length; x++) {
+                    switch (seltype) {
+                        case 0: //no selector
+                            elems.push(e.children[x]);
+                            break;
+                        case 2://match selector
+                            if (el.matches(sel)) {
+                                elems.push(e.children[x]);
+                            }
+                            break;
+                    }
+                }
+            }
+            
         });
         return clone(elems);
     }

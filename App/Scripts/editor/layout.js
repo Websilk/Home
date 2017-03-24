@@ -20,7 +20,8 @@
         $('.layout-area .btn-change a').on('click', S.editor.layout.change.dialog);
         $('.layout-area .btn-add a').on('click', S.editor.layout.add.dialog);
         $('.layout-area .btn-remove a').on('click', S.editor.layout.remove);
-
+        $('.layout-area .btn-sort-up').on('click', S.editor.layout.sort.up);
+        $('.layout-area .btn-sort-down').on('click', S.editor.layout.sort.down);
     },
 
     hide: function () {
@@ -173,11 +174,6 @@
                 return false;
             }
 
-            if (data.area == '') {
-                //area required
-                return false;
-            }
-
             //load block onto page via AJAX
             S.ajax.post(changeOnly === true ? 'Editor/Page/ChangeBlock' : 'Editor/Page/AddBlock', data,
                 function (data) {
@@ -216,17 +212,6 @@
             area: area
         }
 
-        //validate
-        if (data.blockId == '0' && data.name == '') {
-            //name required
-            return false;
-        }
-
-        if (data.area == '') {
-            //area required
-            return false;
-        }
-
         //load block onto page via AJAX
         S.ajax.post('Editor/Page/RemoveBlock', data,
             function (data) {
@@ -240,11 +225,64 @@
                 if (parent.children().length == 1) {
                     parent.children().removeClass('has-siblings');
                 }
-                S.popup.hide();
                 S.editor.layout.hide();
                 S.editor.layout.show();
             }
         );
+    },
+
+    sort: {
+        up: function(){
+            S.editor.layout.sort.direction.call(this, 'up');
+        },
+
+        down: function(){
+            S.editor.layout.sort.direction.call(this, 'down');
+        },
+
+        direction: function(dir){
+            var opt = $(this).parents('.options');
+            var blockid = opt.attr('data-block-id');
+            var id = opt.attr('data-id');
+            var elem = $('#' + id);
+            var area = opt.attr('data-area');
+            var index = elem.index();
+            var data = {
+                blockId: blockid,
+                area: area,
+                index: index,
+                direction: dir //up or down
+            }
+
+            //load block onto page via AJAX
+            S.ajax.post('Editor/Page/MoveBlock', data,
+                function (d) {
+                    if (d.d == 'error') {
+                        alert('an error has occurred');
+                        return;
+                    }
+
+                    //move block up or down
+                    var parent = $('#' + id).parent();
+                    var len = parent.children().length - 1;
+                    if (index == 0 && dir == 'down') {
+                        parent.children(1).after(elem.get());
+                    } else if (index < len - 1 && dir == 'down') {
+                        parent.children(index + 1).after(elem.get());
+                    } else if (index == len - 1 && dir == 'down') {
+                        parent.append(elem.get());
+                    } else if (index == len - 1 && dir == 'up') {
+                        parent.children(index - 1).before(elem.get());
+                    } else if (index > 1 && dir == 'up') {
+                        parent.children(index - 1).before(elem.get());
+                    } else if (index == 1 && dir == 'up') {
+                        parent.prepend(elem.get());
+                    }
+                    S.editor.layout.hide();
+                    S.editor.layout.show();
+                }
+            );
+        }
     },
 
     change: {

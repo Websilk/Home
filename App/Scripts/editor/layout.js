@@ -20,8 +20,8 @@
         $('.layout-area .btn-change a').on('click', S.editor.layout.change.dialog);
         $('.layout-area .btn-add a').on('click', S.editor.layout.add.dialog);
         $('.layout-area .btn-remove a').on('click', S.editor.layout.remove);
-        $('.layout-area .btn-sort-up').on('click', S.editor.layout.sort.up);
-        $('.layout-area .btn-sort-down').on('click', S.editor.layout.sort.down);
+        $('.layout-area .btn-sort-up').not('.disabled').on('click', S.editor.layout.sort.up);
+        $('.layout-area .btn-sort-down').not('.disabled').on('click', S.editor.layout.sort.down);
     },
 
     hide: function () {
@@ -48,6 +48,7 @@
             var scaff = null;
             var opts = {};
             var id = '';
+            var index = 0;
             var ispagelvl = false;
             //update body tag
             $('body').addClass('show-blocks');
@@ -60,6 +61,9 @@
                 pos.height = area.height();
                 div = document.createElement('div');
                 id = area.get().id;
+                index = area.index();
+                total = area.parent().children().length;
+                console.log(total);
                 ispagelvl = area.attr('data-page-level') === 'true';
                 div.id = 'area_' + id.replace('panel_','');
                 div.className = 'layout-area';
@@ -76,8 +80,10 @@
                 var d = $(div);
                 if (ispagelvl) {
                     //block is a page-level block and cannot be removed
-                    d.find('.btn-change, .btn-remove').hide();
+                    d.find('.btn-change, .btn-remove, .sort-btns').hide();
                 }
+                if (index == 0) { d.find('.btn-sort-up').css({ opacity: 0.3, cursor:'default' }).addClass('disabled'); }
+                if (index == total - 1) { d.find('.btn-sort-down').css({ opacity: 0.3, cursor: 'default' }).addClass('disabled'); }
                 d.css({ left: pos.left, top: pos.top, width: pos.width, height: pos.height });
                 tmp.append(div);
             }
@@ -278,6 +284,18 @@
                     } else if (index == 1 && dir == 'up') {
                         parent.prepend(elem.get());
                     }
+
+                    //display a glowing border to show the user where the item moved to
+                    var pos = elem.position();
+                    pos.width = elem.width();
+                    pos.height = elem.height();
+                    var tmp = $('.editor .temp');
+                    var div = document.createElement('div');
+                    div.className = 'block-moved-border';
+                    tmp.append(div);
+                    $(div).animate({ opacity: 0, duration: 2000 });
+                    //$(div).animate()
+
                     S.editor.layout.hide();
                     S.editor.layout.show();
                 }

@@ -250,7 +250,51 @@ namespace Websilk.Services.Editor
 
         public string MoveBlock(int blockId, string area, int index, string direction)
         {
-            return "success";
+            GetPage();
+            var sqlEditor = new SqlQueries.Editor(S);
+            var id = blockId;
+            var tuple = page.loadPageAndLayout(page.pageId, true);
+
+            //load page layout scaffolding
+            var scaffold = tuple.Item1;
+
+            //load page(s) from file/cache
+            var newpage = tuple.Item3;
+
+            var block = new Websilk.Page.structBlock() { id = 0 };
+            for (var x = 0; x < newpage.areas.Count; x++)
+            {
+                if (newpage.areas[x].name.ToLower() == area.ToLower())
+                {
+                    //found matching area
+                    for (var y = 0; y < newpage.areas[x].blocks.Count; y++)
+                    {
+                        if (newpage.areas[x].blocks[y].id == blockId)
+                        {
+                            //found matching block
+                            block = newpage.areas[x].blocks[y];
+                            newpage.areas[x].blocks.Remove(newpage.areas[x].blocks[y]);
+                            if(direction == "up")
+                            {
+                                newpage.areas[x].blocks.Insert(y - 1, block);
+                            }
+                            else
+                            {
+                                newpage.areas[x].blocks.Insert(y + 1, block);
+                            }
+                            break;
+                        }
+                    }
+                    break;
+                }
+            }
+            if (block.id > 0)
+            {
+                //save changes to file
+                page.SavePage(newpage, true);
+                return "success";
+            }
+            return "fail";
         }
         #endregion
     }

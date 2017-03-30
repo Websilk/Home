@@ -45,7 +45,7 @@ namespace Websilk.Services.Editor
             var panels = tuple.Item4;
 
             //find the correct panel to load the component into
-            var panel = page.GetPanelById(panels, panelId.Replace("_","-"));
+            var panel = page.GetPanelById(panels, panelId);
             Component component = null;
             if(panel != null)
             {
@@ -56,13 +56,6 @@ namespace Websilk.Services.Editor
 
                 //get a list of all panels within the page
                 var list = page.GetAllPanels(panels);
-                
-                if(panel.blockId == 0)
-                {
-                    //new component belongs the page-level block, so we should
-                    //strip the page object of all components belonging to custom blocks
-                    page.StripCustomBlocks(newpage);
-                }
 
                 //get a list of blocks that belong to the page
                 var blocks = page.GetBlocks(newpage);
@@ -112,7 +105,7 @@ namespace Websilk.Services.Editor
 
                         //update page block
                         newblock.components = comps;
-                        page.UpdateBlock(newpage, newblock);
+                        page.UpdateBlock(ref newpage, newblock);
 
                         if(panel.blockId == 0)
                         {

@@ -420,9 +420,10 @@ namespace Websilk
                     var block = area.blocks[y];
                     var id = block.name.Replace(" ", "_").ToLower();
                     var panel = CreatePanel(id, block.name, area.name, block.id, block.name, block.isPage);
+                    panel.AddCell(id);
 
                     //add components to panels
-                    panels = loadComponents(block, panel, panels, noExecution);
+                    loadComponents(block, panel, ref panels, noExecution);
 
                     //add block-level panel to page
                     panels.Add(panel);
@@ -527,13 +528,13 @@ namespace Websilk
                     //load Editor UI
                     scaffold.Data["has-editor"] = "1";
                     scaffold.Data["editor-colors-css"] = "/css/colors/editor/" + editorColors + ".css";
-                    scaffold.Data["editor"] = EditorUI.Render(S, this);
+                    scaffold.Data["editor"] = Editor.UI.Render(S, this);
                     useSVG = true;
                 }
             }
             if(useSVG == true)
             {
-                scaffold.Data["svg-icons"] = S.Server.LoadFileFromCache("/App/Content/themes/" + websiteTheme + "/icons.svg");
+                scaffold.Data["svg-icons"] = S.Server.LoadFileFromCache("/App/Content/themes/" + websiteTheme + "/icons.svg", true);
             }
 
             if(isEditable == true)
@@ -654,8 +655,9 @@ namespace Websilk
             }
         }
 
-        public void UpdateBlock(structPage page, structBlock block)
+        public void UpdateBlock(ref structPage page, structBlock block)
         {
+            var found = false;
             for (var x = 0; x < page.areas.Count; x++)
             {
                 for (var y = 0; y < page.areas[x].blocks.Count; y++)
@@ -663,8 +665,11 @@ namespace Websilk
                     if (page.areas[x].blocks[y].name == block.name)
                     {
                         page.areas[x].blocks[y] = block;
+                        found = true;
+                        break;
                     }
                 }
+                if (found) { break; }
             }
         }
         #endregion
@@ -676,7 +681,6 @@ namespace Websilk
             var panel = new Panel(S, this, id, name, S.Util.Str.Capitalize(area.Replace("-", " ")), blockId, blockName, isPageLevelBlock);
             panel.cells = new List<Panel.structCell>();
             panel.arrangement = new Panel.structArrangement();
-            panel.AddCell(name);
             return panel;
         }
 
@@ -788,9 +792,8 @@ namespace Websilk
         }
 
 
-        public List<Panel> loadComponents(structBlock block, Panel blockPanel, List<Panel> panels, bool noExecution = false)
+        public void loadComponents(structBlock block, Panel blockPanel, ref List<Panel> panels, bool noExecution = false)
         {
-            var panelList = panels;
             foreach (var comp in block.components)
             {
                 if (comp.panelId == blockPanel.id)
@@ -801,7 +804,7 @@ namespace Websilk
                 else
                 {
                     //load component into component panel instead
-                    var p = GetPanelById(panelList, comp.panelId);
+                    var p = GetPanelById(panels, comp.panelId);
                     foreach (var cell in p.cells)
                     {
                         if (cell.id == comp.panelCellId)
@@ -815,11 +818,10 @@ namespace Websilk
                 {
                     for(var x = 0; x < comp.panels.Count; x++)
                     {
-                        panelList.Add(comp.panels[x]);
+                        panels.Add(comp.panels[x]);
                     }
                 }
             }
-            return panelList;
         }
         /// <summary>
         /// Create a new component on the page (from within the Editor)

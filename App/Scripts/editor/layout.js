@@ -63,7 +63,6 @@
                 id = area.get().id;
                 index = area.index();
                 total = area.parent().children().length;
-                console.log(total);
                 ispagelvl = area.attr('data-page-level') === 'true';
                 div.id = 'area_' + id.replace('panel_','');
                 div.className = 'layout-area';

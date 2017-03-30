@@ -2,9 +2,9 @@
 using System.Text;
 
 
-namespace Websilk
+namespace Websilk.Editor
 {
-    public static class EditorUI
+    public static class UI
     {
 
         public static string Render(Core S, Page page)

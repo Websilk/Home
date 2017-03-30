@@ -200,7 +200,8 @@ namespace Websilk.Services.Editor
                 //load components into block-level panel
                 var panel = page.CreatePanel(block.name.Replace(" ", "_").ToLower(), block.name, area, block.id, block.name, block.isPage);
                 panel.hasSiblings = true;
-                page.loadComponents(block, panel, new List<Panel>(), true);
+                var panels = new List<Panel>();
+                page.loadComponents(block, panel, ref panels, true);
 
                 //render panel & components
                 return panel.Render();

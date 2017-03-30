@@ -78,9 +78,9 @@ namespace Websilk
         }
 
         #region "Cache"
-        public string LoadFileFromCache(string filename)
+        public string LoadFileFromCache(string filename, bool nodev = false)
         {
-            if (Cache.ContainsKey(filename) && environment != enumEnvironment.development) {
+            if (Cache.ContainsKey(filename) && (environment != enumEnvironment.development || nodev == false)) {
                 return (string)Cache[filename];
             }
             if (File.Exists(MapPath(filename)))

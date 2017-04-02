@@ -57,6 +57,7 @@
                 S.ajax.post('Editor/Components/Create', data, function (d) {
                     S.ajax.callback.inject(d);
                     S.editor.components.hover.reinit(); //reinitialize component events
+                    S.editor.save.add(d.newId, 'new', {});
                 });
             }
         },
@@ -281,7 +282,7 @@
                     var elem = e.get();
                     var track = S.editor.components.track;
                     if (track.component) {
-                        if (track.drop == "after") {
+                        if (track.drop == 'after') {
                             $(track.component).after(elem);
                         } else {
                             $(track.component).before(elem);
@@ -290,6 +291,20 @@
                         $(track.cell).append(elem);
                     }
                     e.css({ 'position': '', top: '', left: '' });
+
+                    //save changes to server
+                    var data = {
+                        componentId: elem.id.substring(1),
+                        blockName: $(track.cell).parents('.is-block').attr('data-block'),
+                        panelId: $(track.cell).parents('.is-panel').attr('id').replace('panel_', ''),
+                        cellId: track.cell.id.replace('cell_', ''),
+                        targetId: track.component ? track.component.id.substring(1) : '',
+                        append: track.drop === 'after' ? 1 : 0
+                    };
+
+                    S.ajax.post('Editor/Components/Move', data, function (d) {
+                        S.editor.save.add(elem.id.substring(1), 'move', {});
+                    });
 
                     //reinitialize component events
                     S.editor.components.hover.reinit();

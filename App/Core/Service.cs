@@ -56,6 +56,7 @@ namespace Websilk.Services
         public string cssId = "";
         public string remove = "";
         public string node = "";
+        public string newId = "";
         public enumInjectTypes inject = 0;
     }
 

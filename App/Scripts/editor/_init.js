@@ -1,6 +1,8 @@
 ﻿S.editor.init = function () {
     //initialize the editor
     S.editor.enabled = true;
+    S.editor.save.disable();
+
     if (this.visible == true) {
         S.editor.show();
     } else {
@@ -24,7 +26,7 @@
         //show Dashboard modal window
         S.editor.window.load('Dashboard', {
             left: 0, top: 0, width: 300, height: 100, title: '', html: $('#template_dashboard').html(),
-            alignTarget: this, alignTo: 'bottom-center', alignAt: 'top-center', alignPadding: 10, hasArrow: true,
+            alignTarget: this, alignTo: 'bottom-center', alignAt: 'top-center', alignPadding: 15, hasArrow: true,
             hasTitleBar: false, canDrag: false, isMenu: true, autoHide: true, 
             onLoad: function () {
                 //set up dashboard model window button events

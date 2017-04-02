@@ -345,7 +345,7 @@ namespace Websilk
                     //load blocks associated with this page
                     for (var x = 0; x < area.blocks.Count; x++)
                     {
-                        if(area.blocks[x].components == null)
+                        if(area.blocks[x].isPage == false && area.blocks[x].id > 0)
                         {
                             //external block
                             area.blocks[x] = loadBlock(area.blocks[x].id);
@@ -418,7 +418,7 @@ namespace Websilk
                 {
                     //create a panel for each block within the area
                     var block = area.blocks[y];
-                    var id = block.name.Replace(" ", "_").ToLower();
+                    var id = block.name.Replace(" ", "_").Replace("-","_").ToLower();
                     var panel = CreatePanel(id, block.name, area.name, block.id, block.name, block.isPage);
                     panel.AddCell(id);
 
@@ -485,7 +485,7 @@ namespace Websilk
                     hasSiblings = area.blocks.Count > 1;
                     foreach (var block in area.blocks)
                     {
-                        panel = GetPanelById(panels, block.name.Replace(" ", "_").ToLower());
+                        panel = GetPanelById(panels, block.name.Replace(" ", "_").Replace("-", "_").ToLower());
                         panel.hasSiblings = hasSiblings;
                         htm.Append(panel.Render());
                     }
@@ -855,7 +855,16 @@ namespace Websilk
         public List<Component> GetAllComponents(List<Panel> panels)
         {
             var list = new List<Component>();
-
+            foreach(var p in panels)
+            {
+                foreach(var cell in p.cells)
+                {
+                    foreach(var c in cell.components)
+                    {
+                        list.Add(c);
+                    }
+                }
+            }
             return list;
         }
         #endregion

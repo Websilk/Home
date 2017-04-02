@@ -78,9 +78,15 @@ namespace Websilk
         }
 
         #region "Cache"
-        public string LoadFileFromCache(string filename, bool nodev = false)
+        /// <summary>
+        /// Loads a file from cache. If the file hasn't been cached yet, then load file from a drive.
+        /// </summary>
+        /// <param name="filename"></param>
+        /// <param name="noDevEnvCache">If true, it will not load a file from cache if the app is running in a development environment. Instead, it will always load the file from a drive.</param>
+        /// <returns></returns>
+        public string LoadFileFromCache(string filename, bool noDevEnvCache = false)
         {
-            if (Cache.ContainsKey(filename) && (environment != enumEnvironment.development || nodev == false)) {
+            if (Cache.ContainsKey(filename) && (environment != enumEnvironment.development || noDevEnvCache == false)) {
                 return (string)Cache[filename];
             }
             if (File.Exists(MapPath(filename)))

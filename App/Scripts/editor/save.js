@@ -19,6 +19,10 @@
         $('.editor .toolbar .save-page').removeClass('nosave');
     },
 
+    disable: function () {
+        $('.editor .toolbar .save-page').addClass('nosave');
+    },
+
     click: function () {
         if ($('.editor .toolbar .save-page').hasClass('saving') == false && $('.editor .toolbar .save-page').hasClass('nosave') == false) {
             var options = {};

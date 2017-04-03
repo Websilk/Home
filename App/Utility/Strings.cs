@@ -335,17 +335,17 @@ namespace Websilk.Utility
         {
             string result = js;
             //trim left
-            result = Regex.Replace(result, "^\\s*", String.Empty, RegexOptions.Compiled | RegexOptions.Multiline);
+            result = Regex.Replace(result, "^\\s*", String.Empty, RegexOptions.ECMAScript);
             //trim right
-            result = Regex.Replace(result, "\\s*[\\r\\n]", "\n", RegexOptions.Compiled | RegexOptions.ECMAScript);
+            result = Regex.Replace(result, "\\s*[\\r\\n]", "\n", RegexOptions.ECMAScript);
             //remove whitespace beside of left curly braced
-            result = Regex.Replace(result, "\\s*{\\s*", "{", RegexOptions.Compiled | RegexOptions.ECMAScript);
+            result = Regex.Replace(result, "\\s*{\\s*", "{", RegexOptions.ECMAScript);
             //remove whitespace beside of coma
-            result = Regex.Replace(result, "\\s*,\\s*", ",", RegexOptions.Compiled | RegexOptions.ECMAScript);
+            result = Regex.Replace(result, "\\s*,\\s*", ",", RegexOptions.ECMAScript);
             //remove whitespace beside of semicolon
-            result = Regex.Replace(result, "\\s*;\\s*", ";", RegexOptions.Compiled | RegexOptions.ECMAScript);
+            result = Regex.Replace(result, "\\s*;\\s*", ";", RegexOptions.ECMAScript);
             //remove newline after keywords
-            result = Regex.Replace(result, "\\r\\n(?<=\\b(abstract|boolean|break|byte|case|catch|char|class|const|continue|default|delete|do|double|else|extends|false|final|finally|float|for|function|goto|if|implements|import|in|instanceof|int|interface|long|native|new|null|package|private|protected|public|return|short|static|super|switch|synchronized|this|throw|throws|transient|true|try|typeof|var|void|while|with|\\r\\n|\\})\\r\\n)", " ", RegexOptions.Compiled | RegexOptions.ECMAScript);
+            result = Regex.Replace(result, "\\r\\n(?<=\\b(abstract|boolean|break|byte|case|catch|char|class|const|continue|default|delete|do|double|else|extends|false|final|finally|float|for|function|goto|if|implements|import|in|instanceof|int|interface|long|native|new|null|package|private|protected|public|return|short|static|super|switch|synchronized|this|throw|throws|transient|true|try|typeof|var|void|while|with|\\r\\n|\\})\\r\\n)", " ", RegexOptions.ECMAScript);
 
             //remove all newlines
             //result = Regex.Replace(result, "\r\n", " ", RegexOptions.Compiled Or RegexOptions.ECMAScript)

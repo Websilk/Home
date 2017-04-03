@@ -12,6 +12,16 @@ namespace Websilk.Services.Editor
         #region "Save"
         public void SaveChanges(string changes)
         {
+            //load the current page
+            GetPage();
+            var tuple = page.loadPageAndLayout(page.pageId, true);
+
+            //load page layout scaffolding
+            var scaffold = tuple.Item1;
+
+            //load page from cache
+            var newpage = tuple.Item3;
+
             //update existing components with json data changes, then save the page to memory & disk
             JArray data = JsonConvert.DeserializeObject<JArray>(changes);
             if (data != null)
@@ -19,15 +29,7 @@ namespace Websilk.Services.Editor
                 string id = "";
                 string type = "";
 
-                //load the current page
-                GetPage();
-                var tuple = page.loadPageAndLayout(page.pageId, true);
-
-                //load page layout scaffolding
-                var scaffold = tuple.Item1;
-
-                //load page(s) from file/cache
-                var newpage = tuple.Item3;
+                
 
                 //process each change
                 foreach (JObject item in data)
@@ -36,73 +38,58 @@ namespace Websilk.Services.Editor
                     id = (string)item["id"];
                     type = (string)item["type"];
 
-                    if (type == "arrange")
+
+                    //change is for a component
+                    switch (type)
                     {
-                        //change is for a panel cell
-                        switch (type)
-                        {
-                            case "arrange":
-                                //rearrange components within a panel
-                                var components = new List<Component>();
+                        case "position":
+                            //update position data for a component
+                            //pages[pid].components[cid].position = (string)item["data"];
+                            break;
 
-                                //create new sorted list of components
-                                foreach (string compid in item["data"].ToString().Split(','))
-                                {
-                                    //foreach (var comp in pages[pageid].components)
-                                    //{
-                                    //    if (comp.id == compid)
-                                    //    {
-                                    //        components.Add(comp);
-                                    //    }
-                                    //}
-                                }
+                        case "arrange":
+                            //rearrange components within a panel
+                            var components = new List<Component>();
 
-                                //TODO: replace old list of components with new list
-                                newpage.changed = true;
-                                break;
-                        }
-                    }
-                    else
-                    {
-                        //change is for a component
-                        switch (type)
-                        {
-                            case "position":
-                                //update position data for a component
-                                //pages[pid].components[cid].position = (string)item["data"];
-                                break;
+                            //create new sorted list of components
+                            //foreach (string compid in item["data"].ToString().Split(','))
+                            //{
+                            //    foreach (var comp in pages[pageid].components)
+                            //    {
+                            //        if (comp.id == compid)
+                            //        {
+                            //            components.Add(comp);
+                            //        }
+                            //    }
+                            //}
 
-                            case "arrange":
-                                //rearrange components within a panel
-                                var components = new List<Component>();
-
-                                //create new sorted list of components
-                                //foreach (string compid in item["data"].ToString().Split(','))
-                                //{
-                                //    foreach (var comp in pages[pageid].components)
-                                //    {
-                                //        if (comp.id == compid)
-                                //        {
-                                //            components.Add(comp);
-                                //        }
-                                //    }
-                                //}
-
-                                //TODO: replace old list of components with new list
-                                newpage.changed = true;
-                                break;
-                        }
+                            //TODO: replace old list of components with new list
+                            break;
                     }
 
 
                 }
+            }
 
-                //save changes to pages
-                if (newpage.changed == true)
+            //check all blocks for changes, then save changes to filesystem
+            var savepage = false;
+            var blocks = page.GetBlocks(newpage);
+            foreach (var block in blocks)
+            {
+                if (block.id == 0 && block.isPage == true && block.changed == true)
                 {
-                    //page has changes
-                    //page.SavePage(newpage, true);
+                    //save page
+                    savepage = true;
                 }
+                else if (block.id > 0 && block.changed == true)
+                {
+                    //save block
+                    page.SaveBlock(block, true);
+                }
+            }
+            if (savepage == true)
+            {
+                page.SavePage(newpage, true);
             }
         }
         #endregion

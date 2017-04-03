@@ -91,7 +91,7 @@
 
         doc:{
             move: function (e) { S.drag.events.mouse.call(S.drag, e); },
-            up: function () { S.drag.events.stop.call(S.drag) }
+            up: function (e) { S.drag.events.stop.call(S.drag) }
         },
 
         mouse: function(e){

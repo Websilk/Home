@@ -105,6 +105,7 @@ namespace Websilk.Services.Editor
 
                         //update page block
                         newblock.components = comps;
+                        newblock.changed = true;
                         page.UpdateBlock(ref newpage, newblock);
 
                         if(panel.blockId == 0)
@@ -184,6 +185,7 @@ namespace Websilk.Services.Editor
 
                                 //update existing block
                                 newblock.components = comps;
+                                newblock.changed = true;
                                 page.UpdateBlock(ref newpage, newblock);
 
                                 //save page or block
@@ -251,6 +253,7 @@ namespace Websilk.Services.Editor
 
                             //update new block
                             newblock.components = comps;
+                            newblock.changed = true;
                             page.UpdateBlock(ref newpage, newblock);
 
                             //save page or block

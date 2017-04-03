@@ -1,4 +1,6 @@
-﻿.tooltab{
+﻿@import 'tapestry/less/util.less';
+
+.tooltab{
     position:fixed; right:0; padding:7px 0 0 7px; margin:6px; border-radius:50px; width:36px; height:36px; box-sizing:border-box; display:none; z-index:5000;
     a{cursor:default;}
     > a > svg{width:22px; height:22px;}
@@ -25,7 +27,19 @@
         .save-page{
             padding:3px 5px 0 0;
             &.nosave{opacity:0.5;}
+            a{text-align:left; width:25px; position:relative; padding:0 7px 7px 0; top:7px;}
         }
+
+        .keyframes(save-svg;{
+            0% { top:-4px; left: -4px; width:33px; height:33px; } 
+            33% { top:0; left: 0; width:25px; height:25px; } 
+            34% { top:-4px; left: -4px; width:33px; height:33px; } 
+            66% { top:0; left: 0; width:25px; height:25px; } 
+            67% { top:-4px; left: -4px; width:33px; height:33px; } 
+            100% { top:0; left: 0; width:25px; height:25px; } 
+        });
+        .save-page.saved svg{position:absolute;.animation(save-svg 2s linear);}
+
         .btn-close{position:relative; top:-2px;}
     }
 

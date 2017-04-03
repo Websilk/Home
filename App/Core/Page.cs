@@ -28,8 +28,6 @@ namespace Websilk
             public int pageId;
             public string layout;
             public List<structArea> areas;
-            [JsonIgnore]
-            public bool changed;
         }
 
         public struct structArea
@@ -44,6 +42,7 @@ namespace Websilk
             public int id;
             public bool isPage;
             public List<Component> components;
+            public bool changed;
         }
 
         public enum enumDomainProtocols
@@ -305,7 +304,7 @@ namespace Websilk
             return areas;
         }
 
-        public string GetPageFilePath(int pageid = 0, string specialFolder = "", string pageType = "", bool checkIfExists = false)
+        public string GetPageFilePath(int pageid = 0, string specialFolder = "", string pageType = "")
         {
 
             var path = "/App/Content/websites/" + 
@@ -322,11 +321,11 @@ namespace Websilk
             }
         }
 
-        public structPage loadPage()
+        public structPage loadPage(bool fromCache = true)
         {
             //get a list of components to load onto the page
             var page = new structPage();
-            var file = S.Server.LoadFileFromCache(GetPageFilePath(pageId, editFolder, editType, true));
+            var file = S.Server.LoadFileFromCache(GetPageFilePath(pageId, editFolder, editType), false, !fromCache);
             if(file != "")
             {
                 page = (structPage)S.Util.Serializer.ReadObject(file, typeof(structPage));
@@ -348,7 +347,7 @@ namespace Websilk
                         if(area.blocks[x].isPage == false && area.blocks[x].id > 0)
                         {
                             //external block
-                            area.blocks[x] = loadBlock(area.blocks[x].id);
+                            area.blocks[x] = loadBlock(area.blocks[x].id, fromCache);
                         }
                     }
                 }
@@ -361,13 +360,13 @@ namespace Websilk
         /// </summary>
         /// <param name="pageid">the page to load</param>
         /// <returns></returns>
-        public Tuple<Scaffold, List<structArea>, structPage, List<Panel>> loadPageAndLayout(int pageid, bool noExecution = false)
+        public Tuple<Scaffold, List<structArea>, structPage, List<Panel>> loadPageAndLayout(int pageid, bool noExecution = false, bool fromCache = true)
         {
             //load page layout scaffolding
             var scaffold = new Scaffold(S, "/App/Content/themes/" + websiteTheme + "/layouts/" + pageLayout + ".html");
 
             //load page(s) from file/cache
-            var page = loadPage();
+            var page = loadPage(fromCache);
 
             //get a list of areas in the layout HTML
             var areas = loadLayout(scaffold);
@@ -577,7 +576,7 @@ namespace Websilk
         #endregion
 
         #region "Blocks"
-        public string GetBlockFilePath(int blockid = 0, string specialFolder = "", string blockType = "", bool checkIfExists = false)
+        public string GetBlockFilePath(int blockid = 0, string specialFolder = "", string blockType = "")
         {
 
             var path = "/App/Content/websites/" +
@@ -595,11 +594,11 @@ namespace Websilk
             }
         }
 
-        public structBlock loadBlock(int blockid)
+        public structBlock loadBlock(int blockid, bool fromCache = true)
         {
             var block = new structBlock();
-            var filename = GetBlockFilePath(blockid, editFolder, editType, true);
-            var file = S.Server.LoadFileFromCache(filename);
+            var filename = GetBlockFilePath(blockid, editFolder, editType);
+            var file = S.Server.LoadFileFromCache(filename, false, !fromCache);
             if (file != "")
             {
                 block = (structBlock)S.Util.Serializer.ReadObject(file, typeof(structBlock));
@@ -823,6 +822,7 @@ namespace Websilk
                 }
             }
         }
+
         /// <summary>
         /// Create a new component on the page (from within the Editor)
         /// </summary>
@@ -874,7 +874,13 @@ namespace Websilk
         {
             StripCustomBlocks(page);
             var path = GetPageFilePath(page.pageId, editFolder, editType);
-            var serialize = S.Util.Serializer.WriteObjectAsString(page, Formatting.None);
+            var contractResolver = new Utility.IgnorableContractResolver();
+            if (saveToDisk == true)
+            {
+                //ignore any properties that are used only for cached pages
+                contractResolver.Ignore(typeof(structBlock), "changed");
+            }
+            var serialize = S.Util.Serializer.WriteObjectAsString(page, Formatting.None, TypeNameHandling.Auto, contractResolver);
             S.Server.SaveToCache(path, serialize);
             if (saveToDisk == true) { File.WriteAllText(S.Server.MapPath(path), serialize); }
         }
@@ -882,7 +888,13 @@ namespace Websilk
         public void SaveBlock(structBlock block, bool saveToDisk = false)
         {
             var path = GetBlockFilePath(block.id, editFolder, editType);
-            var serialize = S.Util.Serializer.WriteObjectAsString(block, Formatting.None);
+            var contractResolver = new Utility.IgnorableContractResolver();
+            if(saveToDisk == true)
+            {
+                //ignore any properties that are used only for cached blocks
+                contractResolver.Ignore(typeof(structBlock), "changed");
+            }
+            var serialize = S.Util.Serializer.WriteObjectAsString(block, Formatting.None, TypeNameHandling.Auto, contractResolver);
             S.Server.SaveToCache(path, serialize);
             if (saveToDisk == true) {
                 if(File.Exists(S.Server.MapPath(path)) == false)

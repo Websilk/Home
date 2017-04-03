@@ -46,6 +46,8 @@ body{font-family: Jaldi, Arial, Helvetica, sans-serif;}
         .box(#214345, transparent, @color);
         .row(transparent, #223235, #173b42, @color, @color-hover, @color, @link, @link-hover, @link-hover, @link, @link, @color, @color-hover, @color-hover, @color);
     }
+
+    .save-page.nosave a:hover use{color:#fff !important;}
 }
 
 .box.blue{
@@ -79,4 +81,18 @@ body{font-family: Jaldi, Arial, Helvetica, sans-serif;}
         .resize.side{background-color:@bg;} 
         .resize.corner{background-color:@bg;}
     }
+    
+    
+    .keyframes(save;{
+        0% { color:#00ff86; fill:#00ff86; top:-4px; left: -4px; width:25px; height:25px; } 
+        33% { color:#fff; fill:#fff; top:0; left: 0; width:100%; height:100%; } 
+        34% { color:#00ff86; fill:#00ff86; top:-4px; left: -4px; width:25px; height:25px; } 
+        66% { color:#fff; fill:#fff; top:0; left: 0; width:100%; height:100%; } 
+        67% { color:#00ff86; fill:#00ff86; top:-4px; left: -4px; width:25px; height:25px; } 
+        100% { color:#fff; fill:#fff; opacity:0.5; top:0; left: 0; width:100%; height:100%; } 
+    });
+
+     
+    .save-page.saved a use{.animation(save 2s linear);}
 }
+

@@ -864,7 +864,7 @@
                             for (var y = 0; y < item.events.length; y++) {
                                 var ev = item.events[y];
                                 for (var z = 0; z < ev.list.length; z++) {
-                                    e.removeEventListener(ev.name, ev.list[z]);
+                                    e.removeEventListener(ev.name, ev.list[z], true);
                                 }
                             }
                             listeners.splice(x, 1);
@@ -874,7 +874,7 @@
                                 if (item.events[y].name == event) {
                                     var ev = item.events[y];
                                     for (var z = 0; z < ev.list.length; z++) {
-                                        e.removeEventListener(event, ev.list[z]);
+                                        e.removeEventListener(event, ev.list[z], true);
                                     }
                                     listeners[x].events.splice(y, 1);
                                     if (listeners[x].events.length == 0) {
@@ -892,8 +892,8 @@
                                 //remove specific event from element in listeners array
                                 var ev = item.events[y];
                                 for (var z = 0; z < ev.list.length; z++) {
-                                    if (ev.list[z] == func) {
-                                        e.removeEventListener(event, func);
+                                    if (ev.list[z].toString() === func.toString()) {
+                                        e.removeEventListener(event, func, true);
                                         listeners[x].events[y].list.splice(z, 1);
                                         break;
                                     }

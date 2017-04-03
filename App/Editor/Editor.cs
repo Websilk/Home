@@ -64,6 +64,20 @@ namespace Websilk.Editor
                 layout_dialog.Data["layout-list"] = (string)S.Server.Cache["layout-options-" + page.websiteId];
             }
 
+            //check if in-memory page differs from page on drive
+            var pagePath = page.GetPageFilePath(page.pageId, page.editFolder, page.editType);
+            if (File.Exists(S.Server.MapPath(pagePath)))
+            {
+                var pageMem = S.Util.Serializer.WriteObjectAsString(page.loadPageAndLayout(page.pageId, true).Item3);
+                var pageDrive = S.Util.Serializer.WriteObjectAsString(page.loadPageAndLayout(page.pageId, true, false).Item3);
+                if (pageMem != pageDrive)
+                {
+                    //page data differs between page in-memory & page file(s) (including in-memory blocks & block files)
+                    S.javascript.Add("editor-save", "S.editor.save.hasChanges(true);");
+                }
+            }
+
+
             //render Editor UI //////////////////////////////////////////////////////////////////////
             editor.Data["svg-logo"] = S.Server.LoadFileFromCache("/App/Content/logo-websilk.svg");
             editor.Data["template-window"] = S.Server.LoadFileFromCache("/app/editor/ui/window.html");

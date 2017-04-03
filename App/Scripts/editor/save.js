@@ -1,5 +1,14 @@
 ﻿S.editor.save = { 
-    cache: [],
+    cache: [], _changes: false,
+
+    hasChanges: function(has){
+        if (has === true) {
+            this._changes = true;
+            this.enable();
+        } else {
+            return this._changes;
+        }
+    },
 
     add: function (id, type, obj) {
         var i = -1;
@@ -24,15 +33,16 @@
     },
 
     click: function () {
-        if ($('.editor .toolbar .save-page').hasClass('saving') == false && $('.editor .toolbar .save-page').hasClass('nosave') == false) {
+        if ($('.editor .toolbar .save-page').hasClass('saving nosave saved') == false) {
             var options = {};
             options.save = JSON.stringify(this.cache);
             this.cache = [];
             $('.editor .toolbar .save-page').addClass('saving');
-            S.ajax.post("/api/Edit/SaveChanges", options, function () {
-                $('.editor .toolbar .save-page').removeClass('saving').addClass('nosave');
-                S.ajax.expire = new Date();
-                S.ajax.keepAlive();
+            S.ajax.post("Editor/Page/SaveChanges", options, function () {
+                $('.editor .toolbar .save-page').removeClass('saving').addClass('saved');
+                setTimeout(function () {
+                    $('.editor .toolbar .save-page').removeClass('saved').addClass('nosave')
+                }, 2000);
             });
         }
     }

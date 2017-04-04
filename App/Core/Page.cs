@@ -311,14 +311,7 @@ namespace Websilk
                 websiteId + "/pages/" + pageid.ToString() + "/" + 
                 (specialFolder != "" ? specialFolder + "/" : "") + 
                 (pageType != "" ? pageType + "_" : "") + "page.json";
-
-            if(File.Exists(S.Server.MapPath(path)))
-            {
-                return path;
-            }else
-            {
-                return "/App/Content/websites/" + websiteId + "/pages/" + pageid.ToString() + "/" + "page.json";
-            }
+            return path;
         }
 
         public structPage loadPage(bool fromCache = true)
@@ -583,15 +576,7 @@ namespace Websilk
                 websiteId + "/blocks/" + blockid.ToString() + "/" +
                 (specialFolder != "" ? specialFolder + "/" : "") +
                 (blockType != "" ? blockType + "_" : "") + "block.json";
-
-            if (File.Exists(S.Server.MapPath(path)))
-            {
-                return path;
-            }
-            else
-            {
-                return "/App/Content/websites/" + websiteId + "/blocks/" + blockid.ToString() + "/" + "block.json";
-            }
+            return path;
         }
 
         public structBlock loadBlock(int blockid, bool fromCache = true)
@@ -882,7 +867,24 @@ namespace Websilk
             }
             var serialize = S.Util.Serializer.WriteObjectAsString(page, Formatting.None, TypeNameHandling.Auto, contractResolver);
             S.Server.SaveToCache(path, serialize);
-            if (saveToDisk == true) { File.WriteAllText(S.Server.MapPath(path), serialize); }
+            if (saveToDisk == true)
+            {
+                //save page to file system
+                if (File.Exists(S.Server.MapPath(path)) == false)
+                {
+                    Directory.CreateDirectory(S.Util.Str.getFolder(S.Server.MapPath(path)));
+                }
+                File.WriteAllText(S.Server.MapPath(path), serialize);
+
+                //save page to history on file system
+                var now = DateTime.Now;
+                var historyPath = GetPageFilePath(page.pageId, "history/" + now.ToString("yyyy"), now.ToString("MM_dd_H_mm"));
+                if (!Directory.Exists(S.Server.MapPath(S.Util.Str.getFolder(historyPath))))
+                {
+                    Directory.CreateDirectory(S.Server.MapPath(S.Util.Str.getFolder(historyPath)));
+                }
+                File.WriteAllText(S.Server.MapPath(historyPath), serialize);
+            }
         }
 
         public void SaveBlock(structBlock block, bool saveToDisk = false)
@@ -897,11 +899,21 @@ namespace Websilk
             var serialize = S.Util.Serializer.WriteObjectAsString(block, Formatting.None, TypeNameHandling.Auto, contractResolver);
             S.Server.SaveToCache(path, serialize);
             if (saveToDisk == true) {
-                if(File.Exists(S.Server.MapPath(path)) == false)
+                // save page to file system
+                if (File.Exists(S.Server.MapPath(path)) == false)
                 {
                     Directory.CreateDirectory(S.Util.Str.getFolder(S.Server.MapPath(path)));
                 }
                 File.WriteAllText(S.Server.MapPath(path), serialize);
+
+                //save page to history on file system
+                var now = DateTime.Now;
+                var historyPath = GetBlockFilePath(block.id, "history/" + now.ToString("yyyy"), now.ToString("MM_dd_H_mm"));
+                if (!Directory.Exists(S.Server.MapPath(S.Util.Str.getFolder(historyPath))))
+                {
+                    Directory.CreateDirectory(S.Server.MapPath(S.Util.Str.getFolder(historyPath)));
+                }
+                File.WriteAllText(S.Server.MapPath(historyPath), serialize);
             }
         }
         #endregion

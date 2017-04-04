@@ -28,9 +28,7 @@ namespace Websilk.Services.Editor
             {
                 string id = "";
                 string type = "";
-
                 
-
                 //process each change
                 foreach (JObject item in data)
                 {

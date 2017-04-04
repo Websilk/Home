@@ -74,6 +74,11 @@
                     block: area.attr('data-block-id'),
                     'color': ispagelvl ? 'green' : 'blue'
                 }
+                if (ispagelvl) {
+                    opts.history = 'View page history for \'' + S.page.title + '\'';
+                } else {
+                    opts.history = 'View block history for \'' + area.attr('data-block') + '\'';
+                }
                 scaff = new S.scaffold(htm, opts);
                 div.innerHTML = scaff.render();
                 var d = $(div);

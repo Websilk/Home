@@ -35,6 +35,11 @@
         });
     });
 
+    $('.editor .toolbar .menu .icon.search').on('click', function () {
+        //show Documentation modal window
+        S.editor.support.glossary();
+    });
+
     $('.editor .save-page a').on('click', function () { S.editor.save.click.call(S.editor.save); });
 
     //set up component events

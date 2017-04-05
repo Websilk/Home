@@ -161,4 +161,18 @@
     <Property Name="ParentElementType" Value="SqlTable" />
     <Property Name="NewName" Value="blockId" />
   </Operation>
+  <Operation Name="Rename Refactor" Key="fb230366-82d8-4103-aa83-7c8c6598dda7" ChangeDateTime="04/05/2017 01:16:23">
+    <Property Name="ElementName" Value="[dbo].[Documentation].[Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[Documentation]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="path" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="2e94282e-ee82-4621-9659-54f0bdfc7b18" ChangeDateTime="04/05/2017 01:16:38">
+    <Property Name="ElementName" Value="[dbo].[Documentation].[words]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[Documentation]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="keywords" />
+  </Operation>
 </Operations>

@@ -322,7 +322,7 @@ namespace Websilk.Utility
             return htm;
         }
 
-        public object RemoveHtmlFromString(string str, bool includeBR = false)
+        public string RemoveHtmlFromString(string str, bool includeBR = false)
         {
             string RegExStr = "<[^>]*>";
             if (includeBR == true)

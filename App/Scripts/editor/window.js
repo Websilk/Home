@@ -50,7 +50,7 @@
                 //content
                 html: options.html ? options.html : '',
                 url: options.url ? options.url : '',
-                urlData: options.urlData ? options.urlData : ''
+                urlData: options.urlData ? options.urlData : (options.data ? options.data : ''),
             }
             //normalize options
             if (win.top < S.editor.toolbar.height) { win.top = S.editor.toolbar.height; }

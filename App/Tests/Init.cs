@@ -220,12 +220,10 @@ namespace Websilk.Services
                     if(file != "")
                     {
                         //remove all common words from file
-                        file = Regex.Replace(S.Util.Str.RemoveHtmlFromString(file).Replace("\n","").Replace("\r",""), @"\s+", " ").ToLower();
-                        common_words.ForEach(x => file = file.Replace(" " + x, " "));
-                        file = Regex.Replace(file, @"\s+", " ");
+                        file = Regex.Replace(Regex.Replace(file, "<.*?>", String.Empty).Replace("\n","").Replace("\r",""), @"\s+", " ").ToLower().Trim();
                         page_words = new List<string>();
                         page_words.AddRange(file.Split(' '));
-                        file = string.Join(" ", page_words.Distinct().ToArray());
+                        file = string.Join(" ", page_words.Except(common_words).Distinct().ToArray());
 
                         //save keywords to database
                         parms = new List<SqlParameter>()

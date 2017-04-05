@@ -77,6 +77,7 @@
     <Folder Include="dbo\Stored Procedures\Applications" />
     <Folder Include="dbo\Stored Procedures\Log" />
     <Folder Include="dbo\Stored Procedures\Blocks" />
+    <Folder Include="dbo\Stored Procedures\Documentation" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="dbo\Tables\ErrorLog.sql" />
@@ -171,6 +172,11 @@
     <Build Include="dbo\Stored Procedures\Blocks\GetBlocks.sql" />
     <Build Include="dbo\Stored Procedures\Blocks\GetBlock.sql" />
     <Build Include="dbo\Stored Procedures\Blocks\HasBlock.sql" />
+    <Build Include="dbo\Tables\Documentation.sql" />
+    <Build Include="dbo\Stored Procedures\Documentation\AddDocumentation.sql" />
+    <Build Include="dbo\Stored Procedures\Documentation\SearchDocumentation.sql" />
+    <Build Include="dbo\Stored Procedures\Documentation\UpdateDocumentation.sql" />
+    <Build Include="dbo\Stored Procedures\Documentation\GetDocumentation.sql" />
   </ItemGroup>
   <ItemGroup>
     <ArtifactReference Include="$(DacPacRootPath)\Extensions\Microsoft\SQLDB\Extensions\SqlServer\110\SqlSchemas\master.dacpac">

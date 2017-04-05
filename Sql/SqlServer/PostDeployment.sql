@@ -1,4 +1,5 @@
-﻿
+﻿SET NOCOUNT ON
+
 /* Only Add initial data once */
 IF (SELECT COUNT(*) FROM Users WHERE userId=1) = 0 BEGIN
 
@@ -58,4 +59,9 @@ IF (SELECT COUNT(*) FROM Users WHERE userId=1) = 0 BEGIN
 	INSERT INTO components (componentId, [namespace], title, category, [description], datecreated, orderindex)
 	VALUES ('payments', 'Payments', 'Payments', 2, 'Add a buy button from Paypal or Stripe onto your web page.', GETDATE(), 5)
 
+END
+
+/* Add documentation pages to database */
+IF (SELECT COUNT(*) FROM Documentation) < 1 BEGIN
+	EXEC AddDocumentation @path='glossary', @title='Glossary', @keywords='glossary' /* 1 */
 END

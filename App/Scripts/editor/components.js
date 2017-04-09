@@ -88,6 +88,16 @@
             //set up static sizes for some resize bars
             this.elem.resize.leftTop.css({ height: this.corners });
             this.elem.resize.topLeft.css({ width: this.corners });
+
+            //setup events for resize bars
+            for (elem in this.elem.resize) {
+                this.elem.resize[elem].on('mousedown', function (e) {
+                    S.editor.components.select.resize.start.call(S.editor.components.select.resize, e);
+                });
+                this.elem.resize[elem].on('mouseup', function (e) {
+                    S.editor.components.select.resize.end.call(S.editor.components.select.resize, e);
+                });
+            }
         },
 
         show: function (e) {
@@ -103,8 +113,73 @@
             this.visible = false;
         },
 
-        resize: function(){
-            //resize component based on resize bar drag position
+        resize: {
+            timer: null, bar: null, type: 0, start: null, cursor: null,
+            start: function (e) {
+                //get resize bar
+                var bar = $(e.target);
+                if (!bar.hasClass('resize')) {
+                    bar = bar.parents('.resize');
+                    if (bar.length == 0) { return; }
+                }
+                this.bar = bar;
+                this.start = {
+                    x: e.clientX + document.body.scrollLeft,
+                    y: e.clientY + document.body.scrollTop
+                };
+
+                //get bar type (4 sides, 4 corners)
+                if (bar.hasClass('r-top')) {
+                    this.type = 1;
+                } else if (bar.hasClass('r-top-right') || bar.hasClass('r-right-top')) {
+                    this.type = 2;
+                } else if (bar.hasClass('r-right')) {
+                    this.type = 3;
+                } else if (bar.hasClass('r-right-bottom') || bar.hasClass('r-bottom-right')) {
+                    this.type = 4;
+                } else if (bar.hasClass('r-bottom')) {
+                    this.type = 5;
+                } else if (bar.hasClass('r-bottom-left') || bar.hasClass('r-left-bottom')) {
+                    this.type = 6;
+                } else if (bar.hasClass('r-left')) {
+                    this.type = 7;
+                } else if (bar.hasClass('r-left-top') || bar.hasClass('r-top-left')) {
+                    this.type = 8;
+                }
+
+                //initialize mouse move event
+                bar.on('mousemove', function (e) {
+                    S.editor.components.select.resize.move.call(S.editor.components.select.resize, e);
+                });
+
+                //start intervals
+                if (this.timer != null) { clearInterval(this.timer); }
+                this.timer = setInterval(function () {
+                    S.editor.components.select.resize.go.call(S.editor.components.select.resize);
+                });
+                
+            },
+
+            move: function(e){
+                this.cursor = {
+                    x: e.clientX + document.body.scrollLeft,
+                    y: e.clientY + document.body.scrollTop
+                };
+            },
+
+            go: function(){
+                //resize component based on resize bar drag position
+                
+            },
+
+            end: function () {
+                //stop resizing
+                if (this.timer != null) { clearInterval(this.timer); }
+                this.bar.off('mousemove');
+                this.bar = null;
+                this.type = null;
+                this.timer = null;
+            }
         },
 
         refresh: function () {

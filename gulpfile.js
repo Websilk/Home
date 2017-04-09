@@ -41,7 +41,7 @@ var paths = {
 paths.working = {
     js: {
         platform: [
-            paths.scripts + 'core/selector.js',
+            paths.scripts + 'selector/selector.js',
             paths.scripts + 'core/velocity.min.js',
             paths.scripts + 'core/platform.js',
             paths.scripts + 'platform/[^_]*.js',
@@ -123,7 +123,7 @@ gulp.task('js:platform', function () {
 });
 
 gulp.task('js:selector', function () {
-    var p = gulp.src(paths.scripts + 'core/selector.js', { base: '.' })
+    var p = gulp.src(paths.scripts + 'selector/selector.js', { base: '.' })
             .pipe(concat(paths.compiled.js + 'selector.js'));
     if (prod == true) { p = p.pipe(uglify()); }
     return p.pipe(gulp.dest('.', { overwrite: true }));

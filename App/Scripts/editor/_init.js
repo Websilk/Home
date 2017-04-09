@@ -34,6 +34,20 @@
             }
         });
     });
+    $('.editor .toolbar .menu .icon.screens').on('contextmenu', function (e) {
+        e.preventDefault();
+    });
+    $('.editor .toolbar .menu .icon.screens').on('mouseup', function (e) {
+        switch (e.which) {
+            case 1:
+                S.viewport.next();
+                break;
+            case 3:
+                S.viewport.previous();
+                break;
+        }
+        return false;
+    });
 
     $('.editor .toolbar .menu .icon.search').on('click', function () {
         //show Documentation modal window

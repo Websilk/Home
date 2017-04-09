@@ -62,6 +62,8 @@ IF (SELECT COUNT(*) FROM Users WHERE userId=1) = 0 BEGIN
 END
 
 /* Add documentation pages to database */
-IF (SELECT COUNT(*) FROM Documentation) < 1 BEGIN
+IF (SELECT COUNT(*) FROM Documentation) < 2 BEGIN
+	DELETE FROM Documentation
 	EXEC AddDocumentation @path='glossary', @title='Glossary', @keywords='glossary' /* 1 */
+	EXEC AddDocumentation @path='editor/page-layout', @title='Page Layout', @keywords='' /* 2 */
 END

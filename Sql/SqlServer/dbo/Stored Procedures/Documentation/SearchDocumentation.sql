@@ -12,10 +12,11 @@ AS
 	FETCH FROM @cursor INTO @word
 	WHILE @@FETCH_STATUS = 0 BEGIN
 		IF @started = 1 BEGIN SET @sql = @sql + CASE WHEN @andor = 0 THEN 'AND ' ELSE 'OR ' END END
-		SET @sql = @sql + 'keyword LIKE ''%' + @word + '%'' '
+		SET @sql = @sql + 'keywords LIKE ''%' + @word + '%'' '
 		FETCH FROM @cursor INTO @word
 	END
 	CLOSE @cursor
 	DEALLOCATE @cursor
+	SET @sql =  @sql + 'ORDER BY LEN([path]) DESC'
 
 	EXECUTE sp_executesql @sql

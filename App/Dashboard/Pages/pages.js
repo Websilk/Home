@@ -9,6 +9,7 @@
         S.events.doc.resize.callback.remove('dash-pages');
         S.events.doc.resize.callback.add('dash-pages', this.resize, this.resize, this.resize);
         this.resize();
+        S.dashboard.sections.show('pages');
     },
 
     reset_info: function(){

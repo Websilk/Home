@@ -156,7 +156,7 @@
         elem:{
             compHover: $('.editor > .component-hover')
         },
-        pad: 13, timer: { date: new Date(), timeout: 250 }, isdragging: false, trigdrag: false,
+        pad: 13, timer: { date: new Date(), timeout: 250 }, isdragging: false, trigdrag: false, disabled: false,
 
         init: function(){
             var e = this.elem.compHover.get();
@@ -188,6 +188,7 @@
             //make sure target is the next element in the hierarchy to be hovered
             if (S.editor.visible == false) { return; }
             if (this.isdragging == true) { return; }
+            if (this.disabled == true) { return; }
             var el = $(e);
             if (!el.hasClass('component')) {
                 el = el.parents('.component').first();
@@ -231,6 +232,15 @@
         hide: function(){
             this.elem.compHover.hide();
             S.editor.components.hovered = null;
+        },
+
+        disable: function () {
+            this.hide();
+            this.disabled = true;
+        },
+
+        enable: function(){
+            this.disabled = false;
         },
 
         drag:{

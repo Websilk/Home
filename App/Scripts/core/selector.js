@@ -1471,6 +1471,11 @@
         return clone(elems);
     }
 
+    select.prototype.stop = function () {
+        Velocity(this.elements, "stop");
+        return this;
+    }
+
     select.prototype.text = function () {
         //Get the combined text contents of each element in the set of matched elements, including their descendants, or set the text contents of the matched elements
         return '';

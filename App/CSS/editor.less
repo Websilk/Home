@@ -87,10 +87,6 @@
         .box > .arrow.bottom{ position:absolute; width: 0; height: 0; border-style: solid; border-width: 25px 25px 0 25px; }
     }
 
-    #winDashboard{
-        .page-title{width:200px; cursor:default;}
-    }
-
     > .component-hover{position:absolute; display:none; border:2px dashed transparent; cursor:move; z-index:3000;}
 
     > .component-select{
@@ -111,6 +107,33 @@
         .r-top, .r-top-right, .r-top-left, .r-bottom, .r-bottom-right, .r-bottom-left{height:@bar;}
         .r-left, .r-left-top, .r-left-bottom, .r-right, .r-right-top, .r-right-bottom{width:@bar;}
     }
+
+}
+
+.webpage{
+    > .grid-leftside{background-image:url(/images/editor/gridleft.jpg); background-position:top right;width:1000px; position:absolute; left:-1000px; height:100%; z-index:480;}
+    > .grid-rightside{ background-image:url(/images/editor/gridright.jpg); background-position:top left; width:1000px; position:absolute; right:-1000px; height:100%; z-index:480;}
+}
+.is-editing .grid-leftside, .is-editing .grid-rightside{height:~"calc(100% - 50px)";}
+
+/* disable text selection on certain elements */
+.editor .toolbar{
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+#winDashboard{
+    .page-title{width:200px; cursor:default;}
+}
+
+#winDocumentation .box{
+    .content p, .content span{line-height:1.25;}
+    .support-search{max-width:200px; width:100% !important;} 
+    .result{cursor:default; font-size:17px;}
 }
 
 .show-empty-cells {

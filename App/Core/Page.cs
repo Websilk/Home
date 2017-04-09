@@ -532,7 +532,7 @@ namespace Websilk
             if(isEditable == true)
             {
                 //show grid at left & right sides of page body
-                scaffold.Data["body-sides"] = "<div class=\"body-sides\"><div class=\"left-side\"></div><div class=\"right-side\"></div></div>";
+                scaffold.Data["body-sides"] = "<div class=\"grid-leftside\"></div><div class=\"grid-rightside\"></div>";
             }
 
             //setup facebook meta tags

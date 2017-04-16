@@ -1,11 +1,20 @@
-﻿# Websilk
-A powerful web development platform built with ASP.net Core
+# Websilk
+#### An advanced web development platform
+Built upon the new ASP.NET Core framework, Websilk is a high-end, enterprise level web development platform with drag & drop design capabilities for web publishers along with a set of powerful class libraries for back-end developers.
 
-### The App Folder
-All of the core C# namespaces for Websilk can be found here within the App folder. Learn how Websilk handles page requests & Web API calls, what components & applications are, and how the dashboard is rendered.
+### Installation
+1. In Visual Studio's Package Manager Console, do the following:
+* install node.js dependencies `npm install`
+* install submodules `git submodule update --init --recursive`
+* run initial gulp task `gulp default`
+2. Then, install the database by opening the `Sql/Sql.sln` Visual Studio solution file and publishing the project to Sql Server 2014 (or higher)
+3. Run `dotnet run` and navigate to http://localhost:7770 , which will generate a `config.json` file. You may need to alter the database connection settings within the `config.json` file in order to access the database correctly.
+4. Open the following web page: http://localhost:7770/api/Init/Website
+, which will generate the initial web pages for your default web site, including the home page, login, & dashboard page.
+5. Navigate to http://localhost:7770/login to set your administrator password, then log into your website dashboard.
 
 #### Initial Page Request
-Websilk runs on the Kestrel web server, which starts an asyncronous task within `/Startup.cs`, listening for incoming page requests. When a user first loads a web page from their web browser, the async task creates a new instance of the `Websilk.Pipeline.PageRequest` class, which in turn initializes a new instance of `Websilk.Page` that loads the requested page from the database and renders the contents of the page as HTML. The web browser finally (20 ms later) loads the web page along with `/js/platform.js` and a few CSS files.
+Websilk runs on the Kestrel web server, which starts an asyncronous task within `/Startup.cs`, listening for incoming page requests. When a user first loads a web page from their web browser, the async task creates a new instance of the `Websilk.Pipeline.PageRequest` class, which in turn initializes a new instance of `Websilk.Page` that loads the requested page from the database and renders the contents of the page as HTML. Finally, the web browser loads the web page along with `/js/platform.js` and a few CSS files.
 
 #### Web API calls for Page Requests
 When a user clicks an anchor link on a typical web page, the default behavior redirects them to the next web page and the web browser reloads Javascript, CSS, & image resources. Websilk overrides the anchor link functionality and executes a Web API call via AJAX instead, masks the URL in the user's address bar using the Javascript History API, and replaces part of the web page with new content. The AJAX request sends a POST to the url */api/App/Url*, which accesses a new instance of the class `Websilk.Pipeline.WebService`, and the page request tries to match the POST parameter labeled *url* to a page path in the database.

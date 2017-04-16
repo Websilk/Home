@@ -254,10 +254,10 @@ namespace Websilk
                 //set up page properties
                 if(pageLayout == "") { pageLayout = "default"; }
                 PageTitleForBrowserTab = pageTitle + websiteTitleSeparator + websiteTitle;
-                pageFolder = "/App/Content/websites/" + websiteId + "/pages/" + pageId + "/";
+                pageFolder = "/Content/websites/" + websiteId + "/pages/" + pageId + "/";
 
                 //initialize theme Elements
-                Elements = new Elements(S, "/App/Content/themes/" + websiteTheme + "/");
+                Elements = new Elements(S, "/Content/themes/" + websiteTheme + "/");
 
                 //check if editable
                 if(pageTitle != "Dashboard")
@@ -307,7 +307,7 @@ namespace Websilk
         public string GetPageFilePath(int pageid = 0, string specialFolder = "", string pageType = "")
         {
 
-            var path = "/App/Content/websites/" + 
+            var path = "/Content/websites/" + 
                 websiteId + "/pages/" + pageid.ToString() + "/" + 
                 (specialFolder != "" ? specialFolder + "/" : "") + 
                 (pageType != "" ? pageType + "_" : "") + "page.json";
@@ -356,7 +356,7 @@ namespace Websilk
         public Tuple<Scaffold, List<structArea>, structPage, List<Panel>> loadPageAndLayout(int pageid, bool noExecution = false, bool fromCache = true)
         {
             //load page layout scaffolding
-            var scaffold = new Scaffold(S, "/App/Content/themes/" + websiteTheme + "/layouts/" + pageLayout + ".html");
+            var scaffold = new Scaffold(S, "/Content/themes/" + websiteTheme + "/layouts/" + pageLayout + ".html");
 
             //load page(s) from file/cache
             var page = loadPage(fromCache);
@@ -490,7 +490,7 @@ namespace Websilk
         public string Render()
         {
             //setup page to render layout, panels, and components (and editor UI too if necessary)
-            var scaffold = new Scaffold(S, "/app/core/page.html");
+            var scaffold = new Scaffold(S, "/core/page.html");
             var useSVG = false;
 
             //setup scaffold variables
@@ -526,7 +526,7 @@ namespace Websilk
             }
             if(useSVG == true)
             {
-                scaffold.Data["svg-icons"] = S.Server.LoadFileFromCache("/App/Content/themes/" + websiteTheme + "/icons.svg", true);
+                scaffold.Data["svg-icons"] = S.Server.LoadFileFromCache("/Content/themes/" + websiteTheme + "/icons.svg", true);
             }
 
             if(isEditable == true)
@@ -572,7 +572,7 @@ namespace Websilk
         public string GetBlockFilePath(int blockid = 0, string specialFolder = "", string blockType = "")
         {
 
-            var path = "/App/Content/websites/" +
+            var path = "/Content/websites/" +
                 websiteId + "/blocks/" + blockid.ToString() + "/" +
                 (specialFolder != "" ? specialFolder + "/" : "") +
                 (blockType != "" ? blockType + "_" : "") + "block.json";

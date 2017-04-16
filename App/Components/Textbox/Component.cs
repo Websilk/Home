@@ -20,7 +20,7 @@ namespace Websilk.Components
         {
             get
             {
-                return "/App/Components/Textbox/";
+                return "/Components/Textbox/";
             }
         }
 
@@ -34,7 +34,7 @@ namespace Websilk.Components
 
         public override void Load()
         {
-            scaffold = new Scaffold(S, "/App/Components/Textbox/component.html");
+            scaffold = new Scaffold(S, "/Components/Textbox/component.html");
 
             if (text == "")
             {

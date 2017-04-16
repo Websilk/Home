@@ -24,7 +24,7 @@ namespace Websilk.Pages.DashboardPages
             }else
             {
                 //load timeline
-                scaffold = new Scaffold(S, "/App/Dashboard/Timeline/timeline.html");
+                scaffold = new Scaffold(S, "/Dashboard/Timeline/timeline.html");
             }
             
             inject.html = scaffold.Render();

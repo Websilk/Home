@@ -65,7 +65,7 @@ namespace Websilk.Services.Dashboard
             var hasChildren = 0;
             var color = "";
             var options = new bool[] { false, false, false, false };
-            var pageItem = new Scaffold(S, "/App/Dashboard/Pages/page-item.html");
+            var pageItem = new Scaffold(S, "/Dashboard/Pages/page-item.html");
 
             htm.Append("<ul class=\"columns-list\">");
 

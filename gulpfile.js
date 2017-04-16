@@ -12,7 +12,7 @@ var gulp = require('gulp'),
     rename = require('gulp-rename'),
     wait = require('gulp-wait'),
     merge = require('merge-stream'),
-    config = require('./config.json');
+    config = require('./App/config.json');
     
 //get config variables from config.json
 var environment = config.environment;
@@ -32,9 +32,9 @@ var paths = {
     components: './App/Components/',
     themes: './App/Content/themes/',
     vendor: {
-        root: './Vendor/**/'
+        root: './App/Vendor/**/'
     },
-    webroot: './wwwroot/',
+    webroot: './App/wwwroot/',
 };
 
 //working paths
@@ -82,6 +82,7 @@ paths.working = {
 
     exclude: {
         app: [
+            '!' + paths.app + 'wwwroot/**/',
             '!' + paths.app + 'Content/**/',
             '!' + paths.app + 'CSS/**/',
             '!' + paths.app + 'CSS/',
@@ -111,22 +112,23 @@ gulp.task('js:app', function () {
             path.basename = path.basename.toLowerCase();
             path.extname = path.extname.toLowerCase();
         }));
+
     if (prod == true) { p = p.pipe(uglify()); }
     return p.pipe(gulp.dest(paths.compiled.js, { overwrite: true }));
 });
 
 gulp.task('js:platform', function () {
     var p = gulp.src(paths.working.js.platform, { base: '.' })
-            .pipe(concat(paths.compiled.platform));
+        .pipe(concat(paths.compiled.platform));
     if (prod == true) { p = p.pipe(uglify()); }
     return p.pipe(gulp.dest('.', { overwrite: true }));
 });
 
 gulp.task('js:selector', function () {
     var p = gulp.src(paths.scripts + 'selector/selector.js', { base: '.' })
-            .pipe(concat(paths.compiled.js + 'selector.js'));
+            .pipe(concat('selector.js'));
     if (prod == true) { p = p.pipe(uglify()); }
-    return p.pipe(gulp.dest('.', { overwrite: true }));
+    return p.pipe(gulp.dest(paths.compiled.js, { overwrite: true }));
 });
 
 gulp.task('js:editor', function () {
@@ -227,7 +229,7 @@ gulp.task('default', ['js', 'less', 'css']);
 gulp.task('watch', function () {
     //watch platform JS
     gulp.watch([
-        paths.scripts + 'core/selector.js',
+        paths.scripts + 'selector/selector.js',
         paths.scripts + 'core/platform.js',
         paths.scripts + 'platform/*.js'
     ], ['js:platform']);

@@ -24,7 +24,7 @@ namespace Websilk.Pages.DashboardPages.Settings
             }else
             {
                 //load settings interface
-                scaffold = new Scaffold(S, "/App/Dashboard/Settings/Themes/themes.html");
+                scaffold = new Scaffold(S, "/Dashboard/Settings/Themes/themes.html");
             }
             
             inject.html = scaffold.Render();

@@ -11,15 +11,15 @@ namespace Websilk.Services.Editor
 
         public string Get(string page)
         {
-            var scaffold = new Scaffold(S, "/App/Editor/Support/support.html");
-            scaffold.Data["content"] = S.Server.LoadFileFromCache("/App/Support/" + page + ".html");
+            var scaffold = new Scaffold(S, "/Editor/Support/support.html");
+            scaffold.Data["content"] = S.Server.LoadFileFromCache("/Support/" + page + ".html");
             return scaffold.Render();
         }
 
         public string Search(string keywords)
         {
-            var scaffold = new Scaffold(S, "/App/Editor/Support/support.html");
-            var result = new Scaffold(S, "/App/Editor/Support/result.html");
+            var scaffold = new Scaffold(S, "/Editor/Support/support.html");
+            var result = new Scaffold(S, "/Editor/Support/result.html");
             var htm = new StringBuilder();
             var parms = new List<SqlParameter>()
             {
@@ -34,7 +34,7 @@ namespace Websilk.Services.Editor
             }
             if(reader.Rows.Count == 0)
             {
-                result = new Scaffold(S, "/App/Editor/Support/noresults.html");
+                result = new Scaffold(S, "/Editor/Support/noresults.html");
                 result.Data["search"] = keywords;
                 htm.Append(result.Render());
             }

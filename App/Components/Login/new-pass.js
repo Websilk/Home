@@ -29,6 +29,7 @@
         //send new password to server
         S.ajax.post('Components/Login/SavePass', { pass: pass }, function (data) {
             //callback, replace form with message
+            console.log(data);
             var err = false;
             if (data.d){
                 if (data.d == 'err') { err = true;}

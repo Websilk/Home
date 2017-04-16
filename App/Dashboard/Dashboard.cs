@@ -22,9 +22,9 @@ namespace Websilk.Pages
         public override void Load()
         {
             //load the dashboard layout
-            scaffold = new Scaffold(S, "/App/Dashboard/dashboard.html");
+            scaffold = new Scaffold(S, "/Dashboard/dashboard.html");
             S.cssFiles.Add("dashboard", "/css/dashboard/dashboard.css");
-            var scaffMenu = new Scaffold(S, "/App/Dashboard/menu-item.html");
+            var scaffMenu = new Scaffold(S, "/Dashboard/menu-item.html");
 
             //load user profile
             scaffold.Data["profile-img"] = "";

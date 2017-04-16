@@ -34,6 +34,7 @@
 
 //add event to listen for menu click & page url change
 S.menu.addListener('dash-menu', '.dash-menu ul.menu');
+S.menu.select('.dash-menu ul.menu');
 
 //add event for url change
 S.events.url.callback.add('dash-menu-url', null, function (e) {

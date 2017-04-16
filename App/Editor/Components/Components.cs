@@ -11,8 +11,8 @@ namespace Websilk.Services.Editor
 
         public string Load(string category)
         {
-            var ui = new Scaffold(S, "/App/Editor/Components/ui.html");
-            var component = new Scaffold(S, "/App/Editor/Components/component.html");
+            var ui = new Scaffold(S, "/Editor/Components/ui.html");
+            var component = new Scaffold(S, "/Editor/Components/component.html");
             var html = new StringBuilder();
             var sqlEditor = new SqlQueries.Editor(S);
             var reader = sqlEditor.GetComponentList(category);

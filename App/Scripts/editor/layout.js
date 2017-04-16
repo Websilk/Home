@@ -56,7 +56,7 @@
             //generate panel outlines
             for (var x = 0; x < this.areas.length; x++) {
                 area = $(this.areas.get(x));
-                pos = area.position();
+                pos = area.offset();
                 pos.width = area.width();
                 pos.height = area.height();
                 div = document.createElement('div');
@@ -98,7 +98,7 @@
             var areas = S.editor.layout.outlines.areas;
             for (var x = 0; x < areas.length; x++) {
                 area = $(areas.get(x));
-                pos = area.position();
+                pos = area.offset();
                 pos.width = area.width();
                 pos.height = area.height();
                 div = $('#area_' + area.get().id.replace('panel_', ''));

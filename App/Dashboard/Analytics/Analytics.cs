@@ -24,7 +24,7 @@ namespace Websilk.Pages.DashboardPages
             }else
             {
                 //load analytics list
-                scaffold = new Scaffold(S, "/App/Dashboard/Analytics/analytics.html");
+                scaffold = new Scaffold(S, "/Dashboard/Analytics/analytics.html");
             }
             
             inject.html = scaffold.Render();

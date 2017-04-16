@@ -19,7 +19,7 @@ namespace Websilk.Components
         {
             get
             {
-                return "/App/Components/Login/";
+                return "/Components/Login/";
             }
         }
 
@@ -28,7 +28,7 @@ namespace Websilk.Components
             if(S.Server.resetPass == true)
             {
                 //load new password form (for admin only)
-                scaffold = new Scaffold(S, "/App/Components/Login/new-pass.html");
+                scaffold = new Scaffold(S, "/Components/Login/new-pass.html");
                 var txtPass = (Element.Textbox)Page.Elements.Load(ElementType.Textbox);
                 var txtPass2 = (Element.Textbox)Page.Elements.Load(ElementType.Textbox);
                 var btnLogin = (Element.Button)Page.Elements.Load(ElementType.Button, "button-apply");

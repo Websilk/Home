@@ -12,7 +12,7 @@
         $(selector + ' li > .row.hover.selected').removeClass('selected');
         //find the correct menu item to select
         var items = $(selector + ' li > .row.hover');
-        for (var x = 0; x < items.elements.length; x++) {
+        for (var x = 0; x < items.length; x++) {
             var e = items.get(x);
             var a = $(e).find('a');
             if (a.length > 0) {

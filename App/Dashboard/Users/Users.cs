@@ -24,7 +24,7 @@ namespace Websilk.Pages.DashboardPages
             }else
             {
                 //load users list
-                scaffold = new Scaffold(S, "/App/Dashboard/Users/users.html");
+                scaffold = new Scaffold(S, "/Dashboard/Users/users.html");
             }
             
             inject.html = scaffold.Render();

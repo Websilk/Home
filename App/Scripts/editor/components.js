@@ -114,7 +114,7 @@
         },
 
         resize: {
-            timer: null, bar: null, type: 0, start: null, cursor: null,
+            timer: null, bar: null, type: 0, start: null, cursor: null, box: null,
             start: function (e) {
                 //get resize bar
                 var bar = $(e.target);
@@ -127,6 +127,10 @@
                     x: e.clientX + document.body.scrollLeft,
                     y: e.clientY + document.body.scrollTop
                 };
+                this.box = {
+                    width: bar.width(),
+                    height: bar.height()
+                }
 
                 //get bar type (4 sides, 4 corners)
                 if (bar.hasClass('r-top')) {
@@ -148,14 +152,15 @@
                 }
 
                 //initialize mouse move event
+                var r = S.editor.components.select.resize;
                 bar.on('mousemove', function (e) {
-                    S.editor.components.select.resize.move.call(S.editor.components.select.resize, e);
+                    r.move.call(r, e);
                 });
 
                 //start intervals
                 if (this.timer != null) { clearInterval(this.timer); }
                 this.timer = setInterval(function () {
-                    S.editor.components.select.resize.go.call(S.editor.components.select.resize);
+                    r.go.call(r);
                 });
                 
             },
@@ -169,7 +174,32 @@
 
             go: function(){
                 //resize component based on resize bar drag position
-                
+                switch (this.type) {
+                    case 1: //top
+
+                        break;
+                    case 2: //top-right
+
+                        break;
+                    case 3: //right
+
+                        break;
+                    case 4: //bottom-right
+
+                        break;
+                    case 5: //bottom
+
+                        break;
+                    case 6: //bottom-left
+
+                        break;
+                    case 7: //left
+
+                        break;
+                    case 8: //top-left
+
+                        break;
+                }
             },
 
             end: function () {

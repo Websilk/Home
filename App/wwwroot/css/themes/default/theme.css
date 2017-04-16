@@ -1,0 +1,4 @@
+.webpage{height:100%; display:flex; flex-direction: column; -ms-flex-direction: column;}
+.content-head{min-height:0px;}
+.content-body{flex:1;} 
+.content-foot{min-height:0px;}

@@ -10,15 +10,15 @@ namespace Websilk.Editor
         public static string Render(Core S, Page page)
         {
             var sql = new SqlQueries.Editor(S);
-            var editor = new Scaffold(S, "/app/editor/editor.html");
-            var dashboard = new Scaffold(S, "/app/editor/ui/dashboard.html");
-            var layout_dialog = new Scaffold(S, "/app/editor/ui/layout-dialog.html");
-            var layout_addblock = new Scaffold(S, "/app/editor/ui/layout-addblock.html");
+            var editor = new Scaffold(S, "/editor/editor.html");
+            var dashboard = new Scaffold(S, "/editor/ui/dashboard.html");
+            var layout_dialog = new Scaffold(S, "/editor/ui/layout-dialog.html");
+            var layout_addblock = new Scaffold(S, "/editor/ui/layout-addblock.html");
 
             var paths = new StringBuilder();
             var pathstep = "";
             var pagepaths = page.pagePathName.Split('/');
-            var layoutpath = S.Server.MapPath("/App/Content/themes/" + page.websiteTheme + "/layouts/");
+            var layoutpath = S.Server.MapPath("/Content/themes/" + page.websiteTheme + "/layouts/");
             var fname = "";
 
             //get page info for Dashboard
@@ -79,12 +79,12 @@ namespace Websilk.Editor
 
 
             //render Editor UI //////////////////////////////////////////////////////////////////////
-            editor.Data["svg-logo"] = S.Server.LoadFileFromCache("/App/Content/logo-websilk.svg");
-            editor.Data["template-window"] = S.Server.LoadFileFromCache("/app/editor/ui/window.html");
+            editor.Data["svg-logo"] = S.Server.LoadFileFromCache("/Content/logo-websilk.svg");
+            editor.Data["template-window"] = S.Server.LoadFileFromCache("/editor/ui/window.html");
             editor.Data["template-dashboard"] = dashboard.Render();
             editor.Data["template-layout-dialog"] = layout_dialog.Render();
             editor.Data["template-layout-addblock"] = layout_addblock.Render();
-            editor.Data["template-layout-options"] = S.Server.LoadFileFromCache("/app/editor/ui/layout-options.html");
+            editor.Data["template-layout-options"] = S.Server.LoadFileFromCache("/editor/ui/layout-options.html");
             return editor.Render();
         }
     }

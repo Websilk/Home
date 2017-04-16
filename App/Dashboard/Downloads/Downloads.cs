@@ -24,7 +24,7 @@ namespace Websilk.Pages.DashboardPages
             }else
             {
                 //load downloads list
-                scaffold = new Scaffold(S, "/App/Dashboard/Downloads/downloads.html");
+                scaffold = new Scaffold(S, "/Dashboard/Downloads/downloads.html");
             }
             
             inject.html = scaffold.Render();

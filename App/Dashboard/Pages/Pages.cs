@@ -25,7 +25,7 @@
                 var websiteId = page.websiteId;
                 if (S.Request.Query.ContainsKey("websiteid")) { websiteId = int.Parse(S.Request.Query["websiteid"]); }
                 servePage.page = page;
-                scaffold = new Scaffold(S, "/App/Dashboard/Pages/pages.html");
+                scaffold = new Scaffold(S, "/Dashboard/Pages/pages.html");
                 scaffold.Data["page-list"] = servePage.View(websiteId, 0, 1, 1000, 4, 0, "");
                 scaffold.Data["field-create-title"] = textCreateTitle.Render("txtcreatetitle","","", "New Page Title");
                 scaffold.Data["field-create-summary"] = textCreateSummary.Render("txtcreatedesc", "", "", "Write a description about your new page", "", Element.Textbox.enumTextType.textarea);

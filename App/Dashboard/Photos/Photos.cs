@@ -24,7 +24,7 @@ namespace Websilk.Pages.DashboardPages
             }else
             {
                 //load photos list
-                scaffold = new Scaffold(S, "/App/Dashboard/Photos/photos.html");
+                scaffold = new Scaffold(S, "/Dashboard/Photos/photos.html");
             }
             
             inject.html = scaffold.Render();

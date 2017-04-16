@@ -67,6 +67,7 @@ namespace Websilk.Services
                 var cLogin = P.loadComponent(new Websilk.Components.Login(), panelBody, panelBody.cells[0], true);
                 var posLogin = cLogin.position[4];
                 posLogin.padding.top = 50;
+                posLogin.width = 400;
                 cLogin.position[4] = posLogin;
 
             }else if (name == "access-denied")
@@ -77,6 +78,7 @@ namespace Websilk.Services
                 var cLogin = P.loadComponent(new Websilk.Components.Login(), panelBody, panelBody.cells[0], true);
                 var posLogin = cLogin.position[4];
                 posLogin.padding.top = 50;
+                posLogin.width = 400;
                 cLogin.position[4] = posLogin;
             }
 
@@ -125,7 +127,7 @@ namespace Websilk.Services
             page.pageId = P.pageId;
 
             //save page to file
-            S.Util.Serializer.SaveToFile(page, S.Server.MapPath("/App/Content/websites/" + P.websiteId + "/pages/" + P.pageId + "/page.json"), Newtonsoft.Json.Formatting.None);
+            S.Util.Serializer.SaveToFile(page, S.Server.MapPath("/Content/websites/" + P.websiteId + "/pages/" + P.pageId + "/page.json"), Newtonsoft.Json.Formatting.None);
         }
 
         public WebRequest Documentation()
@@ -212,7 +214,7 @@ namespace Websilk.Services
             var reader = new SqlReader(S, "EXEC GetDocumentation");
             while (reader.Read())
             {
-                path = S.Server.MapPath("App/Support/" + reader.Get("path") + ".html");
+                path = S.Server.MapPath("/Support/" + reader.Get("path") + ".html");
                 if (File.Exists(path))
                 {
                     file = File.ReadAllText(path);
@@ -238,7 +240,7 @@ namespace Websilk.Services
                 }
 
             }
-            response.html = "Indexed " + totalwords.ToString() + " words in " + totalfiles.ToString() + " html files located in App/Support/";
+            response.html = "Indexed " + totalwords.ToString() + " words in " + totalfiles.ToString() + " html files located in /Support/";
             return response;
         }
     }

@@ -1,4 +1,6 @@
-﻿S.editor.components = {
+﻿var test = false;
+
+S.editor.components = {
     hovered: null, selected: null, 
     // the list of components loaded within the component window /////////////////////////////////////////////////
     list: { 
@@ -94,9 +96,6 @@
                 this.elem.resize[elem].on('mousedown', function (e) {
                     S.editor.components.select.resize.start.call(S.editor.components.select.resize, e);
                 });
-                this.elem.resize[elem].on('mouseup', function (e) {
-                    S.editor.components.select.resize.end.call(S.editor.components.select.resize, e);
-                });
             }
         },
 
@@ -114,22 +113,29 @@
         },
 
         resize: {
-            timer: null, bar: null, type: 0, start: null, cursor: null, box: null,
+            timer: null, bar: null, type: 0, cursorstart: null, cursor: null, box: null,
+
             start: function (e) {
+                //disable text selection
+                e.stopPropagation();
+                e.cancelBubble = true;
+                e.preventDefault();
+
                 //get resize bar
-                var bar = $(e.target);
+                var bar = $(e.target),
+                    c = S.editor.components.selected;
                 if (!bar.hasClass('resize')) {
                     bar = bar.parents('.resize');
                     if (bar.length == 0) { return; }
                 }
                 this.bar = bar;
-                this.start = {
+                this.cursorstart = {
                     x: e.clientX + document.body.scrollLeft,
                     y: e.clientY + document.body.scrollTop
                 };
                 this.box = {
-                    width: bar.width(),
-                    height: bar.height()
+                    width: c.width(),
+                    height: c.height(),
                 }
 
                 //get bar type (4 sides, 4 corners)
@@ -151,11 +157,10 @@
                     this.type = 8;
                 }
 
-                //initialize mouse move event
+                //initialize mouse move & mouse up events for document
                 var r = S.editor.components.select.resize;
-                bar.on('mousemove', function (e) {
-                    r.move.call(r, e);
-                });
+                $(document).on('mousemove', r.mousemove);
+                $(document).on('mouseup', r.mouseup);
 
                 //start intervals
                 if (this.timer != null) { clearInterval(this.timer); }
@@ -165,51 +170,69 @@
                 
             },
 
-            move: function(e){
-                this.cursor = {
+            mousemove: function (e) {
+                //track mouse movements
+                S.editor.components.select.resize.cursor = {
                     x: e.clientX + document.body.scrollLeft,
                     y: e.clientY + document.body.scrollTop
                 };
             },
 
-            go: function(){
+            go: function () {
                 //resize component based on resize bar drag position
+                if (this.cursor == null) { return; }
+                var x = this.cursor.x - this.cursorstart.x,
+                    y = this.cursor.y - this.cursorstart.y,
+                    c = S.editor.components.selected,
+                    w = this.box.width, h = this.box.height;
+
                 switch (this.type) {
                     case 1: //top
-
+                        h = this.box.height + y;
                         break;
                     case 2: //top-right
-
+                        w = this.box.width + (x * 2);
+                        h = this.box.height + y;
                         break;
                     case 3: //right
-
+                        w = this.box.width + (x * 2);
                         break;
                     case 4: //bottom-right
-
+                        w = this.box.width + (x * 2);
+                        h = this.box.height + y;
                         break;
                     case 5: //bottom
-
+                        h = this.box.height + y;
                         break;
                     case 6: //bottom-left
-
+                        w = this.box.width + (x * 2);
+                        h = this.box.height + y;
                         break;
                     case 7: //left
-
+                        w = this.box.width + (x * 2);
                         break;
                     case 8: //top-left
-
+                        w = this.box.width + (x * 2);
+                        h = this.box.height + y;
                         break;
                 }
+
+                S.editor.debugger.show(x + ', ' + y + ', ' + w + ', ' + h);
+
+                c.css({ maxWidth: w, maxHeight: h });
+                S.editor.components.select.refresh();
             },
 
-            end: function () {
+            mouseup: function (e) {
                 //stop resizing
-                if (this.timer != null) { clearInterval(this.timer); }
-                this.bar.off('mousemove');
-                this.bar = null;
-                this.type = null;
-                this.timer = null;
-            }
+                var self = S.editor.components.select.resize;
+                if (self.timer != null) { clearInterval(self.timer); }
+                $(document).off('mousemove', self.mousemove);
+                $(document).off('mouseup', self.mouseup);
+                self.bar = null;
+                self.type = null;
+                self.timer = null;
+            },
         },
 
         refresh: function () {
@@ -527,7 +550,7 @@
             }
         },
 
-        getCell(e){
+        getCell: function(e){
             var pof = e.offset();
             var pdim = { width: e.width(), height: e.height() };
 
@@ -648,7 +671,6 @@
         displayComponentLine: function (elem, drop, left, top, height) {
             //display a dotted line to show where the new component 
             //will be dropped (between two components on the page)
-            var div = $('.editor > .temp > .compline');
             if ($('.editor > .temp > .compline').length == 0) {
                 var div = document.createElement('div');
                 div.className = "compline";
@@ -659,6 +681,7 @@
                 $('.editor > .temp > .compline').remove();
                 $('.editor > .temp').append(div);
             } else {
+                var div = $('.editor > .temp > .compline');
                 div.css({ top: top, left: left, height: height });
             }
             this.component = elem;

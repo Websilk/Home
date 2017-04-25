@@ -1,7 +1,7 @@
-﻿S.editor.save = { 
+﻿S.editor.save = {
     cache: [], _changes: false,
 
-    hasChanges: function(has){
+    hasChanges: function (has) {
         if (has === true) {
             this._changes = true;
             this.enable();
@@ -46,4 +46,4 @@
             });
         }
     }
-}
+};

@@ -78,7 +78,7 @@
                 'titlebar': win.hasTitleBar,
                 'can-maximize': win.canMaximize,
                 'can-close': win.canClose,
-                'html':win.html
+                'html': win.html
             });
             div.innerHTML = scaffold.render();
             win.elem = div;
@@ -182,7 +182,7 @@
         }
     },
 
-    reposition: function (id){
+    reposition: function (id) {
         var win = this.items[id];
 
         if (win.alignTarget == 'window') {
@@ -206,7 +206,7 @@
             target.pos = pos;
 
             //get alignment for target
-            if(elem.length == 1){
+            if (elem.length == 1) {
                 switch (win.alignTo) {
                     case 'top-center':
                         target.x = pos.width / 2;
@@ -260,7 +260,7 @@
                 }
 
                 //realign arrow
-                if(win.hasArrow){
+                if (win.hasArrow) {
                     switch (win.alignAt) {
                         case 'bottom-left': case 'bottom-center': case 'bottom-right':
                             arrow.elem.css({ top: pos.height });
@@ -294,7 +294,7 @@
     },
 
     click: function (target, type) {
-        if ($(target).parents('.menu').parents('.toolbar').length > 0) { return;}
+        if ($(target).parents('.menu').parents('.toolbar').length > 0) { return; }
         if (type != 'window') {
             for (var id in this.items) {
                 if (this.items[id].isDialog) {
@@ -329,6 +329,4 @@
             if (win.isDialog) { $(win.elem).hide(); }
         }
     }
-
-
-}
+};

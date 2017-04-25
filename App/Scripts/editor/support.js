@@ -19,7 +19,7 @@
         S.editor.support.load('Get', { page: name });
     },
 
-    load(action, data) {
+    load: function(action, data) {
         if ($('#winDocumentation').length == 0) {
             S.editor.window.load('Documentation', {
                 left: 0,

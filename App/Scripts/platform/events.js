@@ -348,7 +348,7 @@
 
     images: {
         load: function () {
-            imgs = $('img[src!=""]');
+            imgs = $('img:not([src=""])');
             if (!imgs.length) { S.events.images.complete(); return; }
             var df = [];
             imgs.each(function () {

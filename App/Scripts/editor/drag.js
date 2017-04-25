@@ -1,12 +1,12 @@
 ﻿S.drag = {
-    items: [], timer: null, 
-    
-    item:{
+    items: [], timer: null,
+
+    item: {
         index: null,
         elem: null,
         win: { w: 0, h: 0, scrollx: 0, scrolly: 0 },
-        pos: { x: 0, y: 0, w:0, h:0 },
-        start:{ x: 0, y: 0 },
+        pos: { x: 0, y: 0, w: 0, h: 0 },
+        start: { x: 0, y: 0 },
         cursor: { x: 0, y: 0 },
         options: null,
         hasOnDrag: false
@@ -19,9 +19,9 @@
         $(elem).on('mousedown', function (e) { S.drag.events.start.call(S.drag, x, e) });
     },
 
-    has: function (elem){
+    has: function (elem) {
         this.items.forEach(function (item) {
-            if (item.elem == elem) { return true;}
+            if (item.elem == elem) { return true; }
         });
         return false;
     },
@@ -49,21 +49,21 @@
             }
 
             this.item = {
-                index:index,
+                index: index,
                 elem: item.dragElem,
-                win:{
+                win: {
                     w: win.width(),
                     h: win.height()
                 },
-                start:{
+                start: {
                     x: e.clientX + document.body.scrollLeft,
                     y: e.clientY + document.body.scrollTop
                 },
-                cursor:{
+                cursor: {
                     x: e.clientX + document.body.scrollLeft,
                     y: e.clientY + document.body.scrollTop
                 },
-                pos:{
+                pos: {
                     x: pos.left,
                     y: pos.top,
                     w: elem.width(),
@@ -89,12 +89,12 @@
             return false;
         },
 
-        doc:{
+        doc: {
             move: function (e) { S.drag.events.mouse.call(S.drag, e); },
             up: function (e) { S.drag.events.stop.call(S.drag) }
         },
 
-        mouse: function(e){
+        mouse: function (e) {
             this.item.cursor.x = e.clientX + document.body.scrollLeft;
             this.item.cursor.y = e.clientY + document.body.scrollTop;
         },
@@ -132,4 +132,4 @@
             }
         }
     }
-}
+};

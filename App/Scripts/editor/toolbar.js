@@ -20,4 +20,4 @@
             $('.editor .toolbar .right-side').show();
         }
     }
-}
+};

@@ -15,7 +15,7 @@
 
         //display layout area outlines
         this.outlines.create();
-        
+
         //setup button events for area options
         $('.layout-area .btn-change a').on('click', S.editor.layout.change.dialog);
         $('.layout-area .btn-add a').on('click', S.editor.layout.add.dialog);
@@ -28,7 +28,7 @@
         //hide layout editor
         S.editor.toolbar.dialog.hide();
         //hide layout area outlines
-        if (S.editor.layout.outlines){
+        if (S.editor.layout.outlines) {
             S.editor.layout.outlines.remove();
         }
         //remove window resize event
@@ -36,7 +36,7 @@
     },
 
     outlines: {
-        areas:null,
+        areas: null,
         create: function () {
             //display outline around all layout panels 
             this.areas = $('.is-panel.is-block');
@@ -64,7 +64,7 @@
                 index = area.index();
                 total = area.parent().children().length;
                 ispagelvl = area.attr('data-page-level') === 'true';
-                div.id = 'area_' + id.replace('panel_','');
+                div.id = 'area_' + id.replace('panel_', '');
                 div.className = 'layout-area';
                 opts = {
                     'area-name': '<b>' + area.attr('data-area') + '</b> Area',
@@ -86,7 +86,7 @@
                     //block is a page-level block and cannot be removed
                     d.find('.btn-change, .btn-remove, .sort-btns').hide();
                 }
-                if (index == 0) { d.find('.btn-sort-up').css({ opacity: 0.3, cursor:'default' }).addClass('disabled'); }
+                if (index == 0) { d.find('.btn-sort-up').css({ opacity: 0.3, cursor: 'default' }).addClass('disabled'); }
                 if (index == total - 1) { d.find('.btn-sort-down').css({ opacity: 0.3, cursor: 'default' }).addClass('disabled'); }
                 d.css({ left: pos.left, top: pos.top, width: pos.width, height: pos.height });
                 tmp.append(div);
@@ -114,7 +114,7 @@
     },
 
     block: {
-        list: function(){
+        list: function () {
             //get a list of existing blocks
         }
     },
@@ -127,13 +127,13 @@
             var opt = $(this).parents('.options');
             var id = opt.attr('data-id');
             var area = opt.attr('data-area');
-            var index = $('#' + id).index()+1;
+            var index = $('#' + id).index() + 1;
             var scaffold = new S.scaffold($('#template_layout_addblock').html(), {
                 id: id, area: area, index: index
             });
             var options = {
                 offsetTop: '25%',
-                width:300
+                width: 300
             };
             S.popup.show(changeOnly === true ? 'Change Existing Block' : 'Add Block', scaffold.render(), options);
 
@@ -152,7 +152,7 @@
             $('.popup .btn-done a').on('click', S.editor.layout.add.save);
         },
 
-        blockList:{
+        blockList: {
             change: function () {
                 if ($('#block_list').val() == '0') {
                     //show New Block fields
@@ -175,7 +175,7 @@
                 blockId: $('#block_list').val(),
                 name: $('#block_name').val(),
                 insertAt: index,
-                area:area
+                area: area
             }
 
             //validate
@@ -242,15 +242,15 @@
     },
 
     sort: {
-        up: function(){
+        up: function () {
             S.editor.layout.sort.direction.call(this, 'up');
         },
 
-        down: function(){
+        down: function () {
             S.editor.layout.sort.direction.call(this, 'down');
         },
 
-        direction: function(dir){
+        direction: function (dir) {
             var opt = $(this).parents('.options');
             var blockid = opt.attr('data-block-id');
             var id = opt.attr('data-id');
@@ -308,7 +308,7 @@
     },
 
     change: {
-        dialog: function(){
+        dialog: function () {
             //show a list of blocks the user can select from 
             //with the option to create a new block
             S.editor.layout.add.dialog.call(this, true);
@@ -322,4 +322,4 @@
 
     }
 
-}
+};

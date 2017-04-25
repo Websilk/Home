@@ -27,7 +27,7 @@
         S.editor.window.load('Dashboard', {
             left: 0, top: 0, width: 300, height: 100, title: '', html: $('#template_dashboard').html(),
             alignTarget: this, alignTo: 'bottom-center', alignAt: 'top-center', alignPadding: 15, hasArrow: true,
-            hasTitleBar: false, canDrag: false, isMenu: true, autoHide: true, 
+            hasTitleBar: false, canDrag: false, isMenu: true, autoHide: true,
             onLoad: function () {
                 //set up dashboard model window button events
                 S.editor.dashboard.init();
@@ -69,6 +69,6 @@
     $(document.body).on('click', function (e) { S.events.doc.click.trigger(e.target); });
     S.events.doc.click.callback.add($('.editor .component-select').get(), function (target, type) { S.editor.components.click(target, type); });
     S.events.doc.click.callback.add($('.editor .windows').get(), function (target, type) { S.editor.window.click(target, type); });
-}
+};
 
 S.editor.init();

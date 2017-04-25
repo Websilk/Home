@@ -10,10 +10,10 @@
 
     end: function () {
         S.editor.resize.run();
-    }, 
-    
+    },
+
     run: function () {
         S.editor.components.select.refresh();
         S.editor.window.repositionAll();
     }
-}
+};

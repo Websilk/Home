@@ -8,7 +8,7 @@
     //set up window resize event
     S.events.doc.resize.callback.add('editor', S.editor.resize.start, S.editor.resize.go, S.editor.resize.end);
     S.editor.resize.run();
-}
+};
 
 S.editor.hide = function () {
     $('.editor > .fixed, .component-select, .component-hover').hide();
@@ -21,5 +21,5 @@ S.editor.hide = function () {
     S.popup.hide();
     //remove window resize event
     S.events.doc.resize.callback.remove('editor');
-}
+};
 

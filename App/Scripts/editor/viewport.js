@@ -27,7 +27,7 @@
             }
         }
     });
-}
+};
 
 S.viewport.view = function (level) {
     //hide selected components
@@ -42,7 +42,7 @@ S.viewport.view = function (level) {
     S.viewport.isChanging = false;
     S.viewport.levelChanged(level)
     S.viewport.isChanging = true;
-}
+};
 
 S.viewport.levelChanged = function (level) {
     if (S.viewport.isChanging == true) { return; }
@@ -66,7 +66,7 @@ S.viewport.levelChanged = function (level) {
 
     }
     $('.toolbar .menu .screens use').attr('xlink:href', '#icon-screen' + ext)
-}
+};
 
 S.viewport.next = function () {
     if (S.editor.enabled == false) { return; }
@@ -76,7 +76,7 @@ S.viewport.next = function () {
     }
     var next = sizeIndex > 0 ? sizeIndex - 1 : 4;
     S.viewport.view(next);
-}
+};
 
 S.viewport.previous = function () {
     if (S.editor.enabled == false) { return; }
@@ -86,7 +86,7 @@ S.viewport.previous = function () {
     }
     var prev = sizeIndex < 4 ? sizeIndex + 1 : 0;
     S.viewport.view(prev);
-}
+};
 
 S.viewport.getLevelOrder = function () {
     this.getLevel();
@@ -103,4 +103,4 @@ S.viewport.getLevelOrder = function () {
         case 4:
             return [4, 3, 2, 1, 0];
     }
-}
+};

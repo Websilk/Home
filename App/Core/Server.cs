@@ -86,13 +86,17 @@ namespace Websilk
         /// <returns></returns>
         public string LoadFileFromCache(string filename, bool noDevEnvCache = false, bool noCache = false)
         {
-            if (Cache.ContainsKey(filename) && (environment != enumEnvironment.development || noDevEnvCache == false) && noCache == false) {
-                return (string)Cache[filename];
+            if((environment != enumEnvironment.development || noDevEnvCache == false) && noCache == false)
+            {
+                if (Cache.ContainsKey(filename))
+                {
+                    return (string)Cache[filename];
+                }
             }
             if (File.Exists(MapPath(filename)))
             {
                 var file = File.ReadAllText(MapPath(filename));
-                if(environment != enumEnvironment.development)
+                if(environment != enumEnvironment.development && noCache == false)
                 {
                     Cache.Add(filename, file);
                 }

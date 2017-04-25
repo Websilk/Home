@@ -6,14 +6,14 @@
 *.user
 *.sln.docstates
 
-/config.json
-/wwwroot/css/
-/wwwroot/js/
-/wwwroot/content/themes/default/
-/wwwroot/content/websites/
-/wwwroot/images/screenshots/
-/wwwroot/images/workflow/
-/Vendor/
+/App/config.json
+/App/wwwroot/css/
+/App/wwwroot/js/
+/App/wwwroot/content/themes/default/
+/App/wwwroot/content/websites/
+/App/wwwroot/images/screenshots/
+/App/wwwroot/images/workflow/
+/App/Vendor/
 /App/Content/websites/
 
 *.bak

@@ -2,15 +2,12 @@
 
 //includes
 var gulp = require('gulp'),
-    rimraf = require('gulp-rimraf'),
     concat = require('gulp-concat'),
-    cssmin = require('gulp-cssmin'),
     uglify = require('gulp-uglify'),
+    compile = require('google-closure-compiler-js').gulp(),
     cleancss = require('gulp-clean-css'),
-    util = require('gulp-util'),
     less = require('gulp-less'),
     rename = require('gulp-rename'),
-    wait = require('gulp-wait'),
     merge = require('merge-stream'),
     config = require('./App/config.json');
     
@@ -41,7 +38,7 @@ var paths = {
 paths.working = {
     js: {
         platform: [
-            paths.scripts + 'selector/selector.js',
+            paths.webroot + 'js/selector.js',
             paths.scripts + 'core/velocity.min.js',
             paths.scripts + 'core/platform.js',
             paths.scripts + 'platform/[^_]*.js',
@@ -117,7 +114,7 @@ gulp.task('js:app', function () {
     return p.pipe(gulp.dest(paths.compiled.js, { overwrite: true }));
 });
 
-gulp.task('js:platform', function () {
+gulp.task('js:platform', ['js:selector'], function () {
     var p = gulp.src(paths.working.js.platform, { base: '.' })
         .pipe(concat(paths.compiled.platform));
     if (prod == true) { p = p.pipe(uglify()); }
@@ -127,7 +124,16 @@ gulp.task('js:platform', function () {
 gulp.task('js:selector', function () {
     var p = gulp.src(paths.scripts + 'selector/selector.js', { base: '.' })
             .pipe(concat('selector.js'));
-    if (prod == true) { p = p.pipe(uglify()); }
+    if (prod == true) { 
+        //p = p
+        //    .pipe(compile({
+        //        compilationLevel: 'SIMPLE',
+        //        warningLevel: 'VERBOSE',
+        //        jsOutputFile: 'selector.js',  // outputs single file
+        //        createSourceMap: true
+        //    }));
+        p = p.pipe(uglify());
+    }
     return p.pipe(gulp.dest(paths.compiled.js, { overwrite: true }));
 });
 

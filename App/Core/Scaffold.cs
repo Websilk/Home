@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using Newtonsoft.Json;
 
@@ -26,6 +27,7 @@ namespace Websilk
         
         public Dictionary<string, string> Data;
         public List<structScaffoldElement> elements;
+        public string serializedElements;
         
         public Scaffold(Core WebsilkCore, string file = "", string html = "", string section = "")
         {
@@ -121,6 +123,7 @@ namespace Websilk
                 Data = scaffold.Data;
                 elements = scaffold.elements;
             }
+            serializedElements = S.Util.Serializer.WriteObjectAsString(elements);
         }
 
         public string Render()
@@ -130,7 +133,10 @@ namespace Websilk
 
         public string Render(Dictionary<string, string> nData)
         {
-            if (elements.Count > 0)
+            //deserialize list of elements since we will be manipulating the list,
+            //so we don't want to permanently mutate the public elements array
+            var elems = (List<structScaffoldElement>)S.Util.Serializer.ReadObject(serializedElements, typeof(List<structScaffoldElement>));
+            if (elems.Count > 0)
             {
                 //render scaffold with paired nData data
                 var scaff = new StringBuilder();
@@ -139,26 +145,26 @@ namespace Websilk
                 var closing = new List<List<string>>();
 
                 //remove any unwanted blocks of HTML from scaffold
-                for (var x = 0; x < elements.Count; x++)
+                for (var x = 0; x < elems.Count; x++)
                 {
-                    if (x < elements.Count - 1)
+                    if (x < elems.Count - 1)
                     {
-                        for (var y = x + 1; y < elements.Count; y++)
+                        for (var y = x + 1; y < elems.Count; y++)
                         {
                             //check for closing tag
-                            if (elements[y].name == "/" + elements[x].name)
+                            if (elems[y].name == "/" + elems[x].name)
                             {
                                 //add enclosed group of HTML to list for removing
                                 List<string> closed = new List<string>();
-                                closed.Add(elements[x].name);
+                                closed.Add(elems[x].name);
                                 closed.Add(x.ToString());
                                 closed.Add(y.ToString());
 
-                                if (nData.ContainsKey(elements[x].name) == true)
+                                if (nData.ContainsKey(elems[x].name) == true)
                                 {
                                     //check if user wants to include HTML 
                                     //that is between start & closing tag   
-                                    s = nData[elements[x].name];
+                                    s = nData[elems[x].name];
                                     if (string.IsNullOrEmpty(s) == true) { s = ""; }
                                     if (s == "true" | s == "1")
                                     {
@@ -199,36 +205,36 @@ namespace Websilk
                 int offset = 0;
                 for (int z = 0; z < removeIndexes.Count; z++)
                 {
-                    elements.RemoveAt(removeIndexes[z] - offset);
+                    elems.RemoveAt(removeIndexes[z] - offset);
                     offset += 1;
                 }
 
                 //finally, replace scaffold variables with custom data
-                for (var x = 0; x < elements.Count; x++)
+                for (var x = 0; x < elems.Count; x++)
                 {
                     //check if scaffold item is an enclosing tag or just a variable
                     useScaffold = true;
-                    if (elements[x].name.IndexOf('/') < 0)
+                    if (elems[x].name.IndexOf('/') < 0)
                     {
                         for (int y = 0; y < closing.Count; y++)
                         {
-                            if (elements[x].name == closing[y][0]) { useScaffold = false; break; }
+                            if (elems[x].name == closing[y][0]) { useScaffold = false; break; }
                         }
                     }
                     else { useScaffold = false; }
 
-                    if ((nData.ContainsKey(elements[x].name) == true
-                    || elements[x].name.IndexOf('/') == 0) & useScaffold == true)
+                    if ((nData.ContainsKey(elems[x].name) == true
+                    || elems[x].name.IndexOf('/') == 0) & useScaffold == true)
                     {
                         //inject string into scaffold variable
-                        s = nData[elements[x].name.Replace("/", "")];
+                        s = nData[elems[x].name.Replace("/", "")];
                         if (string.IsNullOrEmpty(s) == true) { s = ""; }
-                        scaff.Append(s + elements[x].htm);
+                        scaff.Append(s + elems[x].htm);
                     }
                     else
                     {
                         //passively add htm, ignoring scaffold variable
-                        scaff.Append(elements[x].htm);
+                        scaff.Append(elems[x].htm);
                     }
                 }
 

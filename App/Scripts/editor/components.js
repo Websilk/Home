@@ -2,6 +2,16 @@
 
 S.editor.components = {
     hovered: null, selected: null, 
+
+    // update editor-related properties for a component //////////////////////////////////////////////////////////
+    update: function (id, resizeWidth, resizeHeight) {
+        var c = S.components.items.find(function (a) { return a.id == id; });
+        if (c != null) {
+            c.canResizeWidth = resizeWidth;
+            c.canResizeHeight = resizeHeight;
+        }
+    },
+
     // the list of components loaded within the component window /////////////////////////////////////////////////
     list: { 
         init: function(){
@@ -113,7 +123,7 @@ S.editor.components = {
         },
 
         resize: {
-            timer: null, bar: null, type: 0, cursorstart: null, cursor: null, box: null,
+            timer: null, bar: null, type: 0, cursorstart: null, cursor: null, box: null, component: null,
 
             start: function (e) {
                 //disable text selection
@@ -137,24 +147,52 @@ S.editor.components = {
                     width: c.width(),
                     height: c.height(),
                 }
+                this.component = S.components.items.find(function (a) { return a.id == c[0].id.substr(1); });
+                if (this.component.canResizeWidth == false && this.component.canResizeHeight == false) { return;}
 
                 //get bar type (4 sides, 4 corners)
                 if (bar.hasClass('r-top')) {
+                    if (this.component.canResizeHeight == false) { return;}
                     this.type = 1;
                 } else if (bar.hasClass('r-top-right') || bar.hasClass('r-right-top')) {
-                    this.type = 2;
+                    if (this.component.canResizeHeight == false) {
+                        this.type = 3;
+                    } else if (this.component.canResizeWidth == false) {
+                        this.type = 1;
+                    } else {
+                        this.type = 2;
+                    }
                 } else if (bar.hasClass('r-right')) {
                     this.type = 3;
                 } else if (bar.hasClass('r-right-bottom') || bar.hasClass('r-bottom-right')) {
-                    this.type = 4;
+                    if (this.component.canResizeHeight == false) {
+                        this.type = 3;
+                    } else if (this.component.canResizeWidth == false) {
+                        this.type = 5;
+                    } else {
+                        this.type = 4;
+                    }
                 } else if (bar.hasClass('r-bottom')) {
+                    if (this.component.canResizeHeight == false) { return; }
                     this.type = 5;
                 } else if (bar.hasClass('r-bottom-left') || bar.hasClass('r-left-bottom')) {
-                    this.type = 6;
+                    if (this.component.canResizeHeight == false) {
+                        this.type = 7;
+                    } else if (this.component.canResizeWidth == false) {
+                        this.type = 5;
+                    } else {
+                        this.type = 6;
+                    }
                 } else if (bar.hasClass('r-left')) {
                     this.type = 7;
                 } else if (bar.hasClass('r-left-top') || bar.hasClass('r-top-left')) {
-                    this.type = 8;
+                    if (this.component.canResizeHeight == false) {
+                        this.type = 7;
+                    } else if (this.component.canResizeWidth == false) {
+                        this.type = 1;
+                    } else {
+                        this.type = 8;
+                    }
                 }
 
                 //initialize mouse move & mouse up events for document
@@ -209,7 +247,7 @@ S.editor.components = {
                         h = this.box.height + y;
                         break;
                     case 7: //left
-                        w = this.box.width + (x * 2);
+                        w = this.box.width - (x * 2);
                         break;
                     case 8: //top-left
                         w = this.box.width + (x * 2);
@@ -219,7 +257,14 @@ S.editor.components = {
 
                 S.editor.debugger.show(x + ', ' + y + ', ' + w + ', ' + h);
 
-                c.css({ maxWidth: w, maxHeight: h });
+                if (this.component.canResizeWidth && this.component.canResizeHeight) {
+                    c.css({ maxWidth: w, maxHeight: h });
+                } else if (this.component.canResizeWidth) {
+                    c.css({ maxWidth: w });
+                } else if (this.component.canResizeHeight) {
+                    c.css({ maxHeight: h });
+                }
+                
                 S.editor.components.select.refresh();
             },
 

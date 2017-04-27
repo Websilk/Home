@@ -78,7 +78,7 @@ namespace Websilk
         public List<structPosition> position;
         public string css = "";
 
-        //resources attached to this component
+        //resources (js, js file, or css file) attached to this component
         [JsonIgnore]
         public List<string> resourcesForInstance;
         [JsonIgnore]
@@ -119,6 +119,18 @@ namespace Websilk
         public virtual int defaultWidth
         {
             get { return 320; }
+        }
+
+        [JsonIgnore]
+        public virtual bool canResizeWidth
+        {
+            get { return true; }
+        }
+
+        [JsonIgnore]
+        public virtual bool canResizeHeight
+        {
+            get { return false; }
         }
         #endregion
 
@@ -307,6 +319,14 @@ namespace Websilk
                 }
             }
             js.Append("]);");
+
+            if(Page.isEditable == true)
+            {
+                //add editor-related properties to component reference
+                js.Append("S.editor.components.update('" + id + "'," +
+                    (canResizeWidth ? "true" : "false") + "," +
+                    (canResizeHeight ? "true" : "false") + ");");
+            }
 
             //add component-type resource references to page (js & css)
             if(resourcesForComponentType != null)

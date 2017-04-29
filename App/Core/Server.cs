@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.IO;
+using Chroniton;
 
 namespace Websilk
 {
@@ -17,6 +19,13 @@ namespace Websilk
             production = 2
         }
 
+        private struct saveFile
+        {
+            public string file;
+            public string data;
+            public DateTime created;
+        }
+
         public string Version = "";
         // #.#.#.#.#.# =  years since github repo was created (10/22/2016) [#]
         //                current year, month, day of release [#.#.#]
@@ -24,7 +33,6 @@ namespace Websilk
 
         public Utility.Util Util = new Utility.Util();
         public enumEnvironment environment = enumEnvironment.development;
-        public bool https = false;
         public DateTime serverStart = DateTime.Now;
         public int requestCount = 0;
         public float requestTime = 0;
@@ -33,6 +41,7 @@ namespace Websilk
         public Random Random = new Random();
         public bool resetPass = false;
         public int bcrypt_workfactor = 10;
+        public int saveFileInterval = 20;
         private string _path = "";
 
 
@@ -46,10 +55,22 @@ namespace Websilk
         //         where data is injected in between each array item.
         public Dictionary<string, structScaffold> Scaffold = new Dictionary<string, structScaffold>();
 
+        //Scheduler that runs once every 1 minute
+        public Scheduler scheduleEveryMinute = new Scheduler();
+
+        //scheduler objects to check every 1 minute
+        private List<saveFile> scheduleSaveFiles = new List<saveFile>();
+
+        public Server()
+        {
+            //start 1 minute interval schedule
+            scheduleEveryMinute.Start(60, CheckScheduleEveryMinute);
+        }
+
         #region "System.UI.Web.Page.Server methods"
         public string path(string strPath = "")
         {
-            if(_path == "") { _path = Path.GetFullPath("project.json").Replace("project.json", ""); }
+            if(_path == "") { _path = Path.GetFullPath(".") + "\\"; }
             return _path + strPath.Replace("/", "\\");
         }
 
@@ -64,9 +85,10 @@ namespace Websilk
         {
             return Uri.EscapeDataString(strPath);
         }
-        
+
         #endregion
 
+        #region "Startup"
         public void CheckAdminPassword()
         {
             var Sql = new Sql(this, Util);
@@ -76,6 +98,7 @@ namespace Websilk
             }
             Sql.Close();
         }
+        #endregion
 
         #region "Cache"
         /// <summary>
@@ -113,6 +136,48 @@ namespace Websilk
             }else
             {
                 Cache.Add(key, value);
+            }
+        }
+        #endregion
+
+        #region "Scheduler"
+        private void CheckScheduleEveryMinute()
+        {
+            //check queue for files to save
+            if(scheduleSaveFiles.Count > 0)
+            {
+                foreach (var f in scheduleSaveFiles)
+                {
+                    if((f.created - DateTime.Now).TotalMinutes >= saveFileInterval)
+                    {
+                        if (!Directory.Exists(Path.GetFullPath(f.file)))
+                        {
+                            Directory.CreateDirectory(Path.GetFullPath(f.file));
+                        }
+                        File.WriteAllText(f.file, f.data);
+                        scheduleSaveFiles.Remove(f);            
+                    }
+                }
+            }
+        }
+
+        public void ScheduleSaveFile(string filePath, string data)
+        {
+            RemoveScheduledSaveFile(filePath);
+            scheduleSaveFiles.Add(new saveFile()
+            {
+                file = filePath,
+                data = data,
+                created = DateTime.Now
+            });
+        }
+
+        public void RemoveScheduledSaveFile(string filePath)
+        {
+            var i = scheduleSaveFiles.FindIndex(a => a.file == filePath);
+            if (i >= 0)
+            {
+                scheduleSaveFiles.RemoveAt(i);
             }
         }
         #endregion

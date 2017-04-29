@@ -1,6 +1,7 @@
 ﻿using System.IO;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.Configuration;
 
 namespace Websilk
 {
@@ -8,9 +9,14 @@ namespace Websilk
     {
         public static void Main(string[] args)
         {
+            var config = new ConfigurationBuilder()
+                    .SetBasePath(Directory.GetCurrentDirectory())
+                    .AddCommandLine(args)
+                    .Build();
+
             var host = new WebHostBuilder()
+                    .UseIISIntegration()
                     .UseKestrel()
-                    .UseUrls(new string[] { "http://localhost:7770"})
                     .UseContentRoot(Directory.GetCurrentDirectory())
                     .UseStartup<Startup>()
                     .Build();

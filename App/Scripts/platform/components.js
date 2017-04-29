@@ -2,12 +2,12 @@
     items: [],
     types: [],
 
-    add: function (id, name, refs) {
+    add: function (id, name, refs, position) {
         //add a component reference to the page
         //refs = array of DOM element id references that belong to the component instance
         if (!this.items.some(function (a) { a.id == id })) {
             //component is unique
-            this.items.push({ id: id, name: name, refs: refs });
+            this.items.push({ id: id, name: name, refs: refs, pos: position });
         }
     },
 

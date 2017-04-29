@@ -869,21 +869,13 @@ namespace Websilk
             S.Server.SaveToCache(path, serialize);
             if (saveToDisk == true)
             {
-                //save page to file system
-                if (File.Exists(S.Server.MapPath(path)) == false)
-                {
-                    Directory.CreateDirectory(S.Util.Str.getFolder(S.Server.MapPath(path)));
-                }
-                File.WriteAllText(S.Server.MapPath(path), serialize);
+                //schedule save to file system
+                S.Server.ScheduleSaveFile(S.Server.MapPath(path), serialize);
 
-                //save page to history on file system
+                //schedule save page to history on file system
                 var now = DateTime.Now;
                 var historyPath = GetPageFilePath(page.pageId, "history/" + now.ToString("yyyy"), now.ToString("MM_dd_H_mm"));
-                if (!Directory.Exists(S.Server.MapPath(S.Util.Str.getFolder(historyPath))))
-                {
-                    Directory.CreateDirectory(S.Server.MapPath(S.Util.Str.getFolder(historyPath)));
-                }
-                File.WriteAllText(S.Server.MapPath(historyPath), serialize);
+                S.Server.ScheduleSaveFile(S.Server.MapPath(historyPath), serialize);
             }
         }
 
@@ -898,22 +890,15 @@ namespace Websilk
             }
             var serialize = S.Util.Serializer.WriteObjectAsString(block, Formatting.None, TypeNameHandling.Auto, contractResolver);
             S.Server.SaveToCache(path, serialize);
-            if (saveToDisk == true) {
-                // save page to file system
-                if (File.Exists(S.Server.MapPath(path)) == false)
-                {
-                    Directory.CreateDirectory(S.Util.Str.getFolder(S.Server.MapPath(path)));
-                }
-                File.WriteAllText(S.Server.MapPath(path), serialize);
+            if (saveToDisk == true)
+            {
+                //schedule save block to file system
+                S.Server.ScheduleSaveFile(S.Server.MapPath(path), serialize);
 
-                //save page to history on file system
+                //schedule save block to history on file system
                 var now = DateTime.Now;
                 var historyPath = GetBlockFilePath(block.id, "history/" + now.ToString("yyyy"), now.ToString("MM_dd_H_mm"));
-                if (!Directory.Exists(S.Server.MapPath(S.Util.Str.getFolder(historyPath))))
-                {
-                    Directory.CreateDirectory(S.Server.MapPath(S.Util.Str.getFolder(historyPath)));
-                }
-                File.WriteAllText(S.Server.MapPath(historyPath), serialize);
+                S.Server.ScheduleSaveFile(S.Server.MapPath(historyPath), serialize);
             }
         }
         #endregion

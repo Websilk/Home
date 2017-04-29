@@ -35,7 +35,7 @@
     click: function () {
         if ($('.editor .toolbar .save-page').hasClass('saving nosave saved') == false) {
             var options = {};
-            options.save = JSON.stringify(this.cache);
+            options.changes = JSON.stringify(this.cache);
             this.cache = [];
             $('.editor .toolbar .save-page').addClass('saving');
             S.ajax.post("Editor/Page/SaveChanges", options, function () {

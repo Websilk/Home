@@ -16,73 +16,101 @@ namespace Websilk.Services.Editor
             GetPage();
             var tuple = page.loadPageAndLayout(page.pageId, true);
 
-            //load page layout scaffolding
-            var scaffold = tuple.Item1;
-
-            //load page from cache
+            //load page(s) from file/cache
             var newpage = tuple.Item3;
 
+            //load list of panels
+            var panels = tuple.Item4;
+
+            //get list of blocks
+            var blocks = page.GetBlocks(newpage);
+
+            //find existing component
+            var components = page.GetAllComponents(panels);
+
+            Websilk.Page.structBlock block;
+            Component component;
+
             //update existing components with json data changes, then save the page to memory & disk
-            JArray data = JsonConvert.DeserializeObject<JArray>(changes);
-            if (data != null)
+            JArray json = JsonConvert.DeserializeObject<JArray>(changes);
+            if (json != null)
             {
                 string id = "";
                 string type = "";
+                string[] str;
+                int level = -1;
+                JToken data;
                 
-                //process each change
-                foreach (JObject item in data)
+                //process each change within the JSON object
+                foreach (JObject item in json)
                 {
-                    //get info from JSON
                     id = (string)item["id"];
-                    type = (string)item["type"];
 
-
-                    //change is for a component
-                    switch (type)
+                    //find component & block reference
+                    component = null;
+                    foreach (var c in components)
                     {
-                        case "position":
-                            //update position data for a component
-                            //pages[pid].components[cid].position = (string)item["data"];
+                        //find target component
+                        if (c.id == id)
+                        {
+                            foreach (var b in blocks)
+                            {
+                                //find block that component belongs to
+                                if (b.id == c.blockId)
+                                {
+                                    //find target component within target block
+                                    foreach (var comp in b.components)
+                                    {
+                                        if (comp.id == id)
+                                        {
+                                            block = b;
+                                            component = comp;
+                                            break;
+                                        }
+                                    }
+                                    break;
+                                }
+                            }
                             break;
-
-                        case "arrange":
-                            //rearrange components within a panel
-                            var components = new List<Component>();
-
-                            //create new sorted list of components
-                            //foreach (string compid in item["data"].ToString().Split(','))
-                            //{
-                            //    foreach (var comp in pages[pageid].components)
-                            //    {
-                            //        if (comp.id == compid)
-                            //        {
-                            //            components.Add(comp);
-                            //        }
-                            //    }
-                            //}
-
-                            //TODO: replace old list of components with new list
-                            break;
+                        }
                     }
 
+                    if(component != null)
+                    {
+                        data = item["data"];
+                        type = (string)item["type"];
+                        str = type.Split(':');
+                        if (str.Length > 0) {
+                            type = str[0];
+                        }
+                        switch (type)
+                        {
+                            case "resize":
+                                //resize component
+                                level = int.Parse(str[1]);
+                                
+                                //pages[pid].components[cid].position = (string)item["data"];
 
+                                break;
+                        }
+                    }
                 }
             }
 
             //check all blocks for changes, then save changes to filesystem
             var savepage = false;
-            var blocks = page.GetBlocks(newpage);
-            foreach (var block in blocks)
+            blocks = page.GetBlocks(newpage);
+            foreach (var b in blocks)
             {
-                if (block.id == 0 && block.isPage == true && block.changed == true)
+                if (b.id == 0 && b.isPage == true && b.changed == true)
                 {
                     //save page
                     savepage = true;
                 }
-                else if (block.id > 0 && block.changed == true)
+                else if (b.id > 0 && b.changed == true)
                 {
                     //save block
-                    page.SaveBlock(block, true);
+                    page.SaveBlock(b, true);
                 }
             }
             if (savepage == true)

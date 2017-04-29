@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System;
+using System.Text;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 
@@ -119,18 +120,6 @@ namespace Websilk
         public virtual int defaultWidth
         {
             get { return 320; }
-        }
-
-        [JsonIgnore]
-        public virtual bool canResizeWidth
-        {
-            get { return true; }
-        }
-
-        [JsonIgnore]
-        public virtual bool canResizeHeight
-        {
-            get { return false; }
         }
         #endregion
 
@@ -318,18 +307,17 @@ namespace Websilk
                     js.Append((x > 0 ? "," : "") + "'" + resourcesForInstance[x] + "'");
                 }
             }
-            js.Append("]);");
+            js.Append("]");
 
             if(Page.isEditable == true)
             {
-                //add editor-related properties to component reference
-                js.Append("S.editor.components.update('" + id + "'," +
-                    (canResizeWidth ? "true" : "false") + "," +
-                    (canResizeHeight ? "true" : "false") + ");");
+                js.Append(", " + S.Util.Serializer.WriteObjectAsString(position));
             }
 
+            js.Append(");");
+
             //add component-type resource references to page (js & css)
-            if(resourcesForComponentType != null)
+            if (resourcesForComponentType != null)
             {
                 if (resourcesForComponentType.Count > 0)
                 {

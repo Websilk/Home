@@ -37,7 +37,7 @@
              
             if (err == false) {
                 //show success message
-                S.message.show(msg, '', 'Your password has been updated. Go ahead and <a href="javascript:window.location.reload()">Log In</a> with your new password');
+                window.location.reload();
             } else {
                 //show error message
                 S.message.show(msg, 'error', 'An error occurred while trying to update your password');
@@ -53,4 +53,9 @@
 //add event listeners
 $('#password, #password2').on('input', S.login.watchPass);
 $('#btnsavepass').on('click', S.login.savePass);
-$('.login form').on('submit', function (e) { S.login.savePass(); e.preventDefault(); return false; });
+$('.login form').on('submit', function (e) {
+    e.preventDefault();
+    e.cancelBubble = true;
+    S.login.savePass();
+    return false;
+});

@@ -4,6 +4,7 @@ using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using Newtonsoft.Json;
 
 namespace Websilk.Services
 {
@@ -127,7 +128,14 @@ namespace Websilk.Services
             page.pageId = P.pageId;
 
             //save page to file
-            S.Util.Serializer.SaveToFile(page, S.Server.MapPath("/Content/websites/" + P.websiteId + "/pages/" + P.pageId + "/page.json"), Newtonsoft.Json.Formatting.None);
+
+            var serialize = S.Util.Serializer.WriteObjectAsString(page, Formatting.None, TypeNameHandling.Auto, P.IgnorablePagePropertiesResolver());
+            var path = S.Server.MapPath("/Content/websites/" + P.websiteId + "/pages/" + P.pageId + "/");
+            if (!Directory.Exists(path))
+            {
+                Directory.CreateDirectory(path);
+            }
+            File.WriteAllText(path + "page.json", serialize);
         }
 
         public WebRequest Documentation()

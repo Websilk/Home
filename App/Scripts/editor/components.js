@@ -288,12 +288,12 @@ S.editor.components = {
 
                 //save component position
                 var pos = {};
-                if (self.component.canResizeWidth && self.component.canResizeHeight) {
-                    pos = { maxWidth: w, maxHeight: h };
-                } else if (self.component.canResizeWidth) {
-                    pos = { maxWidth: w };
-                } else if (self.component.canResizeHeight) {
-                    pos = { maxHeight: h };
+                if (self.pos.widthType <= 1 && self.pos.heightType == 0) {
+                    pos = { maxWidth: c.css('maxWidth').replace('px', ''), maxHeight: c.css('maxHeight').replace('px', '') };
+                } else if (self.pos.widthType <= 1) {
+                    pos = { maxWidth: c.css('maxWidth').replace('px', '') };
+                } else if (self.pos.heightType == 0) {
+                    pos = { maxHeight: c.css('maxHeight').replace('px', '') };
                 }
                 S.editor.save.add(self.component.id, 'resize:' + S.viewport.level, pos);
             },

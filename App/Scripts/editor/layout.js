@@ -113,12 +113,6 @@
 
     },
 
-    block: {
-        list: function () {
-            //get a list of existing blocks
-        }
-    },
-
     add: {
 
         dialog: function (changeOnly) {
@@ -154,7 +148,7 @@
 
         blockList: {
             change: function () {
-                if ($('#block_list').val() == '0') {
+                if ($('#block_list').val() == '') {
                     //show New Block fields
                     $('.add-new-block').removeClass('hide');
                 } else {
@@ -179,7 +173,7 @@
             }
 
             //validate
-            if (data.blockId == '0' && data.name == '') {
+            if (data.blockId == '' && data.name == '') {
                 //name required
                 return false;
             }

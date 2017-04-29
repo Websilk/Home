@@ -1,30 +1,26 @@
-﻿DECLARE @restart bit = 1
+﻿DECLARE @restart bit = 0
 IF @restart = 1 BEGIN
 	/* Clear initial data (if you so desire) */
-	DELETE FROM components
-	DELETE FROM errorlog
-	DELETE FROM [log]
-	DELETE FROM loganalytics
-	DELETE FROM pagelayers
-	DELETE FROM pages
-	DELETE FROM passwordreset
-	DELETE FROM timeline
-	DELETE FROM users
-	DELETE FROM websites
-	DELETE FROM websitedomains
-	DELETE FROM websitesubdomains
-	DELETE FROM websitesecurity
-
-	ALTER SEQUENCE SequencePages
-	RESTART
-
-	ALTER SEQUENCE SequencePhotoFolders
-	RESTART
+	DECLARE @cursor CURSOR, @sql nvarchar(MAX)
+	SET @cursor = CURSOR FOR
+	SELECT
+	  'ALTER SEQUENCE '
+	+  QUOTENAME(schema_name(schema_id))
+	+  '.'
+	+  QUOTENAME(name)
+	+  ' RESTART WITH '
+	+  TRY_CONVERT(nvarchar(50),[start_value])
+	AS [QUERY]
+	FROM sys.sequences
+	OPEN @cursor
+	FETCH FROM @cursor INTO @sql
+	WHILE @@FETCH_STATUS = 0 BEGIN
+		EXEC sp_executesql @sql
+		FETCH FROM @cursor INTO @sql
+	END
+	CLOSE @cursor
+	DEALLOCATE @cursor
 	
-	ALTER SEQUENCE SequenceUsers
-	RESTART
-
-	ALTER SEQUENCE SequenceWebsites
-	RESTART
+	EXEC sp_MSForEachTable 'TRUNCATE TABLE ?'
 END
 

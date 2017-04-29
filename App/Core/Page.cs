@@ -39,7 +39,7 @@ namespace Websilk
         public struct structBlock
         {
             public string name;
-            public int id;
+            public string id;
             public bool isPage;
             public List<Component> components;
             public bool changed;
@@ -159,6 +159,10 @@ namespace Websilk
                         if(reader.Rows.Count > 0)
                         {
                             loadPageInfo(reader);
+                        }
+                        else
+                        {
+                            break;
                         }
                     }
                     else
@@ -325,6 +329,19 @@ namespace Websilk
             }
             else
             {
+                //check if website has been initialized yet
+                if(Url.path == "login")
+                {
+                    if (!S.Server.Cache.ContainsKey("init_website"))
+                    {
+                        //initialize new website
+                        S.Server.Cache.Add("init_website", 1);
+                        var test = new Services.Init(S);
+                        test.Website();
+                        S.Server.Cache.Remove("init_website");
+                        return loadPage();
+                    }
+                }
                 //initialize a new page
                 page = new structPage();
                 page.areas = new List<structArea>();
@@ -337,7 +354,7 @@ namespace Websilk
                     //load blocks associated with this page
                     for (var x = 0; x < area.blocks.Count; x++)
                     {
-                        if(area.blocks[x].isPage == false && area.blocks[x].id > 0)
+                        if(area.blocks[x].isPage == false && area.blocks[x].id.IndexOf("page_") < 0)
                         {
                             //external block
                             area.blocks[x] = loadBlock(area.blocks[x].id, fromCache);
@@ -399,7 +416,7 @@ namespace Websilk
                     //add page-level block to empty area
                     area.blocks.Add(new structBlock()
                     {
-                        id = 0,
+                        id = "page_" + area.name.ToLower(),
                         name = "Page " + S.Util.Str.Capitalize(area.name),
                         isPage = true,
                         components = new List<Component>()
@@ -569,17 +586,17 @@ namespace Websilk
         #endregion
 
         #region "Blocks"
-        public string GetBlockFilePath(int blockid = 0, string specialFolder = "", string blockType = "")
+        public string GetBlockFilePath(string blockid = "", string specialFolder = "", string blockType = "")
         {
 
             var path = "/Content/websites/" +
-                websiteId + "/blocks/" + blockid.ToString() + "/" +
+                websiteId + "/blocks/" + blockid + "/" +
                 (specialFolder != "" ? specialFolder + "/" : "") +
                 (blockType != "" ? blockType + "_" : "") + "block.json";
             return path;
         }
 
-        public structBlock loadBlock(int blockid, bool fromCache = true)
+        public structBlock loadBlock(string blockid, bool fromCache = true)
         {
             var block = new structBlock();
             var filename = GetBlockFilePath(blockid, editFolder, editType);
@@ -592,7 +609,7 @@ namespace Websilk
             {
                 //initialize new block & save to file
                 var sqlEditor = new SqlQueries.Editor(S);
-                var reader = sqlEditor.GetBlock(blockid);
+                var reader = sqlEditor.GetBlock(int.Parse(blockid));
                 if (reader.Read())
                 {
                     block.components = new List<Component>();
@@ -660,7 +677,7 @@ namespace Websilk
 
         #region "Panels"
 
-        public Panel CreatePanel(string id, string name, string area, int blockId, string blockName = "", bool isPageLevelBlock = false)
+        public Panel CreatePanel(string id, string name, string area, string blockId, string blockName = "", bool isPageLevelBlock = false)
         {
             var panel = new Panel(S, this, id, name, S.Util.Str.Capitalize(area.Replace("-", " ")), blockId, blockName, isPageLevelBlock);
             panel.cells = new List<Panel.structCell>();
@@ -815,7 +832,7 @@ namespace Websilk
         /// <param name="panel">instance of the panel which contains the cell instance</param>
         /// <param name="cell">panel cell instance to load the component into</param>
         /// <returns></returns>
-        public Component createNewComponent(string name, string panelId, string cellId, int blockId)
+        public Component createNewComponent(string name, string panelId, string cellId, string blockId)
         {
             //first, find component class by name
             string className = "Websilk.Components." + name;
@@ -855,50 +872,49 @@ namespace Websilk
         #endregion
 
         #region "Save"
+        public Utility.IgnorableContractResolver IgnorablePagePropertiesResolver(bool ignore = true)
+        {
+            //create contract resolver that removes ignored properties from an object before serializing the object
+            var contractResolver = new Utility.IgnorableContractResolver();
+            if(ignore == true)
+            {
+                contractResolver.Ignore(typeof(structBlock), "changed");
+            }
+            return contractResolver;
+        }
+
         public void SavePage(structPage page, bool saveToDisk = false)
         {
             StripCustomBlocks(page);
             var path = GetPageFilePath(page.pageId, editFolder, editType);
-            var contractResolver = new Utility.IgnorableContractResolver();
-            if (saveToDisk == true)
-            {
-                //ignore any properties that are used only for cached pages
-                contractResolver.Ignore(typeof(structBlock), "changed");
-            }
-            var serialize = S.Util.Serializer.WriteObjectAsString(page, Formatting.None, TypeNameHandling.Auto, contractResolver);
+            var serialize = S.Util.Serializer.WriteObjectAsString(page, Formatting.None, TypeNameHandling.Auto, IgnorablePagePropertiesResolver(saveToDisk));
             S.Server.SaveToCache(path, serialize);
             if (saveToDisk == true)
             {
                 //schedule save to file system
-                S.Server.ScheduleSaveFile(S.Server.MapPath(path), serialize);
+                S.Server.ScheduleEveryMinute.ScheduleSaveFile(S.Server.MapPath(path), serialize);
 
                 //schedule save page to history on file system
                 var now = DateTime.Now;
                 var historyPath = GetPageFilePath(page.pageId, "history/" + now.ToString("yyyy"), now.ToString("MM_dd_H_mm"));
-                S.Server.ScheduleSaveFile(S.Server.MapPath(historyPath), serialize);
+                S.Server.ScheduleEveryMinute.ScheduleSaveFile(S.Server.MapPath(historyPath), serialize);
             }
         }
 
         public void SaveBlock(structBlock block, bool saveToDisk = false)
         {
             var path = GetBlockFilePath(block.id, editFolder, editType);
-            var contractResolver = new Utility.IgnorableContractResolver();
-            if(saveToDisk == true)
-            {
-                //ignore any properties that are used only for cached blocks
-                contractResolver.Ignore(typeof(structBlock), "changed");
-            }
-            var serialize = S.Util.Serializer.WriteObjectAsString(block, Formatting.None, TypeNameHandling.Auto, contractResolver);
+            var serialize = S.Util.Serializer.WriteObjectAsString(block, Formatting.None, TypeNameHandling.Auto, IgnorablePagePropertiesResolver(saveToDisk));
             S.Server.SaveToCache(path, serialize);
             if (saveToDisk == true)
             {
                 //schedule save block to file system
-                S.Server.ScheduleSaveFile(S.Server.MapPath(path), serialize);
+                S.Server.ScheduleEveryMinute.ScheduleSaveFile(S.Server.MapPath(path), serialize);
 
                 //schedule save block to history on file system
                 var now = DateTime.Now;
                 var historyPath = GetBlockFilePath(block.id, "history/" + now.ToString("yyyy"), now.ToString("MM_dd_H_mm"));
-                S.Server.ScheduleSaveFile(S.Server.MapPath(historyPath), serialize);
+                S.Server.ScheduleEveryMinute.ScheduleSaveFile(S.Server.MapPath(historyPath), serialize);
             }
         }
         #endregion

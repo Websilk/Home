@@ -71,7 +71,7 @@ namespace Websilk
         public Page Page;
 
         public string id = ""; //unique ID
-        public int blockId = 0;
+        public string blockId = "";
         public string panelId = ""; //unique ID of panel this component belongs to
         public string panelCellId = ""; //unique ID of panel cell this component belongs to
 

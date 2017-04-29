@@ -28,7 +28,7 @@ namespace Websilk.Services.Editor
             //find existing component
             var components = page.GetAllComponents(panels);
 
-            Websilk.Page.structBlock block;
+            Websilk.Page.structBlock block = new Websilk.Page.structBlock();
             Component component;
 
             //update existing components with json data changes, then save the page to memory & disk
@@ -75,7 +75,7 @@ namespace Websilk.Services.Editor
                         }
                     }
 
-                    if(component != null)
+                    if(component != null && block.id != "")
                     {
                         data = item["data"];
                         type = (string)item["type"];
@@ -88,11 +88,22 @@ namespace Websilk.Services.Editor
                             case "resize":
                                 //resize component
                                 level = int.Parse(str[1]);
+                                var pos = component.position[level];
+                                foreach (JProperty child in data.Children<JProperty>())
+                                {
+                                    if(child.Name == "maxWidth")
+                                    {
+                                        pos.width = child.Value.ToObject<int>();
+                                    }
+                                }
+                                component.position[level] = pos;
+                                block.changed = true;
                                 
                                 //pages[pid].components[cid].position = (string)item["data"];
 
                                 break;
                         }
+                        page.UpdateBlock(ref newpage, block);
                     }
                 }
             }
@@ -102,12 +113,12 @@ namespace Websilk.Services.Editor
             blocks = page.GetBlocks(newpage);
             foreach (var b in blocks)
             {
-                if (b.id == 0 && b.isPage == true && b.changed == true)
+                if (b.id.IndexOf("page_") == 0 && b.isPage == true && b.changed == true)
                 {
                     //save page
                     savepage = true;
                 }
-                else if (b.id > 0 && b.changed == true)
+                else if (b.id.IndexOf("page_") < 0 && b.changed == true)
                 {
                     //save block
                     page.SaveBlock(b, true);
@@ -125,7 +136,7 @@ namespace Websilk.Services.Editor
         {
             var sql = new SqlQueries.Editor(S);
             var htm = new StringBuilder();
-            htm.Append("<option value=\"0\">[New Block]</option>");
+            htm.Append("<option value=\"\">[New Block]</option>");
             GetPage();
 
             //load layout list ////////////////////////////////////////////////////////////////
@@ -135,7 +146,7 @@ namespace Websilk.Services.Editor
                 var reader = sql.GetBlockList(page.websiteId, area.ToLower());
                 while (reader.Read())
                 {
-                    htm.Append("<option value=\"" + reader.GetInt("blockId") + "\">" +
+                    htm.Append("<option value=\"" + reader.Get("blockId") + "\">" +
                         S.Util.Str.Capitalize(reader.Get("name")) + "</option>");
                 }
                 S.Server.Cache["blocks-" + page.websiteId + '-' + area] = htm.ToString();
@@ -148,11 +159,11 @@ namespace Websilk.Services.Editor
             }
         }
 
-        public string AddBlock(int blockId, int insertAt, string name, string area, bool isPageLevelBlock = false, bool changeOnly = false)
+        public string AddBlock(string blockId, int insertAt, string name, string area, bool isPageLevelBlock = false, bool changeOnly = false)
         {
             GetPage();
             var sqlEditor = new SqlQueries.Editor(S);
-            if (blockId == 0 && name != "")
+            if (blockId == "" && name != "")
             {
                 if (sqlEditor.HasBlock(page.websiteId, name) == true){
                     return "exists";
@@ -179,16 +190,16 @@ namespace Websilk.Services.Editor
                 }
             }
 
-            var block = new Websilk.Page.structBlock() { id = 0 };
+            var block = new Websilk.Page.structBlock() { id = "" };
             for(var x = 0; x < newpage.areas.Count; x++)
             {
                 if (newpage.areas[x].name.ToLower() == area.ToLower())
                 {
                     //found matching area
-                    if(blockId == 0)
+                    if(blockId == "")
                     {
                         //create new block
-                        id = sqlEditor.CreateBlock(page.websiteId, area.ToLower(), name);
+                        id = sqlEditor.CreateBlock(page.websiteId, area.ToLower(), name).ToString();
                     }
                     block = page.loadBlock(id);
                     newpage.areas[x].blocks.Insert(insertAt, block);
@@ -200,15 +211,13 @@ namespace Websilk.Services.Editor
                     break;
                 }
             }
-            if(block.id > 0)
+            if(block.id.IndexOf("page_") < 0)
             {
                 //save changes to file
                 page.SavePage(newpage, true);
 
                 //reset cache for block list
                 S.Server.Cache.Remove("blocks-" + page.websiteId + '-' + area);
-
-                //finally, render new block onto the existing page
 
                 //load components into block-level panel
                 var panel = page.CreatePanel(block.name.Replace(" ", "_").ToLower(), block.name, area, block.id, block.name, block.isPage);
@@ -222,14 +231,14 @@ namespace Websilk.Services.Editor
             return "error";
         }
 
-        public string ChangeBlock(int blockId, int insertAt, string name, string area, bool isPageLevelBlock = false)
+        public string ChangeBlock(string blockId, int insertAt, string name, string area, bool isPageLevelBlock = false)
         {
             return AddBlock(blockId, insertAt, name, area, isPageLevelBlock = false, true);
         }
 
-        public string RemoveBlock(int blockId, string area)
+        public string RemoveBlock(string blockId, string area)
         {
-            if(blockId == 0) { return "error"; }
+            if(blockId.IndexOf("page_") == 0) { return "error"; }
             GetPage();
             var id = blockId;
             var tuple = page.loadPageAndLayout(page.pageId, true);
@@ -239,8 +248,7 @@ namespace Websilk.Services.Editor
 
             //load page(s) from file/cache
             var newpage = tuple.Item3;
-
-            var block = new Websilk.Page.structBlock() { id = 0 };
+            
             for (var x = 0; x < newpage.areas.Count; x++)
             {
                 if (newpage.areas[x].name.ToLower() == area.ToLower())
@@ -262,7 +270,7 @@ namespace Websilk.Services.Editor
             return "success";
         }
 
-        public string MoveBlock(int blockId, string area, int index, string direction)
+        public string MoveBlock(string blockId, string area, int index, string direction)
         {
             GetPage();
             var sqlEditor = new SqlQueries.Editor(S);
@@ -275,7 +283,7 @@ namespace Websilk.Services.Editor
             //load page(s) from file/cache
             var newpage = tuple.Item3;
 
-            var block = new Websilk.Page.structBlock() { id = 0 };
+            var block = new Websilk.Page.structBlock() { id = "" };
             for (var x = 0; x < newpage.areas.Count; x++)
             {
                 if (newpage.areas[x].name.ToLower() == area.ToLower())
@@ -288,7 +296,8 @@ namespace Websilk.Services.Editor
                             //found matching block
                             block = newpage.areas[x].blocks[y];
                             newpage.areas[x].blocks.Remove(newpage.areas[x].blocks[y]);
-                            if(direction == "up")
+
+                            if (direction == "up")
                             {
                                 newpage.areas[x].blocks.Insert(y - 1, block);
                             }
@@ -302,7 +311,7 @@ namespace Websilk.Services.Editor
                     break;
                 }
             }
-            if (block.id > 0)
+            if (block.id.IndexOf("page_") < 0)
             {
                 //save changes to file
                 page.SavePage(newpage, true);

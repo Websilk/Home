@@ -1,5 +1,6 @@
 ﻿using System.IO;
 using System.Text;
+using Newtonsoft.Json;
 
 
 namespace Websilk.Editor
@@ -64,12 +65,13 @@ namespace Websilk.Editor
                 layout_dialog.Data["layout-list"] = (string)S.Server.Cache["layout-options-" + page.websiteId];
             }
 
-            //check if in-memory page differs from page on drive
+            //check if in-memory page differs from either page on drive or page scheduled to be saved on drive
             var pagePath = page.GetPageFilePath(page.pageId, page.editFolder, page.editType);
-            if (File.Exists(S.Server.MapPath(pagePath)))
+            var absPath = S.Server.MapPath(pagePath);
+            if (File.Exists(absPath))
             {
-                var pageMem = S.Util.Serializer.WriteObjectAsString(page.loadPageAndLayout(page.pageId, true).Item3);
-                var pageDrive = S.Util.Serializer.WriteObjectAsString(page.loadPageAndLayout(page.pageId, true, false).Item3);
+                var pageMem = S.Util.Serializer.WriteObjectAsString(page.loadPageAndLayout(page.pageId, true), Formatting.None, TypeNameHandling.Auto, page.IgnorablePagePropertiesResolver());
+                var pageDrive = S.Util.Serializer.WriteObjectAsString(page.loadPageAndLayout(page.pageId, true, false), Formatting.None, TypeNameHandling.Auto, page.IgnorablePagePropertiesResolver());
                 if (pageMem != pageDrive)
                 {
                     //page data differs between page in-memory & page file(s) (including in-memory blocks & block files)

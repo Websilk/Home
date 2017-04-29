@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.IO;
-using Chroniton;
 
 namespace Websilk
 {
@@ -17,13 +16,6 @@ namespace Websilk
             development = 0,
             staging = 1,
             production = 2
-        }
-
-        private struct saveFile
-        {
-            public string file;
-            public string data;
-            public DateTime created;
         }
 
         public string Version = "";
@@ -41,7 +33,6 @@ namespace Websilk
         public Random Random = new Random();
         public bool resetPass = false;
         public int bcrypt_workfactor = 10;
-        public int saveFileInterval = 20;
         private string _path = "";
 
 
@@ -55,23 +46,16 @@ namespace Websilk
         //         where data is injected in between each array item.
         public Dictionary<string, structScaffold> Scaffold = new Dictionary<string, structScaffold>();
 
-        //Scheduler that runs once every 1 minute
-        public Scheduler scheduleEveryMinute = new Scheduler();
-
-        //scheduler objects to check every 1 minute
-        private List<saveFile> scheduleSaveFiles = new List<saveFile>();
-
-        public Server()
-        {
-            //start 1 minute interval schedule
-            scheduleEveryMinute.Start(60, CheckScheduleEveryMinute);
-        }
+        //schedule that runs once every minute
+        public Schedule.EveryMinute ScheduleEveryMinute = new Schedule.EveryMinute();
 
         #region "System.UI.Web.Page.Server methods"
         public string path(string strPath = "")
         {
-            if(_path == "") { _path = Path.GetFullPath(".") + "\\"; }
-            return _path + strPath.Replace("/", "\\");
+            if (_path == "") { _path = Path.GetFullPath(".") + "\\"; }
+            var str = strPath.Replace("/", "\\");
+            if (str.Substring(0, 1) == "\\") { str = str.Substring(1); }
+            return _path + str;
         }
 
         public string MapPath(string strPath = "") { return path(strPath); }
@@ -109,8 +93,15 @@ namespace Websilk
         /// <returns></returns>
         public string LoadFileFromCache(string filename, bool noDevEnvCache = false, bool noCache = false)
         {
-            if((environment != enumEnvironment.development || noDevEnvCache == false) && noCache == false)
+            //first, check scheduled save file list
+            if (ScheduleEveryMinute.HasScheduledSaveFile(MapPath(filename)))
             {
+                return ScheduleEveryMinute.GetScheduledSaveFileData(MapPath(filename));
+            }
+
+            if ((environment != enumEnvironment.development || noDevEnvCache == false) && noCache == false)
+            {
+                //next, check cache
                 if (Cache.ContainsKey(filename))
                 {
                     return (string)Cache[filename];
@@ -118,8 +109,9 @@ namespace Websilk
             }
             if (File.Exists(MapPath(filename)))
             {
+                //finally, check file system
                 var file = File.ReadAllText(MapPath(filename));
-                if(environment != enumEnvironment.development && noCache == false)
+                if (environment != enumEnvironment.development && noCache == false)
                 {
                     Cache.Add(filename, file);
                 }
@@ -133,55 +125,12 @@ namespace Websilk
             if (Cache.ContainsKey(key))
             {
                 Cache[key] = value;
-            }else
+            }
+            else
             {
                 Cache.Add(key, value);
             }
         }
         #endregion
-
-        #region "Scheduler"
-        private void CheckScheduleEveryMinute()
-        {
-            //check queue for files to save
-            if(scheduleSaveFiles.Count > 0)
-            {
-                foreach (var f in scheduleSaveFiles)
-                {
-                    if((f.created - DateTime.Now).TotalMinutes >= saveFileInterval)
-                    {
-                        if (!Directory.Exists(Path.GetFullPath(f.file)))
-                        {
-                            Directory.CreateDirectory(Path.GetFullPath(f.file));
-                        }
-                        File.WriteAllText(f.file, f.data);
-                        scheduleSaveFiles.Remove(f);            
-                    }
-                }
-            }
-        }
-
-        public void ScheduleSaveFile(string filePath, string data)
-        {
-            RemoveScheduledSaveFile(filePath);
-            scheduleSaveFiles.Add(new saveFile()
-            {
-                file = filePath,
-                data = data,
-                created = DateTime.Now
-            });
-        }
-
-        public void RemoveScheduledSaveFile(string filePath)
-        {
-            var i = scheduleSaveFiles.FindIndex(a => a.file == filePath);
-            if (i >= 0)
-            {
-                scheduleSaveFiles.RemoveAt(i);
-            }
-        }
-        #endregion
     }
-
-
 }

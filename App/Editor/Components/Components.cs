@@ -108,7 +108,7 @@ namespace Websilk.Services.Editor
                         newblock.changed = true;
                         page.UpdateBlock(ref newpage, newblock);
 
-                        if(panel.blockId == 0)
+                        if(panel.blockId.IndexOf("page_") == 0)
                         {
                             //save page-level block to page
                             page.SavePage(newpage);
@@ -189,7 +189,7 @@ namespace Websilk.Services.Editor
                                 page.UpdateBlock(ref newpage, newblock);
 
                                 //save page or block
-                                if (block.id == 0)
+                                if (block.id.IndexOf("page_") == 0)
                                 {
                                     //save page-level block to page
                                     page.SavePage(newpage);
@@ -257,7 +257,7 @@ namespace Websilk.Services.Editor
                             page.UpdateBlock(ref newpage, newblock);
 
                             //save page or block
-                            if (block.id == 0)
+                            if (block.id.IndexOf("page_") == 0)
                             {
                                 //save page-level block to page
                                 page.SavePage(newpage);

@@ -49,7 +49,7 @@ namespace Websilk
 
             server.sqlActive = config.GetSection("Data:Active").Value;
             server.sqlConnection = config.GetSection("Data:" + server.sqlActive).Value;
-            server.saveFileInterval = int.Parse(config.GetSection("Scheduler:saveFileInterval").Value);
+            server.ScheduleEveryMinute.saveFileInterval = int.Parse(config.GetSection("Scheduler:saveFileInterval").Value);
 
             var isdev = false;
             switch (config.GetSection("Environment").Value.ToLower())

@@ -88,7 +88,7 @@ namespace Websilk
 
         public string name = ""; //a human-readable name for reference only
         public string id = ""; //a unique ID
-        public int blockId = 0;
+        public string blockId = "";
         public bool isPageBlock = false;
         public string areaName = ""; //name of layout area this panel belongs to
         public string blockName = ""; //name of block section to load into
@@ -104,7 +104,7 @@ namespace Websilk
         [JsonIgnore]
         public string foot = "";
         
-        public Panel(Core WebsilkCore, Page page, string Id = "", string Name = "", string AreaName = "", int BlockId = 0, string BlockName = "", bool IsPageBlock = false)
+        public Panel(Core WebsilkCore, Page page, string Id = "", string Name = "", string AreaName = "", string BlockId = "", string BlockName = "", bool IsPageBlock = false)
         {
             S = WebsilkCore;
             id = Id;
@@ -161,7 +161,7 @@ namespace Websilk
                 {
                     div.Attributes.Add("data-area", areaName);
                     div.Attributes.Add("data-block", blockName);
-                    div.Attributes.Add("data-block-id", blockId.ToString());
+                    div.Attributes.Add("data-block-id", blockId);
                     if(isPageBlock == true)
                     {
                         div.Attributes.Add("data-page-level", "true");

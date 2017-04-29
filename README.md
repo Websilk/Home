@@ -1,18 +1,19 @@
 # Websilk
 #### An advanced web development platform
-Built upon the new ASP.NET Core framework, Websilk is a high-end, enterprise level web development platform with drag & drop design capabilities for web publishers along with a set of powerful class libraries for back-end developers.
+Built upon the new ASP.NET Core framework, Websilk is a high-end, enterprise-level web development platform with drag & drop design capabilities for web publishers along with a set of powerful C# class libraries for back-end developers.
 
 ### Installation
-1. In Visual Studio's Package Manager Console, do the following:
-* install node.js dependencies `npm install`
-* install submodules `git submodule update --init --recursive`
-* run initial gulp task `gulp default`
-2. Then, install the database by publishing the Sql project to Sql Server 2016
+1. Fork or clone from Github, then open `Websilk.sln` in Visual Studio
+2. In Visual Studio's Package Manager Console, do the following:
+    * install node.js dependencies: `npm install`
+    * install submodules: `git submodule update --init --recursive`
+    * run initial gulp task: `gulp default`
+2. Install the database by publishing the Sql project to Sql Server 2016. The default database name is `WebsilkDev`
 3. Press the play button in Visual Studio!
 
 
 ### How does Websilk work?
-Websilk uses a custom-built C# MVC framework along with simple HTML files that can contain scaffold (mustache) variables & sections. The goal behind this approach was to make Websilk fast & nimble, allowing HTML to be cached and easily rendered within a super light-weight MVC framework (instead of using Microsoft's MVC 5 + Razor).
+Websilk uses a custom-built C# MVC framework along with HTML files that can contain scaffold (mustache) variables & sections. The goal behind this approach was to make Websilk fast & nimble, allowing HTML to be cached and easily rendered within a super light-weight MVC framework (instead of using Microsoft's MVC 5 + Razor).
 
 ### How does the MVC framework handle requests?
 

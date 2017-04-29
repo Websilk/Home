@@ -123,7 +123,7 @@ S.editor.components = {
         },
 
         resize: {
-            timer: null, bar: null, type: 0, cursorstart: null, cursor: null, box: null, component: null,
+            timer: null, bar: null, type: 0, cursorstart: null, cursor: null, box: null, component: null, pos: null,
 
             start: function (e) {
                 //disable text selection
@@ -147,53 +147,59 @@ S.editor.components = {
                     width: c.width(),
                     height: c.height(),
                 }
-                this.component = S.components.items.find(function (a) { return a.id == c[0].id.substr(1); });
-                if (this.component.canResizeWidth == false && this.component.canResizeHeight == false) { return;}
 
+                //get component information
+                this.component = S.components.items.find(function (a) { return a.id == c[0].id.substr(1); });
+                var pos = this.component.pos[S.viewport.level];
+                if (pos.widthType > 1 && pos.heightType == 1) { return; }
+                
                 //get bar type (4 sides, 4 corners)
                 if (bar.hasClass('r-top')) {
-                    if (this.component.canResizeHeight == false) { return;}
+                    if (pos.heightType == 1) { return;}
                     this.type = 1;
                 } else if (bar.hasClass('r-top-right') || bar.hasClass('r-right-top')) {
-                    if (this.component.canResizeHeight == false) {
+                    if (pos.heightType == 1) {
                         this.type = 3;
-                    } else if (this.component.canResizeWidth == false) {
+                    } else if (pos.widthType > 1) {
                         this.type = 1;
                     } else {
                         this.type = 2;
                     }
                 } else if (bar.hasClass('r-right')) {
+                    if (pos.widthType > 1) { return; }
                     this.type = 3;
                 } else if (bar.hasClass('r-right-bottom') || bar.hasClass('r-bottom-right')) {
-                    if (this.component.canResizeHeight == false) {
+                    if (pos.heightType == 1) {
                         this.type = 3;
-                    } else if (this.component.canResizeWidth == false) {
+                    } else if (pos.widthType > 1) {
                         this.type = 5;
                     } else {
                         this.type = 4;
                     }
                 } else if (bar.hasClass('r-bottom')) {
-                    if (this.component.canResizeHeight == false) { return; }
+                    if (pos.heightType == 1) { return; }
                     this.type = 5;
                 } else if (bar.hasClass('r-bottom-left') || bar.hasClass('r-left-bottom')) {
-                    if (this.component.canResizeHeight == false) {
+                    if (pos.heightType == 1) {
                         this.type = 7;
-                    } else if (this.component.canResizeWidth == false) {
+                    } else if (pos.widthType > 1) {
                         this.type = 5;
                     } else {
                         this.type = 6;
                     }
                 } else if (bar.hasClass('r-left')) {
+                    if (pos.widthType > 1) { return; }
                     this.type = 7;
                 } else if (bar.hasClass('r-left-top') || bar.hasClass('r-top-left')) {
-                    if (this.component.canResizeHeight == false) {
+                    if (pos.heightType == 1) {
                         this.type = 7;
-                    } else if (this.component.canResizeWidth == false) {
+                    } else if (pos.widthType > 1) {
                         this.type = 1;
                     } else {
                         this.type = 8;
                     }
                 }
+                this.pos = pos;
 
                 //initialize mouse move & mouse up events for document
                 var r = S.editor.components.select.resize;
@@ -255,13 +261,14 @@ S.editor.components = {
                         break;
                 }
 
+
                 S.editor.debugger.show(x + ', ' + y + ', ' + w + ', ' + h);
 
-                if (this.component.canResizeWidth && this.component.canResizeHeight) {
+                if (this.pos.widthType == 0 && this.pos.heightType == 0) {
                     c.css({ maxWidth: w, maxHeight: h });
-                } else if (this.component.canResizeWidth) {
+                } else if (this.pos.widthType == 0) {
                     c.css({ maxWidth: w });
-                } else if (this.component.canResizeHeight) {
+                } else if (pos.heightType == 0) {
                     c.css({ maxHeight: h });
                 }
                 
@@ -270,13 +277,25 @@ S.editor.components = {
 
             mouseup: function (e) {
                 //stop resizing
-                var self = S.editor.components.select.resize;
+                var self = S.editor.components.select.resize,
+                    c = S.editor.components.selected;
                 if (self.timer != null) { clearInterval(self.timer); }
                 $(document).off('mousemove', self.mousemove);
                 $(document).off('mouseup', self.mouseup);
                 self.bar = null;
                 self.type = null;
                 self.timer = null;
+
+                //save component position
+                var pos = {};
+                if (self.component.canResizeWidth && self.component.canResizeHeight) {
+                    pos = { maxWidth: w, maxHeight: h };
+                } else if (self.component.canResizeWidth) {
+                    pos = { maxWidth: w };
+                } else if (self.component.canResizeHeight) {
+                    pos = { maxHeight: h };
+                }
+                S.editor.save.add(self.component.id, 'resize:' + S.viewport.level, pos);
             },
         },
 

@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
+using Chroniton;
 
 namespace Websilk
 {
@@ -16,6 +17,9 @@ namespace Websilk
         {
             services.AddDistributedMemoryCache();
             services.AddSession();
+
+            //add server-side scheduler service (like CRON jobs)
+            services.AddSingleton<ISingularity, Singularity>(serviceProvider => Singularity.Instance);
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
@@ -45,10 +49,10 @@ namespace Websilk
 
             server.sqlActive = config.GetSection("Data:Active").Value;
             server.sqlConnection = config.GetSection("Data:" + server.sqlActive).Value;
-            server.https = config.GetSection("https").Value.ToLower() == "true" ? true : false;
+            server.saveFileInterval = int.Parse(config.GetSection("Scheduler:saveFileInterval").Value);
 
             var isdev = false;
-            switch (config.GetSection("Environment").Value)
+            switch (config.GetSection("Environment").Value.ToLower())
             {
                 case "development": case "dev":
                     server.environment = Server.enumEnvironment.development;
@@ -176,23 +180,10 @@ namespace Websilk
         private void checkForConfig()
         {
             //generate a new config.json file
-            var configPath = Path.GetFullPath("project.json").Replace("project.json","config.json");
+            var configPath = Path.GetFullPath("config.json");
             if (!File.Exists(configPath))
             {
-                File.WriteAllText(configPath,
-                "{\n" +
-                "    \"environment\": \"development\",\n" +
-                "    \"https\": false,\n" +
-                "    \"data\": {\n" +
-                "        \"active\": \"SqlServerTrusted\",\n" +
-                "        \"SqlServerDev\": \"server=.\\\\SQL2014; database=WebsilkDev; user=WebsilkDev; password=development\",\n" +
-                "        \"SqlServerTrusted\": \"server=.\\\\SQL2014; database=WebsilkDev; Trusted_Connection=true\"\n" +
-                "    },\n" +
-                "    \"encryption\":{\n" +
-                "        \"bcrypt_work_factor\":\"10\"\n" +
-                "    }\n" +
-                "}\n"
-                );
+                File.WriteAllText(configPath, (new Tests.Config()).NewConfig());
             }
         }
     }

@@ -132,7 +132,7 @@ namespace Websilk
             string subDomain = "";
             string[] domains = GetDomainParts(url.host);
             string title = url.path;
-            SqlReader reader;
+            SqlReader reader = null;
 
             domain = domains[1];
             subDomain = domains[0];
@@ -144,6 +144,7 @@ namespace Websilk
                 //get page info from website domain name & page title
                 while (title != "")
                 {
+                    reader = null;
                     if (string.IsNullOrEmpty(subDomain))
                     {
                         //domain name & page title
@@ -151,18 +152,21 @@ namespace Websilk
                         if (S.Server.Cache.ContainsKey(cacheName))
                         {
                             reader = (SqlReader)S.Server.Cache[cacheName];
+                            if(reader.Rows.Count == 0) {
+                                reader = null;
+                                S.Server.Cache.Remove(cacheName);
+                            }
                         }
-                        else {
+                        if(reader == null) {
                             reader = sql.GetPageInfoFromDomainAndTitle(domain, title);
-                            S.Server.Cache.Add(cacheName, reader);
+                            if(reader.Rows.Count > 0)
+                            {
+                                S.Server.Cache.Add(cacheName, reader);
+                            }
                         }
                         if(reader.Rows.Count > 0)
                         {
                             loadPageInfo(reader);
-                        }
-                        else
-                        {
-                            break;
                         }
                     }
                     else

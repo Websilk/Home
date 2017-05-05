@@ -36,9 +36,9 @@ namespace Websilk.Schedule
             {
                 foreach (var f in scheduleSaveFiles)
                 {
-                    if ((f.created - DateTime.Now).TotalMinutes >= saveFileInterval || force == true)
+                    if ((DateTime.Now - f.created).TotalMinutes >= saveFileInterval || force == true)
                     {
-                        ProcessScheduleSaveFile(f);
+                            ProcessScheduleSaveFile(f);
                     }
                 }
             }
@@ -46,9 +46,9 @@ namespace Websilk.Schedule
 
         private void ProcessScheduleSaveFile(saveFile f)
         {
-            if (!Directory.Exists(Path.GetFullPath(f.file)))
+            if (!Directory.Exists(Path.GetDirectoryName(f.file)))
             {
-                Directory.CreateDirectory(Path.GetFullPath(f.file));
+                Directory.CreateDirectory(Path.GetDirectoryName(f.file));
             }
             File.WriteAllText(f.file, f.data);
             scheduleSaveFiles.Remove(f);

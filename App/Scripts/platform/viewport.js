@@ -12,8 +12,11 @@
                 S.viewport.level = x;
                 if (changed == true) {
                     var wp = $(document.body);
-                    var size = S.viewport.levelNames[x];
-                    if (wp.hasClass(size) == false) { wp.removeClass('s-cell s-mobile s-tablet s-desktop s-hd').addClass('s-' + size); }
+                    wp.removeClass('s-cell s-mobile s-tablet s-desktop s-hd');
+                    for (var y = 4; y >= x; y--) {
+                        var size = S.viewport.levelNames[y];
+                        wp.addClass('s-' + size);
+                    }
                 }
                 return changed;
             }

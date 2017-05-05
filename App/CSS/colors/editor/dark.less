@@ -26,7 +26,7 @@ body{font-family: Jaldi, Arial, Helvetica, sans-serif;}
     .row(transparent, #223235, #173b42, @color, @color-hover, @color, @link, @link-hover, @link-hover, @link, @link, @color, @color-hover, @color-hover, @color);
     .row-alt(darken(@bg, @row-alt), darken(#223235, @row-alt), darken(#173b42, @row-alt), @color, @color-hover, @color, @link, @link-hover, @link-hover, @link, @link, @color, @color-hover, @color-hover, @color);
     .fonts(@color, fade(@color, 30%), #009B87, #4DA400, #FF2222, #376EB2);
-    .input(#fff, #444, #cccccc, #aaa, #eef7f7, #444, #d2e4e4, #d7eded, #114b4b, #b1dcdc, #114b4b );
+    .input(#3b3b3b, #c0c0c0, #3b3b3b, #585858, #3b3b3b, #c0c0c0, #3b3b3b, #3b3b3b, #c0c0c0, #3b3b3b, #a4e7dd );
     .line(lighten(@bg, 3%));
     .button(default,  #56bf94, #1bcd84, #1bcd84, #1bcd84, transparent, transparent, transparent, transparent, transparent, transparent, transparent, transparent, #fff, #fff, #fff, #fff);
     .button(apply,    #4dc2c7, #16ced6, #16ced6, #16ced6, transparent, transparent, transparent, transparent, transparent, transparent, transparent, transparent, #fff, #fff, #fff, #fff);
@@ -46,8 +46,11 @@ body{font-family: Jaldi, Arial, Helvetica, sans-serif;}
         .box(#214345, transparent, @color);
         .row(transparent, #223235, #173b42, @color, @color-hover, @color, @link, @link-hover, @link-hover, @link, @link, @color, @color-hover, @color-hover, @color);
     }
+}
 
+.editor .box{
     .save-page.nosave a:hover use{color:#fff !important;}
+    
 }
 
 .box.blue{

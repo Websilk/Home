@@ -31,6 +31,7 @@
             onLoad: function () {
                 //set up dashboard model window button events
                 S.editor.dashboard.init();
+                $('#template_dashboard').remove();
             }
         });
     });

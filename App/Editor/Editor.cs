@@ -87,6 +87,8 @@ namespace Websilk.Editor
             editor.Data["template-layout-dialog"] = layout_dialog.Render();
             editor.Data["template-layout-addblock"] = layout_addblock.Render();
             editor.Data["template-layout-options"] = S.Server.LoadFileFromCache("/editor/ui/layout-options.html");
+            editor.Data["template-select-menu-props"] = S.Server.LoadFileFromCache("/editor/ui/select-menu-props.html");
+            editor.Data["template-select-menu-alignment"] = S.Server.LoadFileFromCache("/editor/ui/select-menu-alignment.html");
             return editor.Render();
         }
     }

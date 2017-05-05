@@ -78,6 +78,7 @@ namespace Websilk
         //data stored about the component
         public List<structPosition> position;
         public string css = "";
+        public string[] menuTypes = new string[] { "" }; //specific menu types to show in the component select menu
 
         //resources (js, js file, or css file) attached to this component
         [JsonIgnore]
@@ -120,6 +121,18 @@ namespace Websilk
         public virtual int defaultWidth
         {
             get { return 320; }
+        }
+
+        [JsonIgnore]
+        public virtual bool canResizeWidth
+        {
+            get { return true; }
+        }
+
+        [JsonIgnore]
+        public virtual bool canResizeHeight
+        {
+            get { return false; }
         }
         #endregion
 
@@ -182,11 +195,14 @@ namespace Websilk
             StringBuilder css = new StringBuilder();
             StringBuilder style;
             structPosition pos;
-            for(var x = 4; x >= 0; x--)
+            var newPos = new structPosition();
+
+            for (var x = 4; x >= 0; x--)
             {
                 //set up each window size breakpoint (cell, mobile, tablet, desktop, HD)
                 pos = position[x];
 
+                if (pos.Equals(newPos)) { continue; }
                 if(pos.width == 0) { continue; } //0 width means no position data available
 
                 style = new StringBuilder();
@@ -280,16 +296,16 @@ namespace Websilk
                         css.Append(".s-cell #c" + id + "{" + style.ToString() + "}\n");
                         break;
                     case 1://Mobile
-                        css.Append(".s-mobile #c" + id + ", .s-cell #c" + id + "{" + style.ToString() + "}\n");
+                        css.Append(".s-mobile #c" + id + "{" + style.ToString() + "}\n");
                         break;
                     case 2://Tablet
-                        css.Append(".s-tablet #c" + id + ", .s-mobile #c" + id + ", .s-cell #c" + id + "{" + style.ToString() + "}\n");
+                        css.Append(".s-tablet #c" + id + "{" + style.ToString() + "}\n");
                         break;
                     case 3://Desktop
-                        css.Append(".s-desktop #c" + id + ", .s-tablet #c" + id + ", .s-mobile #c" + id + ", .s-cell #c" + id + "{" + style.ToString() + "}\n");
+                        css.Append(".s-desktop #c" + id + "{" + style.ToString() + "}\n");
                         break;
                     case 4://HD
-                        css.Append(".s-hd #c" + id + ",  .s-desktop #c" + id + ", .s-tablet #c" + id + ", .s-mobile #c" + id + ", .s-cell #c" + id + "{" + style.ToString() + "}\n");
+                        css.Append(".s-hd #c" + id + "{" + style.ToString() + "}\n");
                         break;
                 }
                 x--;
@@ -298,7 +314,7 @@ namespace Websilk
             //add compiled CSS to renderer
             S.css.Add("block_" + blockId, css.ToString());
 
-            //add component reference (with component instance-specific resource references) to page
+            //add component reference (with instance-specific resource references) to page
             js.Append("S.components.add('" + id + "', '" + Name + "', [");
             if(resourcesForInstance != null)
             {
@@ -311,7 +327,30 @@ namespace Websilk
 
             if(Page.isEditable == true)
             {
-                js.Append(", " + S.Util.Serializer.WriteObjectAsString(position));
+                //add position data
+                js.Append(",[");
+                for (var x = 0; x < position.Count; x++)
+                {
+                    if (x > 0) { js.Append(","); }
+                    if(position[x].Equals(newPos))
+                    {
+                        js.Append("null");
+                    }
+                    else
+                    {
+                        js.Append(S.Util.Serializer.WriteObjectAsString(position[x]));
+                    }
+                }
+                js.Append("]");
+
+                //add menu type
+                js.Append(", ['" + string.Join("','", menuTypes) + "']");
+
+                //add other options
+                js.Append(", {" +
+                    "canResizeWidth:" + (canResizeWidth ? "true" : "false") +
+                    ", canResizeHeight:" + (canResizeHeight ? "true" : "false") + 
+                "}");
             }
 
             js.Append(");");

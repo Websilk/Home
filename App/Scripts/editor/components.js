@@ -92,9 +92,10 @@ S.editor.components = {
                 left: $('.editor > .component-select > .r-left'),
                 leftTop: $('.editor > .component-select > .r-left-top'),
                 topLeft: $('.editor > .component-select > .r-top-left'),
-            }
+            },
+            menu: $('.component-select .menu')
         },
-        visible: false, corners: 20, pad: 13, bar: 4, menu: { width: 40 },
+        visible: false, corners: 10, pad: 13, bar: 4, menu: { width: 40 },
 
         init: function () {
             //set up static sizes for some resize bars
@@ -107,17 +108,27 @@ S.editor.components = {
                     S.editor.components.select.resize.start.call(S.editor.components.select.resize, e);
                 });
             }
+
+            //setup menu
+            this.menu.add($('#template_select_menu_props').html(), 'props');
+            this.menu.add($('#template_select_menu_alignment').html(), 'alignment', null, null, S.editor.components.select.menu.alignment.show);
+            this.menu.alignment.init();
+            $('#template_select_menu_props').remove();
+            $('#template_select_menu_options').remove();
         },
 
         show: function (e) {
             S.editor.components.selected = e;
+            var c = S.components.items.find(function (a) { return a.id == e[0].id.substr(1); });
             this.refresh();
             this.elem.compSel.show();
+            this.menu.show(c.menus);
             this.visible = true;
         },
 
         hide: function () {
             S.editor.components.selected = null;
+            $('.component-select .menu-window').hide();
             this.elem.compSel.hide();
             this.visible = false;
         },
@@ -150,7 +161,7 @@ S.editor.components = {
 
                 //get component information
                 this.component = S.components.items.find(function (a) { return a.id == c[0].id.substr(1); });
-                var pos = this.component.pos[S.viewport.level];
+                var pos = this.component.pos[S.viewport.indexFromLevelOrder(this.component.pos)];
                 if (pos.widthType > 1 && pos.heightType == 1) { return; }
                 
                 //get bar type (4 sides, 4 corners)
@@ -200,6 +211,9 @@ S.editor.components = {
                     }
                 }
                 this.pos = pos;
+
+                //hide menu
+                $('.component-select .menu-window').hide();
 
                 //initialize mouse move & mouse up events for document
                 var r = S.editor.components.select.resize;
@@ -261,8 +275,9 @@ S.editor.components = {
                         break;
                 }
 
-
-                S.editor.debugger.show(x + ', ' + y + ', ' + w + ', ' + h);
+                var win = S.window.pos();
+                if (w > win.w - 30) { w = win.w - 30; }
+                if (h > win.h - 30) { h = win.h - 30; }
 
                 if (this.pos.widthType == 0 && this.pos.heightType == 0) {
                     c.css({ maxWidth: w, maxHeight: h });
@@ -307,6 +322,7 @@ S.editor.components = {
             var w = c.width();
             var h = c.height();
             var r = this.elem.resize;
+            var m = this.elem.menu;
             var maxw = w + (this.pad * 2);
             var maxh = h + (this.pad * 2);
             var win = S.window.pos();
@@ -339,7 +355,128 @@ S.editor.components = {
             r.left.css({ top: this.corners, height: box.h - (this.corners * 2) });
 
             //reposition menu system
+            if (win.w - (box.x + box.w) < 50) {
+                //inner menu
+                m.addClass('inner').css({ left: box.w - 36, top: 4 });
+            } else {
+                //outer menu
+                m.removeClass('inner').css({ left: box.w, top:0 });
+            }
+            if (win.w - (box.x + box.w) < 250) {
+                //inner menu window
+                m.find('.menu-window').addClass('inner');
+            } else {
+                //outer menu window
+                m.find('.menu-window').removeClass('inner');
+            }
+        },
 
+        menu: {
+            items: [],
+
+            add: function (html, id, types, onShow, onClick) {
+                //html = icon & optional menu
+                //types = array of component types this menu should be displayed for (all, text, photo, etc.)
+                //onShow = function to call when the menu is shown
+                //onClick = function to call when the menu item is clicked
+                var self = S.editor.components.select.menu;
+                if (self.items.find(function (a) { return a.id == id; }) == undefined) {
+                    var div = document.createElement('div');
+                    var classname = 'item menu-' + id + ' ';
+                    if (types == null) { classname += 'for-all'; }
+                    for (var t in types) {
+                        classname += 'for-' + t;
+                    }
+                    div.setAttribute('data-id', id);
+                    div.className = classname;
+                    $(div).html(html);
+                    $(div).find('.menu-window').hide();
+                    $('.component-select .menu').append(div);
+                    $('.component-select .menu-' + id + ' > .icon a').on('click', function () {
+                        var menu = $('.component-select .menu-' + id + ' > .menu-window');
+                        if (menu[0].style.display == 'none') {
+                            menu.show();
+                            var item = self.items.find(function (a) { return a.id == id; });
+                            if (typeof item.onClick == 'function') { item.onClick(); }
+                        } else {
+                            menu.hide();
+                        }
+                    });
+                }
+                S.editor.components.select.menu.items.push({
+                    id: id, types: types, onShow: onShow, onClick: onClick
+                });
+            },
+
+            show: function (types) {
+                var self = S.editor.components.select.menu;
+                $('.component-select .menu .item').hide();
+                if (types[0] == '') { types[0] = 'all';}
+                //show menu items
+                for (var t in types) {
+                    var b = $('.component-select .menu .item.for-' + types[t]);
+                    b.show();
+                    var item = self.items.find(function (a) { return a.id == b.attr('data-id'); });
+                    if (typeof item.onShow == 'function') { item.onShow(); }
+                }
+            },
+
+            alignment: {
+                init: function () {
+                    $('.menu-alignment select, .menu-alignment input').on('change', this.update);
+                },
+
+                show: function () {
+                    var self = S.editor.components.select.menu;
+                    var c = S.editor.components.selected;
+                    var i = S.components.items.findIndex(function (a) { return a.id == c[0].id.substr(1); });
+                    var component = S.components.items[i];
+                    var pos = component.pos[S.viewport.level];
+
+                    //update form fields
+                    $('#component_align').val(pos.align);
+                    $('#component_width_type').val(pos.widthType);
+                    $('#component_height_type').val(pos.heightType);
+                    $('#component_pad_top').val(pos.padding.top);
+                    $('#component_pad_right').val(pos.padding.right);
+                    $('#component_pad_bottom').val(pos.padding.bottom);
+                    $('#component_pad_left').val(pos.padding.left);
+                    $('#component_newline')[0].checked = pos.forceNewLine;
+                },
+
+                update: function () {
+                    //update alignment settings for selected component
+                    var c = S.editor.components.selected;
+                    var i = S.components.items.findIndex(function (a) {return a.id == c[0].id.substr(1);});
+                    var component = S.components.items[i];
+                    var pos = component.pos[S.viewport.level];
+                    var data = {
+                        align: parseInt($('#component_align').val()),
+                        fixedAlign: pos.fixedAlign,
+                        position: pos.position,
+                        top: pos.top,
+                        width: pos.width,
+                        height: pos.height,
+                        widthType: parseInt($('#component_width_type').val()),
+                        heightType: parseInt($('#component_height_type').val()),
+                        padding: {
+                            top: parseInt($('#component_pad_top').val() || 0),
+                            right: parseInt($('#component_pad_right').val() || 0),
+                            bottom: parseInt($('#component_pad_bottom').val() || 0),
+                            left: parseInt($('#component_pad_left').val() || 0)
+                        },
+                        forceNewLine: $('#component_newline')[0].checked
+                    };
+
+                    //update component
+                    S.components.items[i].pos[S.viewport.level] = data;
+                    S.editor.components.css.update(c[0]);
+                    S.editor.components.select.refresh();
+
+                    //save changes to page
+                    S.editor.save.add(c[0].id, 'alignment:' + S.viewport.level, data);
+                }
+            }
         }
     },
 
@@ -750,6 +887,125 @@ S.editor.components = {
             }
             this.component = elem;
             this.drop = drop;
+        }
+    },
+
+    css: {
+        update: function (c) {
+            //update CSS for component position & alignment settings
+            var component = S.components.items.find(function (a) { return a.id == c.id.substr(1); });
+            if (component != null) {
+                var id = c.id.substr(1);
+                var pos = component.pos;
+                var css = '';
+                var style = '';
+                for (var x = 0; x < pos.length; x++) {
+                    var p = pos[x];
+                    if (p != null) {
+                        style = '';
+
+                        //alignment
+                        switch (p.align) {
+                            case 0: //left
+                                style += 'float:left;display:block;';
+                                break;
+                            case 1: //center
+                                if (p.forceNewLine == true) {
+                                    style += 'float:none;display:block;';
+                                } else {
+                                    style += 'float:none;display:inline-block;';
+                                }
+                                break;
+                            case 2: //right
+                                style += 'float:right;display:block;';
+                                break;
+                        }
+
+                        //position
+                        switch (p.position) {
+                            case 1://fixed
+                                style += 'position:fixed;';
+                                switch (p.fixedAlign) {
+                                    case 0://top
+                                        style += 'top:auto;bottom:auto;';
+                                        break;
+                                    case 1://middle
+                                        style += 'top:50%;bottom:50%;';
+                                        break;
+                                    case 2://bottom
+                                        style += 'top:auto;bottom:0;';
+                                }
+                                break;
+                            default:
+                                style += 'position:relative;';
+                        }
+
+                        //x & y offset position
+                        style += 'left:' + p.left + 'px;top:' + p.top + 'px;width:100%;';
+
+                        //width
+                        switch (p.widthType) {
+                            case 0://pixels
+                                style += 'max-width:' + p.width + 'px;';
+                                break;
+                            case 1://percent
+                                style += 'max-width:' + p.width + '%;';
+                                break;
+                            case 2://window
+                                style += 'max-width:100%;';
+                                break;
+                        }
+
+                        //height
+                        switch (p.heightType) {
+                            case 0://pixels
+                                style += 'height:' + p.height + 'px;';
+                                break;
+                            case 1://auto
+                            case 2://window
+                                style += 'height:auto;';
+                                break;
+                        }
+
+                        //padding
+                        style += 'padding:' +
+                            p.padding.top + "px " +
+                            p.padding.right + "px " +
+                            p.padding.bottom + "px " +
+                            p.padding.left + "px;";
+
+                        //force new line
+                        if (p.forceNewLine == true) {
+                            style += 'margin:0 auto;';
+                        }
+
+                        //compile style with CSS selector
+                        switch (x) {
+                            case 0: //cell
+                                css += ".s-cell #c" + id + "{" + style + "}\n"
+                                break;
+                            case 1: //mobile
+                                css += ".s-mobile #c" + id + "{" + style + "}\n"
+                                break;
+                            case 2: //tablet
+                                css += ".s-tablet #c" + id + "{" + style + "}\n"
+                                break;
+                            case 3: //desktop
+                                css += ".s-desktop #c" + id + "{" + style + "}\n"
+                                break;
+                            case 4: //HD
+                                css += ".s-hd #c" + id + "{" + style + "}\n"
+                                break;
+                        }
+                    }
+                }
+
+                style = document.createElement('style');
+                style.id = 'css_component_' + c.id;
+                style.innerHTML = css;
+                $('#' + style.id).remove();
+                $('head').append(style);
+            }
         }
     }
 };

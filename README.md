@@ -12,6 +12,17 @@ Built upon the new ASP.NET Core framework, Websilk is a high-end, enterprise-lev
 3. Press the play button in Visual Studio!
 
 
+### Features
+* **Manage websites from a centralized dashboard**
+  * Create a hierarchy of web pages
+  * Upload & manage photos & files to use within your website
+  * Manage user accounts *(coming soon!)*
+* **Edit your web pages from a browser-based editor**
+  * Drag & drop components into blocks within web pages to create content, including text, photos, videos, menus, buttons, forms, maps, and much more!
+  * Reuse blocks of content across multiple web pages
+  * Resize the viewport to see what your web page will look like on a mobile or tablet device, laptop, desktop PC, or in UHD (4K)
+
+
 ### How does Websilk work?
 Websilk uses a custom-built C# MVC framework along with HTML files that can contain scaffold (mustache) variables & sections. The goal behind this approach was to make Websilk fast & nimble, allowing HTML to be cached and easily rendered within a super light-weight MVC framework (instead of using Microsoft's MVC 5 + Razor).
 
@@ -31,7 +42,7 @@ Making an AJAX call via the Javascript function `S.ajax.post` will access a new 
 NOTE: The argument `pageId` is a reserved argument for `S.ajax.post`, so the example above uses `id` instead.
 
 #### Dynamic Page requests
- A dynamic page is one that is created visually through Websilk's drag & drop interface. When loading a dynamic page, a new instance of `Websilk.Page` loads a file called `page.json` which contains a list of blocks & components that belong to the page. Then, each block in the list loads components onto the page from a `block.json` file. Finally, Websilk renders the contents of the page as HTML and then the web browser loads the page along with `/js/platform.js` and a few CSS files.
+ A dynamic page is one that is created visually through Websilk's drag & drop interface. When loading a dynamic page, a new instance of `Websilk.Page` loads a file called `page.json` which contains a list of blocks & components that belong to the page. Then, each block in the list loads components onto the page from `block.json` files. Finally, Websilk renders the contents of the page as HTML and then the web browser loads the page along with `/js/platform.js` and a few CSS files.
 
 #### Namespace-Driven Page requests
 This custom page request loads a web page from the database, but instead of loading blocks & components onto the page from a `page.json` file, Websilk renders the output of a method within a `Websilk.StaticPage` class located in the `Websilk.Pages` namespace. For example, the page `http://localhost:7770/dashboard` exists in the database with the columns `Title = 'Dashboard'`, `pageType = 1`, and `service = 'Dashboard'`. This will instruct the `Websilk.Page` class to load & render the contents of the class `Websilk.Pages.Dashboard`.

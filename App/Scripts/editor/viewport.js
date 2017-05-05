@@ -66,6 +66,9 @@ S.viewport.levelChanged = function (level) {
 
     }
     $('.toolbar .menu .screens use').attr('xlink:href', '#icon-screen' + ext)
+
+    //rename screen size labels
+    $('span.lbl-screen-size').html(screen);
 };
 
 S.viewport.next = function () {
@@ -103,4 +106,14 @@ S.viewport.getLevelOrder = function () {
         case 4:
             return [4, 3, 2, 1, 0];
     }
+};
+
+S.viewport.indexFromLevelOrder = function(arr){
+    //get index of a given array that
+    //corresponds with the current level order
+    var lvls = S.viewport.getLevelOrder();
+    for (var x = 0; x < lvls.length; x++) {
+        if (arr[lvls[x]] != null) { return lvls[x];}
+    }
+    return -1;
 };

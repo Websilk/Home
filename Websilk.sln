@@ -5,6 +5,7 @@ VisualStudioVersion = 15.0.26403.3
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{754FB4EF-AD10-4F29-A7D2-B58CC3DEB553}"
 	ProjectSection(SolutionItems) = preProject
+		.gitignore = .gitignore
 		gulpfile.js = gulpfile.js
 		README.md = README.md
 	EndProjectSection

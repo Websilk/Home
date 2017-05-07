@@ -5,8 +5,8 @@ Built upon the new ASP.NET Core framework, Websilk is a high-end, enterprise-lev
 ### Installation
 1. Fork or clone from Github, then open `Websilk.sln` in Visual Studio
 2. In Visual Studio's Package Manager Console, do the following:
-    * install node.js dependencies: `npm install`
     * install submodules: `git submodule update --init --recursive`
+    * install node.js dependencies: `npm install`
     * run initial gulp task: `gulp default`
 2. Install the database by publishing the Sql project to Sql Server 2016. The default database name is `WebsilkDev`
 3. Press the play button in Visual Studio!

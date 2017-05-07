@@ -112,7 +112,7 @@ S.editor.components = {
 
             //setup menu
             this.menu.add($('#template_select_menu_props').html(), 'props', ['all', 'props']);
-            this.menu.add($('#template_select_menu_alignment').html(), 'alignment', ['all', 'alignment'], null, null, S.editor.components.select.menu.alignment.show, S.editor.components.select.menu.alignment.hide);
+            this.menu.add($('#template_select_menu_alignment').html(), 'alignment', ['all', 'alignment'], null, S.editor.components.select.menu.alignment.hide, S.editor.components.select.menu.alignment.show);
             this.menu.alignment.init();
             $('#template_select_menu_props').remove();
             $('#template_select_menu_options').remove();
@@ -320,7 +320,6 @@ S.editor.components = {
                 var component = S.components.items[i];
                 var posIndex = S.viewport.indexFromLevelOrder(component.pos);
                 var pos = $.extend(true, {}, component.pos[posIndex]);
-                console.log(pos);
 
                 //stop events & reset vars
                 if (self.timer != null) { clearInterval(self.timer); }
@@ -334,9 +333,8 @@ S.editor.components = {
                 //update component CSS
                 if (pos != null) {
                     pos.width = c.width();
-                    pos.height = c.height();
+                    if (pos.heightType == 0) { pos.height = c.height() };
                     S.components.items[i].pos[S.viewport.level] = pos;
-                    console.log(S.components.items[i].pos);
                     S.editor.components.css.update(c[0]);
                     c[0].style = "";
 
@@ -1035,87 +1033,115 @@ S.editor.components = {
                 var pos = component.pos;
                 var css = '';
                 var style = '';
+
+                //check for redundant settings
+                var noFloat = true;
+                var noDisplay = true;
+                var noPosition = true;
+                var noLeft = true;
+                var noTop = true;
+                var noWidth = true;
+                var noHeight = true;
+                var noPadding = true;
+                var noMargin = true;
+                for (var x = 4; x >= 0; x--) {
+                    p = pos[x];
+                    if (p == null) { continue; }
+                    if (p.align != 1) { noFloat = false; }
+                    if (p.align == 1 && p.forceNewLine == false) { noDisplay = false; }
+                    if (p.pition == 1) { noDisplay = false; }
+                    if (p.left > 0) { noLeft = false; }
+                    if (p.top > 0) { noTop = false; }
+                    if (p.width > 0) { noWidth = false; }
+                    if (p.height > 0 && p.height != null) { noHeight = false; }
+                    if (p.forceNewLine == false) { noMargin = false; }
+                    if (p.padding.top > 0 || p.padding.right > 0 || p.padding.bottom > 0 || p.padding.left > 0) { noPadding = false; }
+                }
+
                 for (var x = 4; x >= 0; x--) {
                     var p = pos[x];
-                    if (p != null) {
-                        style = '';
+                    if (p == null) { continue; }
+                    style = '';
 
-                        //alignment
-                        switch (p.align) {
-                            case 0: //left
-                                style += 'float:left;display:block;';
-                                break;
-                            case 1: //center
-                                if (p.forceNewLine == true) {
-                                    style += 'float:none;display:block;';
-                                } else {
-                                    style += 'float:none;display:inline-block;';
-                                }
-                                break;
-                            case 2: //right
-                                style += 'float:right;display:block;';
-                                break;
-                        }
+                    //alignment
+                    switch (p.align) {
+                        case 0: //left
+                            style += 'float:left;' + (noDisplay ? '' : 'display:block;');
+                            break;
+                        case 1: //center
+                            if (p.forceNewLine == true) {
+                                style += (noFloat ? '' : 'float:none;') + (noDisplay ? '' : 'display:block;');
+                            } else {
+                                style += (noFloat ? '' : 'float:none;') + 'display:inline-block;';
+                            }
+                            break;
+                        case 2: //right
+                            style += 'float:right;' + (noDisplay ? '' : 'display:block;');
+                            break;
+                    }
 
-                        //position
-                        switch (p.position) {
-                            case 1://fixed
-                                style += 'position:fixed;';
-                                switch (p.fixedAlign) {
-                                    case 0://top
-                                        style += 'top:auto;bottom:auto;';
-                                        break;
-                                    case 1://middle
-                                        style += 'top:50%;bottom:50%;';
-                                        break;
-                                    case 2://bottom
-                                        style += 'top:auto;bottom:0;';
-                                }
-                                break;
-                            default:
-                                style += 'position:relative;';
-                        }
+                    //position
+                    switch (p.position) {
+                        case 1://fixed
+                            style += 'position:fixed;';
+                            switch (p.fixedAlign) {
+                                case 0://top
+                                    style += 'top:auto;bottom:auto;';
+                                    break;
+                                case 1://middle
+                                    style += 'top:50%;bottom:50%;';
+                                    break;
+                                case 2://bottom
+                                    style += 'top:auto;bottom:0;';
+                            }
+                            break;
+                        default:
+                            if (!noPosition) { style += 'position:relative;'; }
+                    }
 
-                        //x & y offset position
-                        style += 'left:' + p.left + 'px;top:' + p.top + 'px;width:100%;';
+                    //x & y offset position
+                    style += (noLeft ? '' : 'left:' + pos.left + 'px;') + (noTop ? '' : 'top:' + pos.top + 'px;');
 
-                        //width
-                        switch (p.widthType) {
-                            case 0://pixels
-                                style += 'max-width:' + p.width + 'px;';
-                                break;
-                            case 1://percent
-                                style += 'max-width:' + p.width + '%;';
-                                break;
-                            case 2://window
-                                style += 'max-width:100%;';
-                                break;
-                        }
+                    //width
+                    switch (p.widthType) {
+                        case 0://pixels
+                            if (p.width > 0) { style += 'max-width:' + p.width + 'px;'; }
+                            break;
+                        case 1://percent
+                            if (p.width > 0) { style += 'max-width:' + p.width + '%;'; }
+                            break;
+                        case 2://window
+                            if (!noWidth) { style += 'max-width:100%;'; }
+                            break;
+                    }
 
-                        //height
-                        switch (p.heightType) {
-                            case 0://pixels
-                                style += 'height:' + p.height + 'px;';
-                                break;
-                            case 1://auto
-                            case 2://window
-                                style += 'height:auto;';
-                                break;
-                        }
+                    //height
+                    switch (p.heightType) {
+                        case 0://pixels
+                            if (p.height > 0) { style += 'height:' + p.height + 'px;'; }
+                            break;
+                        case 1://auto
+                        case 2://window
+                            if (!noHeight) { style += 'height:auto;'; }
+                            break;
+                    }
 
-                        //padding
+                    //padding
+                    if (!noPadding) {
                         style += 'padding:' +
                             p.padding.top + "px " +
                             p.padding.right + "px " +
                             p.padding.bottom + "px " +
                             p.padding.left + "px;";
+                    }
+                    
+                    //force new line
+                    if (p.forceNewLine == true && !noMargin) {
+                        style += 'margin:0 auto;';
+                    }
 
-                        //force new line
-                        if (p.forceNewLine == true) {
-                            style += 'margin:0 auto;';
-                        }
-
-                        //compile style with CSS selector
+                    //compile style with CSS selector
+                    if (style != '') {
                         switch (x) {
                             case 0: //cell
                                 css += ".s-cell #c" + id + "{" + style + "}\n"

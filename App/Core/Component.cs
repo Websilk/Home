@@ -203,13 +203,37 @@ namespace Websilk
             structPosition pos;
             var newPos = new structPosition();
 
+            //check for redundant settings
+            var noFloat = true;
+            var noDisplay = true;
+            var noPosition = true;
+            var noLeft = true;
+            var noTop = true;
+            var noWidth = true;
+            var noHeight = true;
+            var noPadding = true;
+            var noMargin = true;
+            for (var x = 4; x >= 0; x--)
+            {
+                pos = position[x];
+                if (pos.Equals(newPos)) { continue; }
+                if (pos.align != enumAlign.center) { noFloat = false; }
+                if(pos.align == enumAlign.center && pos.forceNewLine == false) { noDisplay = false; }
+                if(pos.position == enumPosition.isFixed) { noDisplay = false; }
+                if(pos.left > 0) { noLeft = false; }
+                if (pos.top > 0) { noTop = false; }
+                if (pos.width > 0) { noWidth = false; }
+                if (pos.height > 0) { noHeight = false; }
+                if(pos.forceNewLine == false) { noMargin = false; }
+                if(pos.padding.top > 0 || pos.padding.right > 0 || pos.padding.bottom > 0 || pos.padding.left > 0) { noPadding = false; }
+            }
+
             for (var x = 4; x >= 0; x--)
             {
                 //set up each window size breakpoint (cell, mobile, tablet, desktop, HD)
                 pos = position[x];
 
                 if (pos.Equals(newPos)) { continue; }
-                if(pos.width == 0) { continue; } //0 width means no position data available
 
                 style = new StringBuilder();
 
@@ -217,19 +241,19 @@ namespace Websilk
                 switch (pos.align)
                 {
                     case enumAlign.left:
-                        style.Append("float:left;display:block;");
+                        style.Append("float:left;" + (noDisplay ? "" : "display:block;"));
                         break;
                     case enumAlign.center:
                         if(pos.forceNewLine == true)
                         {
-                            style.Append("float:none;display:block;");
+                            style.Append((noFloat ? "" : "float:none;") + (noDisplay ? "" : "display:block;"));
                         }else
                         {
-                            style.Append("float:none;display:inline-block;");
+                            style.Append((noFloat ? "" : "float:none;") + "display:inline-block;");
                         }
                         break;
                     case enumAlign.right:
-                        style.Append("float:right;display:block;");
+                        style.Append("float:right;" + (noDisplay ? "" : "display:block;"));
                         break;
                 }
 
@@ -252,69 +276,77 @@ namespace Websilk
                 }
                 else
                 {
-                    style.Append("position:relative;");
+                    if (!noPosition) { style.Append("position:relative;"); }
                 }
                 
                 //x & y offset position
-                style.Append("left:" + pos.left + "px;top:" + pos.top + "px;width:100%;");
+                if(!noLeft || !noTop)
+                {
+                    style.Append((noLeft ? "" : "left:" + pos.left + "px;") + (noTop ? "" : "top:" + pos.top + "px;"));
+                }
 
                 //width & height
                 switch (pos.widthType)
                 {
                     case enumWidthType.pixels:
-                        style.Append("max-width:" + pos.width + "px;");
+                        if (pos.width > 0) { style.Append("max-width:" + pos.width + "px;"); }
                         break;
                     case enumWidthType.percent:
-                        style.Append("max-width:" + pos.width + "%;");
+                        if (pos.width > 0) { style.Append("max-width:" + pos.width + "%;"); }
                         break;
                     case enumWidthType.window:
-                        style.Append("max-width:100%;");
+                        if (!noWidth) { style.Append("max-width:100%;"); }
                         break;
                 }
                 switch (pos.heightType)
                 {
                     case enumHeightType.pixels:
-                        style.Append("height:" + pos.height + "px;");
+                        if (pos.height > 0) { style.Append("height:" + pos.height + "px;"); }
                         break;
                     case enumHeightType.auto:
                     case enumHeightType.window:
-                        style.Append("height:auto;");
+                        if (!noHeight) { style.Append("height:auto;"); }
                         break;
                 }
 
                 //padding
-                style.Append("padding:" + 
-                    pos.padding.top + "px " + 
-                    pos.padding.right + "px " + 
-                    pos.padding.bottom + "px " + 
-                    pos.padding.left + "px;");
+                if (!noPadding)
+                {
+                    style.Append("padding:" +
+                        pos.padding.top + "px " +
+                        pos.padding.right + "px " +
+                        pos.padding.bottom + "px " +
+                        pos.padding.left + "px;");
+                }
 
                 //force new line
-                if (pos.forceNewLine == true)
+                if (pos.forceNewLine == true && !noMargin)
                 {
                     style.Append("margin:0 auto;");
                 }
 
                 //compile style with CSS selector
-                switch (x)
+                if(style.ToString() != "")
                 {
-                    case 0://Cell
-                        css.Append(".s-cell #c" + id + "{" + style.ToString() + "}\n");
-                        break;
-                    case 1://Mobile
-                        css.Append(".s-mobile #c" + id + "{" + style.ToString() + "}\n");
-                        break;
-                    case 2://Tablet
-                        css.Append(".s-tablet #c" + id + "{" + style.ToString() + "}\n");
-                        break;
-                    case 3://Desktop
-                        css.Append(".s-desktop #c" + id + "{" + style.ToString() + "}\n");
-                        break;
-                    case 4://HD
-                        css.Append(".s-hd #c" + id + "{" + style.ToString() + "}\n");
-                        break;
+                    switch (x)
+                    {
+                        case 0://Cell
+                            css.Append(".s-cell #c" + id + "{" + style.ToString() + "}\n");
+                            break;
+                        case 1://Mobile
+                            css.Append(".s-mobile #c" + id + "{" + style.ToString() + "}\n");
+                            break;
+                        case 2://Tablet
+                            css.Append(".s-tablet #c" + id + "{" + style.ToString() + "}\n");
+                            break;
+                        case 3://Desktop
+                            css.Append(".s-desktop #c" + id + "{" + style.ToString() + "}\n");
+                            break;
+                        case 4://HD
+                            css.Append(".s-hd #c" + id + "{" + style.ToString() + "}\n");
+                            break;
+                    }
                 }
-                x--;
             }
 
             //add compiled CSS to renderer

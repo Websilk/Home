@@ -34,11 +34,15 @@ namespace Websilk.Schedule
             //check queue for files to save
             if (scheduleSaveFiles.Count > 0)
             {
-                foreach (var f in scheduleSaveFiles)
+                var len = scheduleSaveFiles.Count;
+                for(var x = 0; x < len; x++)
                 {
+                    var f = scheduleSaveFiles[x];
                     if ((DateTime.Now - f.created).TotalMinutes >= saveFileInterval || force == true)
                     {
-                            ProcessScheduleSaveFile(f);
+                        ProcessScheduleSaveFile(f);
+                        scheduleSaveFiles.Remove(f);
+                        len -= 1;
                     }
                 }
             }
@@ -51,7 +55,6 @@ namespace Websilk.Schedule
                 Directory.CreateDirectory(Path.GetDirectoryName(f.file));
             }
             File.WriteAllText(f.file, f.data);
-            scheduleSaveFiles.Remove(f);
         }
 
         public void ProcessScheduleSaveFile(string filePath)

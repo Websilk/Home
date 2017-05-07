@@ -83,12 +83,13 @@ namespace Websilk.Services.Editor
                         if (str.Length > 0) {
                             type = str[0];
                         }
+                        Component.structPosition pos;
                         switch (type)
                         {
                             case "resize":
-                                //resize component
+                                //resize component for a specific viewport size
                                 level = int.Parse(str[1]);
-                                var pos = component.position[level];
+                                pos = component.position[level];
                                 foreach (JProperty child in data.Children<JProperty>())
                                 {
                                     if(child.Name == "maxWidth")
@@ -98,9 +99,66 @@ namespace Websilk.Services.Editor
                                 }
                                 component.position[level] = pos;
                                 block.changed = true;
-                                
-                                //pages[pid].components[cid].position = (string)item["data"];
+                                break;
 
+                            case "alignment":
+                                //change component alignment settings for a specific viewport size
+                                level = int.Parse(str[1]);
+                                pos = component.position[level];
+                                foreach (JProperty child in data.Children<JProperty>())
+                                {
+                                    switch (child.Name)
+                                    {
+                                        case "align":
+                                            pos.align = (Component.enumAlign)child.Value.ToObject<int>();
+                                            break;
+                                        case "fixedAlign":
+                                            pos.fixedAlign = (Component.enumIsFixed)child.Value.ToObject<int>();
+                                            break;
+                                        case "position":
+                                            pos.position = (Component.enumPosition)child.Value.ToObject<int>();
+                                            break;
+                                        case "top":
+                                            pos.top = child.Value.ToObject<int>();
+                                            break;
+                                        case "widthType":
+                                            pos.widthType = (Component.enumWidthType)child.Value.ToObject<int>();
+                                            break;
+                                        case "heightType":
+                                            pos.heightType = (Component.enumHeightType)child.Value.ToObject<int>();
+                                            break;
+                                        case "padding":
+                                            foreach (JProperty pad in child.First.Children<JProperty>())
+                                            {
+                                                switch (pad.Name)
+                                                {
+                                                    case "top":
+                                                        pos.padding.top = pad.Value.ToObject<int>();
+                                                        break;
+                                                    case "right":
+                                                        pos.padding.right = pad.Value.ToObject<int>();
+                                                        break;
+                                                    case "bottom":
+                                                        pos.padding.bottom = pad.Value.ToObject<int>();
+                                                        break;
+                                                    case "left":
+                                                        pos.padding.left = pad.Value.ToObject<int>();
+                                                        break;
+                                                }
+                                            }
+                                            break;
+                                        case "forceNewLine":
+                                            pos.forceNewLine = (bool)child.Value.ToObject<bool>();
+                                            break;
+                                    }
+                                }
+                                component.position[level] = pos;
+                                block.changed = true;
+                                break;
+                            default:
+                                //tries saving custom data to component
+                                component.Save(type, data.ToObject(typeof(object)));
+                                block.changed = true;
                                 break;
                         }
                         page.UpdateBlock(ref newpage, block);

@@ -91,7 +91,7 @@
 .component-hover{position:absolute; display:none; border:2px dashed transparent; cursor:move; z-index:3000;}
 
 .component-select{
-    cursor:move; position:absolute; display:none; z-index:3000;
+    cursor:move; position:absolute; display:none; z-index:3001;
     .side, .corner{position:absolute;line-height:0;font-size:0;}
     .r-top, .r-bottom{cursor:ns-resize;}
     .r-left, .r-right{cursor:ew-resize;}
@@ -114,9 +114,11 @@
         .item{position:relative; padding-bottom:10px;}
         .item:last-child{padding-bottom:4px;}
     }
-    .menu-window{position:absolute; display:none; left:18px; margin-top:-7px; margin-left:3px; padding-bottom:10px; width:210px;}
+    .menu-window{position:absolute; display:none; left:18px; margin-top:-7px; margin-left:3px; padding-bottom:10px; width:250px;}
     .menu-window.inner{left:auto; right:25px;}
 }
+
+.component-shield{position:absolute; display:none; z-index:1000;}
 
 .debugger {
     background:rgba(0,0,0,0.5); color:#4cff00; padding:10px 30px; position:fixed; bottom:20px; right:20px;
@@ -160,6 +162,11 @@
         .is-panel.has-siblings{height:auto; min-height:120px;}
     }
 }
+
+/* component specific */
+.component.c-textbox{word-break: break-word;}
+.text-toolbar{position:absolute; width:330px; z-index:3001;} 
+.text-editor{position:absolute !important; z-index:1001;}
 
 @media(max-width:1920px){
     .editor{

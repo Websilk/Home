@@ -17,8 +17,33 @@
                         var size = S.viewport.levelNames[y];
                         wp.addClass('s-' + size);
                     }
+                    S.viewport.events.levelChange.execute();
                 }
                 return changed;
+            }
+        }
+    },
+
+    events: {
+        levelChange: {
+            items: [],
+            add: function (elem, onChange) {
+                this.items.push({ elem: elem, onChange: onChange });
+            },
+
+            remove: function (elem) {
+                for (var x = 0; x < this.items.length; x++) {
+                    if (this.items[x].elem == elem) {
+                        this.items.splice(x, 1);
+                        break;
+                    }
+                }
+            },
+
+            execute: function () {
+                for (var x = 0; x < this.items.length; x++) {
+                    this.items[x].onChange();
+                }
             }
         }
     }

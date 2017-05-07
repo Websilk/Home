@@ -23,13 +23,13 @@ Built upon the new ASP.NET Core framework, Websilk is a high-end, enterprise-lev
   * Resize the viewport to see what your web page will look like on a mobile or tablet device, laptop, desktop PC, or in UHD (4K)
 
 
-### How does Websilk work?
-Websilk uses a custom-built C# MVC framework along with HTML files that can contain scaffold (mustache) variables & sections. The goal behind this approach was to make Websilk fast & nimble, allowing HTML to be cached and easily rendered within a super light-weight MVC framework (instead of using Microsoft's MVC 5 + Razor).
+### How does Websilk work (under the hood)?
+Websilk uses a custom-built C# MVC framework that loads HTML files with scaffolding (mustache) variables & sections. The goal behind this approach was to make Websilk fast & nimble, allowing HTML to be cached and easily rendered within a super light-weight MVC framework (instead of using Microsoft's MVC 5 + Razor).
 
 ### How does the MVC framework handle requests?
 
 #### Initial Page Request
-Websilk runs on the Kestrel web server, which starts an asyncronous task within `/Startup.cs`, listening for incoming page requests. When a user first loads a web page from their web browser, the async task creates a new instance of the `Websilk.Pipeline.PageRequest` class, which in turn initializes a new instance of `Websilk.Page`. This class is used to load & render the contents of a page, whether the page is *dynamic* or *namespace-driven*.
+Websilk runs on the Kestrel web server, which starts an asyncronous task within `Startup.cs`, listening for incoming page requests. When a user first loads a web page from their web browser, the async task creates a new instance of the `Websilk.Pipeline.PageRequest` class, which in turn initializes a new instance of `Websilk.Page`. This class is used to load & render the contents of a page, whether the page is *dynamic* or *namespace-driven*.
 
 #### Web API calls for Page Requests
 We all know that when a user clicks an anchor link on a typical web page, their browser redirects them to the next web page and then loads Javascript, CSS, & image resources. Websilk overrides the anchor link functionality and instead, executes a Web API call via AJAX, masks the URL in the user's address bar using the Javascript History API, and replaces part of the web page with new content. The AJAX request sends a POST to the url */api/App/Url*, which accesses a new instance of the class `Websilk.Pipeline.WebService`, which in turn initializes a new instance of `Websilk.Page`. This class is used to load & render the contents of a *dynamic page*.
@@ -45,4 +45,4 @@ NOTE: The argument `pageId` is a reserved argument for `S.ajax.post`, so the exa
  A dynamic page is one that is created visually through Websilk's drag & drop interface. When loading a dynamic page, a new instance of `Websilk.Page` loads a file called `page.json` which contains a list of blocks & components that belong to the page. Then, each block in the list loads components onto the page from `block.json` files. Finally, Websilk renders the contents of the page as HTML and then the web browser loads the page along with `/js/platform.js` and a few CSS files.
 
 #### Namespace-Driven Page requests
-This custom page request loads a web page from the database, but instead of loading blocks & components onto the page from a `page.json` file, Websilk renders the output of a method within a `Websilk.StaticPage` class located in the `Websilk.Pages` namespace. For example, the page `http://localhost:7770/dashboard` exists in the database with the columns `Title = 'Dashboard'`, `pageType = 1`, and `service = 'Dashboard'`. This will instruct the `Websilk.Page` class to load & render the contents of the class `Websilk.Pages.Dashboard`.
+This custom page request loads a web page from the database, but instead of loading blocks & components onto the page from a `page.json` file, Websilk renders the output of a method within a `Websilk.StaticPage` class located in the `Websilk.Pages` namespace. For example, the page `http://localhost:7770/dashboard` exists in the database with the columns `path = 'Dashboard'`, `pageType = 1`, and `service = 'Dashboard'`. Websilk finds the database record by matching the url with the path column. Then, the `Websilk.Page` class will use the service column to create an instance of the `Websilk.Pages.Dashboard` class and render its output as HTML.

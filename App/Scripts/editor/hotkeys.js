@@ -1,7 +1,7 @@
 ﻿S.hotkeys = {
     keyhold: '',
     keydown: function (e) {
-        if ($("input, textarea").is(":focus") == false && $('.textedit.editing').length == 0) {
+        if ($("input, textarea").is(":focus") == false && $('.component[contentEditable]').length == 0) {
             var k = e.keyCode, itemId = '', isPanel = false, c = null;
             if (S.editor.components.hovered != null) {
                 c = S.editor.components.hovered;

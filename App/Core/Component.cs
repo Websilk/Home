@@ -90,9 +90,13 @@ namespace Websilk
         public List<string> panelIds;
         [JsonIgnore]
         public List<Panel> panels;
+
+        //internal variables
         [JsonIgnore]
+        public bool isLoaded = true;
 
         //rendering objects
+        [JsonIgnore]
         protected Scaffold scaffold;
         [JsonIgnore]
         protected Utility.DOM.Element div;
@@ -181,7 +185,9 @@ namespace Websilk
             }
             //add HD position object
             position.Add(posHD);
-            
+
+            //set up component internal variables
+            isLoaded = false;
         }
 
         /// <summary>
@@ -375,7 +381,7 @@ namespace Websilk
 
             //set up div container for component
             div.id = "c" + id;
-            div.Classes.Add("component");
+            div.Classes.Add("component c-" + Name.Replace(" ", "-").ToLower());
 
             //finally, render contents of component
             div.innerHTML = scaffold.Render();
@@ -386,10 +392,7 @@ namespace Websilk
         /// Sets a value for a custom variable within the component that is later saved to the page.json file 
         /// </summary>
         /// <param name="data"></param>
-        public virtual void SetValue(object data)
-        {
-
-        }
+        public virtual void Save(string key, object data){}
 
         public void AddPanel(string id, string name)
         {
@@ -421,7 +424,7 @@ namespace Websilk
         {
             //add javascript file reference for this component (instance or type)
             var n = (forInstanceOnly ? "c" + id : Name.Replace(" ","-")) + '_' + name;
-            S.javascriptFiles.Add(n, file);
+            S.javascriptFiles.Add(n, file, false);
             if (forInstanceOnly)
             {
                 if (resourcesForInstance == null) { resourcesForInstance = new List<string>(); }
@@ -450,6 +453,36 @@ namespace Websilk
                 resourcesForComponentType.Add("css_" + n);
             }
         }
+
+        protected void AddHtml(string name, string html, Func<Component, bool> check)
+        {
+            //add html code for this component type
+            var components = Page.GetAllComponents(Page.panels, true);
+            foreach(var c in components)
+            {
+                if(c.Name == Name)
+                {
+                    if(check(c) == false) { return; }
+                }
+            }
+            S.html.Add(Name.Replace(" ", "-") + '_' + name, html);
+        }
+
+        protected void AddHtmlToEditor(string name, string html, Func<Component, bool> check)
+        {
+            //add html code for this component type
+            var components = Page.GetAllComponents(Page.panels, true);
+            foreach (var c in components)
+            {
+                if (c.Name == Name)
+                {
+                    if (check(c) == false) { return; }
+                }
+            }
+            S.htmlEditor.Add(Name.Replace(" ", "-") + '_' + name, html);
+        }
+
+
         #endregion
     }
 }

@@ -34,6 +34,7 @@
 
     click: function () {
         if ($('.editor .toolbar .save-page').hasClass('saving nosave saved') == false) {
+            this.events.save.execute();
             var options = {};
             options.changes = JSON.stringify(this.cache);
             this.cache = [];
@@ -45,5 +46,29 @@
                 }, 2000);
             });
         }
-    }
+    },
+
+    events: {
+        save: {
+            items: [],
+            add: function (elem, onSave) {
+                this.items.push({ elem: elem, onSave: onSave });
+            },
+
+            remove: function (elem) {
+                for (var x = 0; x < this.items.length; x++) {
+                    if (this.items[x].elem == elem) {
+                        this.items.splice(x, 1);
+                        break;
+                    }
+                }
+            },
+
+            execute: function () {
+                for (var x = 0; x < this.items.length; x++) {
+                    this.items[x].onSave();
+                }
+            }
+        }
+    },
 };

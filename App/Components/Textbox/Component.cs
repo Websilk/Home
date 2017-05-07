@@ -98,10 +98,30 @@ namespace Websilk.Components
                 var i = rnd.Next(0, lorem.Length - 1);
                 text = lorem[i];
             }
-
-
-
+            
             scaffold.Data["text"] = text;
+
+            if (Page.isEditable)
+            {
+                menuTypes = new string[] { "all", "!props", "texteditor" };
+                AddHtmlToEditor("texteditor", S.Server.LoadFileFromCache("/components/textbox/texteditor.html"), new Func<Component, bool>(
+                    (c) => {
+                        //text component already exists on the page, so don't add Html
+                        return false;
+                    }
+                ));
+                AddJavascriptFile("texteditor", "js/components/textbox/texteditor.js");
+            }
+        }
+
+        public override void Save(string key, object data)
+        {
+            switch (key)
+            {
+                case "text":
+                    text = (string)data;
+                    break;
+            }
         }
     }
 }

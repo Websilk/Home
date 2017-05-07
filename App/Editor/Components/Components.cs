@@ -128,6 +128,19 @@ namespace Websilk.Services.Editor
                 inject.js =  S.javascriptFiles.renderJavascriptFiles(false, S.javascript.renderJavascript(false));
                 inject.css = S.css.renderCss(false);
                 inject.cssId = "comp" + component.id;
+
+
+                //inject html resources
+                var html = S.html.renderHtml();
+                if(html != "")
+                {
+                    inject.js += "$('.webpage').before('" + html.Replace("'", "\\'").Replace("\n","").Replace("\r","") + "');";
+                }
+                html = S.htmlEditor.renderHtml();
+                if (html != "")
+                {
+                    inject.js += "$('.editor').append('" + html.Replace("'", "\\'").Replace("\n", "").Replace("\r", "") + "');";
+                }
             }
             return inject;
         }

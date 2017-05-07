@@ -65,7 +65,7 @@ namespace Websilk.Services
                 //generate login page
                 P.Url = P.parseUrl("/login");
                 P.getPageInfoFromUrl();
-                var cLogin = P.loadComponent(new Websilk.Components.Login(), panelBody, panelBody.cells[0], true);
+                var cLogin = P.loadComponent(new Websilk.Components.Login(), panelBody, panelBody.cells[0], ref panels, true);
                 var posLogin = cLogin.position[4];
                 posLogin.padding.top = 50;
                 posLogin.width = 400;
@@ -76,7 +76,7 @@ namespace Websilk.Services
                 //generate login page
                 P.Url = P.parseUrl("/access-denied");
                 P.getPageInfoFromUrl();
-                var cLogin = P.loadComponent(new Websilk.Components.Login(), panelBody, panelBody.cells[0], true);
+                var cLogin = P.loadComponent(new Websilk.Components.Login(), panelBody, panelBody.cells[0], ref panels, true);
                 var posLogin = cLogin.position[4];
                 posLogin.padding.top = 50;
                 posLogin.width = 400;

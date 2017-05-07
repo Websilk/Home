@@ -34,7 +34,7 @@ S.viewport.view = function (level) {
     S.editor.components.hover.disable();
     switch (level) {
         case 4: //HD
-            S.viewport.resize(1920); break;
+            S.viewport.resize('100%'); break;
 
         default: //all other screen sizes
             S.viewport.resize(S.viewport.levels[level]); break;

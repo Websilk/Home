@@ -101,6 +101,12 @@ namespace Websilk
         public string editType = ""; //page type to edit (usually "edit" when isEditable = true)
         public string editFolder = ""; //sub-folder where page.json is located (usually used for "history" folder)
 
+        //page references
+        [JsonIgnore]
+        public List<Panel> panels;
+        [JsonIgnore]
+        public List<structBlock> blocks;
+
         public Page(Core WebsilkCore)
         {
             S = WebsilkCore;
@@ -486,7 +492,7 @@ namespace Websilk
                 var page = tuple.Item3;
 
                 //load list of panels
-                var panels = tuple.Item4;
+                panels = tuple.Item4;
                 Panel panel;
                 var hasSiblings = false;
                 
@@ -513,6 +519,16 @@ namespace Websilk
             //setup page to render layout, panels, and components (and editor UI too if necessary)
             var scaffold = new Scaffold(S, "/core/page.html");
             var useSVG = false;
+
+            //setup base javascript files
+            S.javascriptFiles.Add("platform", "/js/platform.js");
+            if (isEditable == true)
+            {
+                S.javascriptFiles.Add("editor", "/js/editor.js");
+            }
+
+            //render page layout (panels & components)
+            scaffold.Data["body"] = renderLayout();
 
             //setup scaffold variables
             scaffold.Data["favicon"] = "/images/favicon.gif";
@@ -564,17 +580,7 @@ namespace Websilk
             }
             scaffold.Data["facebook"] += "<meta id=\"metafbtitle\" property=\"og:title\" content=\"" + pageTitle + "\" />" +
                             "<meta id=\"metafbsite\" property=\"og:site_name\" content=\"" + websiteTitle + "\" />";
-
-            //setup base javascript files
-            S.javascriptFiles.Add("platform", "/js/platform.js");
-            if (isEditable == true)
-            {
-                S.javascriptFiles.Add("editor", "/js/editor.js");
-            }
-
-            //render page layout (panels & components)
-            scaffold.Data["body"] = renderLayout();
-
+            
             //setup inline CSS
             scaffold.Data["head-css"] = S.css.renderCss();
 
@@ -583,7 +589,10 @@ namespace Websilk
 
             //setup inline javascript
             scaffold.Data["scripts"] = S.javascriptFiles.renderJavascriptFiles(true, S.javascript.renderJavascript());
-                                       ;
+
+            //setup component-specific html
+            scaffold.Data["html"] = S.html.renderHtml();
+
             //finally, render web page
             return scaffold.Render();
         }
@@ -764,7 +773,7 @@ namespace Websilk
         /// </summary>
         /// <param name="component"></param>
         /// <param name="panelId"></param>
-        public Component loadComponent(Component component, Panel panel, Panel.structCell cell, bool isCreated = false, bool noExecution = false)
+        public Component loadComponent(Component component, Panel panel, Panel.structCell cell, ref List<Panel> panels, bool isCreated = false, bool noExecution = false)
         {
             if (component.id == "")
             {
@@ -792,6 +801,7 @@ namespace Websilk
 
                 //call component Load() function
                 panel.cells[cellIndex].components[compIndex].Load();
+                panel.cells[cellIndex].components[compIndex].isLoaded = true;
             }
             return panel.cells[cellIndex].components[compIndex];
         }
@@ -799,12 +809,13 @@ namespace Websilk
 
         public void loadComponents(structBlock block, Panel blockPanel, ref List<Panel> panels, bool noExecution = false)
         {
+            this.panels = panels;
             foreach (var comp in block.components)
             {
                 if (comp.panelId == blockPanel.id)
                 {
                     //load component into layout panel
-                    loadComponent(comp, blockPanel, blockPanel.cells[0], false, noExecution);
+                    loadComponent(comp, blockPanel, blockPanel.cells[0], ref panels, false, noExecution);
                 }
                 else
                 {
@@ -814,7 +825,7 @@ namespace Websilk
                     {
                         if (cell.id == comp.panelCellId)
                         {
-                            loadComponent(comp, p, cell, false, noExecution);
+                            loadComponent(comp, p, cell, ref panels, false, noExecution);
                         }
                     }
                 }
@@ -849,6 +860,7 @@ namespace Websilk
             component.Initialize(S, this);
             component.Create();
             component.Load();
+            component.isLoaded = true;
 
             return component;
         }
@@ -858,7 +870,7 @@ namespace Websilk
         /// </summary>
         /// <param name="panels"></param>
         /// <returns></returns>
-        public List<Component> GetAllComponents(List<Panel> panels)
+        public List<Component> GetAllComponents(List<Panel> panels, bool isLoadedOnly = false)
         {
             var list = new List<Component>();
             foreach(var p in panels)
@@ -867,7 +879,14 @@ namespace Websilk
                 {
                     foreach(var c in cell.components)
                     {
-                        list.Add(c);
+                        if(isLoadedOnly == false)
+                        {
+                            list.Add(c);
+                        }
+                        else if(c.isLoaded == true)
+                        {
+                            list.Add(c);
+                        }
                     }
                 }
             }

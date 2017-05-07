@@ -79,6 +79,7 @@ S.editor.components = {
     select: { 
         elem:{
             compSel: $('.editor > .component-select'),
+            compShield: $('.editor > .component-shield'),
             resize: {
                 top: $('.editor > .component-select > .r-top'),
                 topRight: $('.editor > .component-select > .r-top-right'),
@@ -110,27 +111,48 @@ S.editor.components = {
             }
 
             //setup menu
-            this.menu.add($('#template_select_menu_props').html(), 'props');
-            this.menu.add($('#template_select_menu_alignment').html(), 'alignment', null, null, S.editor.components.select.menu.alignment.show);
+            this.menu.add($('#template_select_menu_props').html(), 'props', ['all', 'props']);
+            this.menu.add($('#template_select_menu_alignment').html(), 'alignment', ['all', 'alignment'], null, null, S.editor.components.select.menu.alignment.show, S.editor.components.select.menu.alignment.hide);
             this.menu.alignment.init();
             $('#template_select_menu_props').remove();
             $('#template_select_menu_options').remove();
         },
 
         show: function (e) {
+            if (S.editor.components.selected != null) { this.hide(); }
+            $('.component-select .menu-window').hide();
             S.editor.components.selected = e;
+            e.css({ zIndex: 1001 });
             var c = S.components.items.find(function (a) { return a.id == e[0].id.substr(1); });
             this.refresh();
             this.elem.compSel.show();
-            this.menu.show(c.menus);
+            this.elem.compShield.show();
+            this.menu.show(e, c.menus);
             this.visible = true;
+
+            //add event to window scroll event listener
+            S.events.doc.scroll.callback.add('component-select', null,
+                function () {
+                    S.editor.components.select.refresh.call(S.editor.components.select);
+                },
+                function () {
+                    S.editor.components.select.refresh.call(S.editor.components.select);
+                }
+            );
         },
 
         hide: function () {
-            S.editor.components.selected = null;
-            $('.component-select .menu-window').hide();
-            this.elem.compSel.hide();
-            this.visible = false;
+            var e = S.editor.components.selected;
+            if (e != null) {
+                e[0].style.zIndex = '';
+                $('.component-select .menu-window').hide();
+                this.elem.compSel.hide();
+                this.elem.compShield.hide();
+                this.visible = false;
+                this.menu.hide(e);
+                S.editor.components.selected = null;
+                S.events.doc.scroll.callback.remove('component-select');
+            }
         },
 
         resize: {
@@ -294,23 +316,41 @@ S.editor.components = {
                 //stop resizing
                 var self = S.editor.components.select.resize,
                     c = S.editor.components.selected;
+                var i = S.components.items.findIndex(function (a) { return a.id == c[0].id.substr(1); });
+                var component = S.components.items[i];
+                var posIndex = S.viewport.indexFromLevelOrder(component.pos);
+                var pos = $.extend(true, {}, component.pos[posIndex]);
+                console.log(pos);
+
+                //stop events & reset vars
                 if (self.timer != null) { clearInterval(self.timer); }
                 $(document).off('mousemove', self.mousemove);
                 $(document).off('mouseup', self.mouseup);
                 self.bar = null;
                 self.type = null;
                 self.timer = null;
+                S.editor.components.hover.hide();
 
-                //save component position
-                var pos = {};
-                if (self.pos.widthType <= 1 && self.pos.heightType == 0) {
-                    pos = { maxWidth: c.css('maxWidth').replace('px', ''), maxHeight: c.css('maxHeight').replace('px', '') };
-                } else if (self.pos.widthType <= 1) {
-                    pos = { maxWidth: c.css('maxWidth').replace('px', '') };
-                } else if (self.pos.heightType == 0) {
-                    pos = { maxHeight: c.css('maxHeight').replace('px', '') };
+                //update component CSS
+                if (pos != null) {
+                    pos.width = c.width();
+                    pos.height = c.height();
+                    S.components.items[i].pos[S.viewport.level] = pos;
+                    console.log(S.components.items[i].pos);
+                    S.editor.components.css.update(c[0]);
+                    c[0].style = "";
+
+                    //save component position
+                    data = {};
+                    if (self.pos.widthType <= 1 && self.pos.heightType == 0) {
+                        data = { maxWidth: pos.width, maxHeight: pos.height };
+                    } else if (self.pos.widthType <= 1) {
+                        data = { maxWidth: pos.width };
+                    } else if (self.pos.heightType == 0) {
+                        data = { maxHeight: pos.height };
+                    }
+                    S.editor.save.add(self.component.id, 'resize:' + S.viewport.level, data);
                 }
-                S.editor.save.add(self.component.id, 'resize:' + S.viewport.level, pos);
             },
         },
 
@@ -330,6 +370,7 @@ S.editor.components = {
             var bottomspace = (win.h + win.scrolly) - (pos.top - this.pad + maxh);
             var topspace = pos.top - this.pad;
             var toolh = S.editor.toolbar.height;
+            var scrollbarv = S.window.verticalScrollbarWidth();
 
             //set up select box dimensions (with window-bound constraints)
             var box = {
@@ -338,6 +379,14 @@ S.editor.components = {
                 w: rightspace < 0 ? maxw + rightspace : maxw, 
                 h: (bottomspace < 0 ? maxh + bottomspace : maxh) + (topspace < toolh ? topspace - toolh : 0)
             };
+
+            //set component shield before resizing box within boundaries
+            this.elem.compShield.css({ top: box.y, left: box.x, width: box.w, height: box.h });
+
+            if (box.x < 0) { box.x = 5; }
+            if (box.y - win.scrolly - toolh < 0) { box.y = win.scrolly + toolh; }
+            if (box.w > win.w - scrollbarv) { box.w = win.w - scrollbarv - (box.x * 2); }
+            if (box.h > win.h - toolh) { box.h = win.h - toolh; }
 
             //reposition component select box container
             this.elem.compSel.css({ top: box.y, left: box.x });
@@ -355,12 +404,16 @@ S.editor.components = {
             r.left.css({ top: this.corners, height: box.h - (this.corners * 2) });
 
             //reposition menu system
+            var menutop = 0;
+            if (win.scrolly > box.y) {
+                menutop = win.scrolly - box.y;
+            }
             if (win.w - (box.x + box.w) < 50) {
                 //inner menu
-                m.addClass('inner').css({ left: box.w - 36, top: 4 });
+                m.addClass('inner').css({ left: box.w - 36, top: menutop + 4 });
             } else {
                 //outer menu
-                m.removeClass('inner').css({ left: box.w, top:0 });
+                m.removeClass('inner').css({ left: box.w, top: menutop });
             }
             if (win.w - (box.x + box.w) < 250) {
                 //inner menu window
@@ -369,55 +422,123 @@ S.editor.components = {
                 //outer menu window
                 m.find('.menu-window').removeClass('inner');
             }
+
+            //execute all registered events
+            this.events.refresh.execute();
+        },
+
+        events: {
+            refresh: {
+                items: [],
+                add: function (elem, onRefresh) {
+                    this.items.push({ elem: elem, onRefresh: onRefresh });
+                },
+
+                remove: function (elem) {
+                    for (var x = 0; x < this.items.length; x++) {
+                        if (this.items[x].elem == elem) {
+                            this.items.splice(x, 1);
+                            break;
+                        }
+                    }
+                },
+
+                execute: function () {
+                    for (var x = 0; x < this.items.length; x++) {
+                        this.items[x].onRefresh();
+                    }
+                }
+            }
         },
 
         menu: {
-            items: [],
+            items: [], usedMenus: [],
 
-            add: function (html, id, types, onShow, onClick) {
+            add: function (html, id, types, onShow, onHide, onClick) {
                 //html = icon & optional menu
                 //types = array of component types this menu should be displayed for (all, text, photo, etc.)
                 //onShow = function to call when the menu is shown
                 //onClick = function to call when the menu item is clicked
                 var self = S.editor.components.select.menu;
                 if (self.items.find(function (a) { return a.id == id; }) == undefined) {
-                    var div = document.createElement('div');
-                    var classname = 'item menu-' + id + ' ';
-                    if (types == null) { classname += 'for-all'; }
-                    for (var t in types) {
-                        classname += 'for-' + t;
-                    }
-                    div.setAttribute('data-id', id);
-                    div.className = classname;
-                    $(div).html(html);
-                    $(div).find('.menu-window').hide();
-                    $('.component-select .menu').append(div);
-                    $('.component-select .menu-' + id + ' > .icon a').on('click', function () {
-                        var menu = $('.component-select .menu-' + id + ' > .menu-window');
-                        if (menu[0].style.display == 'none') {
-                            menu.show();
-                            var item = self.items.find(function (a) { return a.id == id; });
-                            if (typeof item.onClick == 'function') { item.onClick(); }
-                        } else {
-                            menu.hide();
+                    if (html != "") {
+                        var div = document.createElement('div');
+                        var classname = 'item menu-' + id;
+                        if (types == null) { classname += ' for-all'; }
+                        for (var t in types) {
+                            classname += ' for-' + types[t];
                         }
-                    });
+                        div.setAttribute('data-id', id);
+                        div.className = classname;
+                        $(div).html(html);
+                        $(div).find('.menu-window').hide();
+                        $('.component-select .menu').append(div);
+                        $('.component-select .menu-' + id + ' > .icon a').on('click', function () {
+                            var menu = $('.component-select .menu-' + id + ' > .menu-window');
+                            if (menu[0].style.display == 'none') {
+                                menu.show();
+                                var item = self.items.find(function (a) { return a.id == id; });
+                                if (typeof item.onClick == 'function') { item.onClick(); }
+                            } else {
+                                menu.hide();
+                            }
+                        });
+                    }
                 }
                 S.editor.components.select.menu.items.push({
-                    id: id, types: types, onShow: onShow, onClick: onClick
+                    id: id, types: types, onShow: onShow, onHide: onHide, onClick: onClick
                 });
             },
 
-            show: function (types) {
+            show: function (e, types) {
                 var self = S.editor.components.select.menu;
                 $('.component-select .menu .item').hide();
                 if (types[0] == '') { types[0] = 'all';}
                 //show menu items
+                var menus = [];
                 for (var t in types) {
-                    var b = $('.component-select .menu .item.for-' + types[t]);
-                    b.show();
-                    var item = self.items.find(function (a) { return a.id == b.attr('data-id'); });
-                    if (typeof item.onShow == 'function') { item.onShow(); }
+                    var type = types[t];
+                    var hide = type.substr(0, 1) == '!';
+                    if (hide) { type = type.substr(1); }
+                    var b = $('.component-select .menu .item.for-' + type);
+                    
+                    var items = self.items.filter(function (a) {
+                        return a.types.indexOf(type) >= 0;
+                    });
+                    for (var i = 0; i < items.length; i++) {
+                        var x = -1;
+                        if (menus.length > 0) {
+                            x = menus.findIndex(function (a) {
+                                return a.id == items[i].id;
+                            });
+                        }
+                        if (!hide && x < 0) {
+                            //add menu to list
+                            menus.push(items[i]);
+                        } else if (x >= 0) {
+                            //remove menu from list
+                            menus.splice(x, 1);
+                        }
+                    }
+                    if (!hide) {
+                            b.show();
+                    } else {
+                        b.hide();
+                    }
+                }
+                //finally, execute events for menus in list
+                S.editor.components.select.menu.usedMenus = menus;
+                for (var x = 0; x < menus.length; x++) {
+                    if (typeof menus[x].onShow == 'function') { menus[x].onShow(e); }
+                }
+                S.editor.components.hover.hide();
+            },
+
+            hide: function (e) {
+                var self = S.editor.components.select.menu;
+                for (var x = 0; x < self.usedMenus.length; x++) {
+                    var item = self.usedMenus[x];
+                    if (typeof item.onHide == 'function') { item.onHide(e); }
                 }
             },
 
@@ -427,11 +548,17 @@ S.editor.components = {
                 },
 
                 show: function () {
-                    var self = S.editor.components.select.menu;
+                    var self = S.editor.components.select.menu.alignment;
+                    self.load();
+                    S.viewport.events.levelChange.add('menu-alignment', self.load);
+                },
+
+                load: function () {
                     var c = S.editor.components.selected;
                     var i = S.components.items.findIndex(function (a) { return a.id == c[0].id.substr(1); });
                     var component = S.components.items[i];
-                    var pos = component.pos[S.viewport.level];
+                    var posIndex = S.viewport.indexFromLevelOrder(component.pos);
+                    var pos = component.pos[posIndex];
 
                     //update form fields
                     $('#component_align').val(pos.align);
@@ -444,12 +571,17 @@ S.editor.components = {
                     $('#component_newline')[0].checked = pos.forceNewLine;
                 },
 
+                hide: function () {
+                    S.viewport.events.levelChange.remove('menu-alignment');
+                },
+
                 update: function () {
                     //update alignment settings for selected component
                     var c = S.editor.components.selected;
                     var i = S.components.items.findIndex(function (a) {return a.id == c[0].id.substr(1);});
                     var component = S.components.items[i];
-                    var pos = component.pos[S.viewport.level];
+                    var posIndex = S.viewport.indexFromLevelOrder(component.pos);
+                    var pos = component.pos[posIndex];
                     var data = {
                         align: parseInt($('#component_align').val()),
                         fixedAlign: pos.fixedAlign,
@@ -474,7 +606,7 @@ S.editor.components = {
                     S.editor.components.select.refresh();
 
                     //save changes to page
-                    S.editor.save.add(c[0].id, 'alignment:' + S.viewport.level, data);
+                    S.editor.save.add(c[0].id.substr(1), 'alignment:' + S.viewport.level, data);
                 }
             }
         }
@@ -675,15 +807,18 @@ S.editor.components = {
     // executed when the user clicks anywhere on the web page ////////////////////////////////////////////////////
     click: function (target, type) {
         if (type != 'component-select' && type != 'component-hover' && type != 'window' && type != 'toolbar') {
-            //deselect component
-            var c = $(target);
-            if (!c.hasClass('component')) { c = c.parents('.component'); }
-            if(c.length > 0){
-                if (S.editor.components.selected != null) {
-                    if (c.get() == S.editor.components.selected.get()) { return; }
+            //check for parents that have specific class 'for-component-select'
+            if ($(target).parents('.for-component-select').length == 0) {
+                //deselect component
+                var c = $(target);
+                if (!c.hasClass('component')) { c = c.parents('.component'); }
+                if (c.length > 0) {
+                    if (S.editor.components.selected != null) {
+                        if (c.get() == S.editor.components.selected.get()) { return; }
+                    }
                 }
+                S.editor.components.select.hide();
             }
-            S.editor.components.select.hide();
         }
     },
 
@@ -890,6 +1025,7 @@ S.editor.components = {
         }
     },
 
+    // updating CSS properties for a specific component //////////////////////////////////////////////////////////
     css: {
         update: function (c) {
             //update CSS for component position & alignment settings
@@ -899,7 +1035,7 @@ S.editor.components = {
                 var pos = component.pos;
                 var css = '';
                 var style = '';
-                for (var x = 0; x < pos.length; x++) {
+                for (var x = 4; x >= 0; x--) {
                     var p = pos[x];
                     if (p != null) {
                         style = '';
@@ -1005,6 +1141,7 @@ S.editor.components = {
                 style.innerHTML = css;
                 $('#' + style.id).remove();
                 $('head').append(style);
+                S.editor.components.hover.hide();
             }
         }
     }

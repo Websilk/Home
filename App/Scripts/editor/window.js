@@ -201,6 +201,7 @@
             var pos = elem.offset();
             var arrowPad = win.hasArrow ? 25 : 0;
             var arrow = { elem: $(win.elem).find('.box > .arrow'), x: 0, w: 50 };
+            var windw = S.window.pos();
             pos.width = elem.width();
             pos.height = elem.height();
             target.pos = pos;
@@ -283,7 +284,7 @@
                 //align window to target
                 elem.css({
                     left: target.pos.left + target.x - box.x,
-                    top: target.pos.top + target.y - box.y
+                    top: target.pos.top + target.y - box.y - windw.scrolly
                 });
             }
         }

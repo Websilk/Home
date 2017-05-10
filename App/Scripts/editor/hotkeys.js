@@ -84,7 +84,12 @@
                         if (!S.editor.visible) {
                             S.editor.show();
                         } else {
-                            S.editor.hide();
+                            //check for toolbar dialog
+                            if ($('.editor .toolbar .dialog')[0].style.display != 'none'){
+                                S.editor.layout.hide();
+                            } else {
+                                S.editor.hide();
+                            }
                         }
                         break;
                     case 38: //up

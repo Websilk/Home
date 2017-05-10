@@ -13,6 +13,7 @@
         };
         this.options = opts;
 
+        var win = S.window.pos();
         var div = document.createElement('div');
         var forpopup = $('body > .for-popup');
         var popup = $(div);
@@ -27,7 +28,7 @@
             popup.css({ top: opts.offsetTop });
         } else if (Number(opts.offsetTop) == opts.offsetTop) {
             if (opts.offsetTop > 0) {
-                popup.css({ top: opts.offsetTop });
+                popup.css({ top: win.scrolly + ((win.h - 300) / 3) + opts.offsetTop });
             }
         }
         if (opts.padding > 0) {
@@ -47,6 +48,7 @@
 
         //set up events
         S.events.doc.resize.callback.add('popup', S.popup.resize, S.popup.resize, S.popup.resize);
+        S.events.doc.scroll.callback.add('popup', S.popup.resize, S.popup.resize, S.popup.resize);
 
         if (opts.close == true) {
             $('.popup .btn-close a').on('click', function () {
@@ -67,6 +69,8 @@
         var win = S.window.pos();
         var pos = S.popup.elem.position();
         pos.height = S.popup.elem.height();
-        S.popup.elem.css({ maxHeight: win.height - (S.popup.options.padding * 2), top: S.popup.options.offsetTop.toString().indexOf('%') > 0 ? S.popup.options.offsetTop : (win.h / 2) - (pos.height / 2) + S.popup.options.offsetTop });
+        console.log(pos);
+        console.log(S.popup.elem);
+        S.popup.elem.css({ maxHeight: win.height - (S.popup.options.padding * 2), top: S.popup.options.offsetTop.toString().indexOf('%') > 0 ? S.popup.options.offsetTop : win.scrolly + ((win.h - pos.height) / 3) + S.popup.options.offsetTop });
     }
 }

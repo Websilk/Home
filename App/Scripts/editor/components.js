@@ -111,7 +111,7 @@ S.editor.components = {
             }
 
             //setup menu
-            this.menu.add($('#template_select_menu_props').html(), 'props', ['all', 'props']);
+            this.menu.add($('#template_select_menu_props').html(), 'props', ['all', 'props'], null, null, S.editor.components.select.properties.show);
             this.menu.add($('#template_select_menu_alignment').html(), 'alignment', ['all', 'alignment'], null, S.editor.components.select.menu.alignment.hide, S.editor.components.select.menu.alignment.show);
             this.menu.alignment.init();
             $('#template_select_menu_props').remove();
@@ -473,17 +473,20 @@ S.editor.components = {
                         $('.component-select .menu').append(div);
                         $('.component-select .menu-' + id + ' > .icon a').on('click', function () {
                             var menu = $('.component-select .menu-' + id + ' > .menu-window');
-                            if (menu[0].style.display == 'none') {
-                                menu.show();
-                                var item = self.items.find(function (a) { return a.id == id; });
-                                if (typeof item.onClick == 'function') { item.onClick(); }
-                            } else {
-                                menu.hide();
+                            if (menu.length > 0) {
+                                if (menu[0].style.display == 'none') {
+                                    menu.show();
+                                } else {
+                                    menu.hide();
+                                    return;
+                                }
                             }
+                            var item = self.items.find(function (a) { return a.id == id; });
+                            if (typeof item.onClick == 'function') { item.onClick(); }
                         });
                     }
                 }
-                S.editor.components.select.menu.items.push({
+                self.items.push({
                     id: id, types: types, onShow: onShow, onHide: onHide, onClick: onClick
                 });
             },
@@ -605,6 +608,22 @@ S.editor.components = {
 
                     //save changes to page
                     S.editor.save.add(c[0].id.substr(1), 'alignment:' + S.viewport.level, data);
+                }
+            }
+        },
+
+        properties: {
+            component: null,
+
+            show: function () {
+                //load component properties window
+                var self = S.editor.components.select.properties;
+                var c = S.editor.components.selected;
+                if (self.component != c[0]) {
+                    self.component = c;
+                    console.log(S.editor.components.select.properties);
+                } else {
+
                 }
             }
         }

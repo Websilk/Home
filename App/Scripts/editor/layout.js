@@ -126,7 +126,7 @@
                 id: id, area: area, index: index
             });
             var options = {
-                offsetTop: '25%',
+                offsetTop: 50,
                 width: 300
             };
             S.popup.show(changeOnly === true ? 'Change Existing Block' : 'Add Block', scaffold.render(), options);

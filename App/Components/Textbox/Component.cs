@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Websilk.Components
 {
@@ -104,7 +105,49 @@ namespace Websilk.Components
             if (Page.isEditable)
             {
                 menuTypes = new string[] { "all", "!props", "texteditor" };
-                AddHtmlToEditor("texteditor", S.Server.LoadFileFromCache("/components/textbox/texteditor.html"), new Func<Component, bool>(
+                var texteditor = new Scaffold(S, "/components/textbox/texteditor.html");
+
+                //set up font sizes
+                var fontSizes = new int[]
+                {
+                    8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
+                    20, 21, 22, 23, 24, 25, 26, 27, 28, 29,
+                    30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40,
+                    42, 44, 46, 48, 50, 52, 54, 56, 58, 60, 62, 64, 66, 68,
+                    70, 72, 74, 76, 78, 80, 82, 84, 86, 88, 90, 92, 94, 96, 98,
+                    100, 120, 140, 160, 180, 200, 250
+                };
+                var html = "";
+                foreach(var s in fontSizes)
+                {
+                    html += "<option value=\"" + s + "\">" + s + "</option>\n";
+                }
+                texteditor.Data["font-size"] = html;
+
+                //set up font family
+                html = "";
+                var fontFamilies = new List<string>()
+                {
+                    "Arial, Helvetica, sans-serif",
+                    "\"Arial Black\", Gadget, sans-serif",
+                    "Impact, Charcoal, sans-serif",
+                    "\"Lucida Sans Unicode\", \"Lucida Grande\", sans-serif",
+                    "Tahoma, Geneva, sans-serif",
+                    "\"Trebuchet MS\", Helvetica, sans-serif",
+                    "Verdana, Geneva, sans-serif",
+                    "Georgia, serif",
+                    "\"Palatino Linotype\", \"Book Antiqua\", Palatino, serif",
+                    "\"Times New Roman\", Times, serif",
+                    "\"Courier New\", Courier, monospace",
+                    "\"Lucida Console\", Monaco, monospace"
+                };
+                foreach(var f in fontFamilies)
+                {
+                    html += "<option value=\"" + f.Replace("\"", "&quot;") + "\">" + f + "</option>\n";
+                }
+                texteditor.Data["font-family"] = html;
+
+                AddHtmlToEditor("texteditor", texteditor.Render(), new Func<Component, bool>(
                     (c) => {
                         //text component already exists on the page, so don't add Html
                         return false;

@@ -48,6 +48,7 @@ paths.working = {
             paths.scripts + 'core/editor.js',
             paths.scripts + 'editor/[^_]*.js',
             paths.scripts + 'utility/rangy.js',
+            paths.scripts + 'utility/DOMpurify.js',
             paths.scripts + 'editor/_init.js'
         ],
         app: paths.app + '**/*.js'

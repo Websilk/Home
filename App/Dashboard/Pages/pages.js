@@ -202,6 +202,7 @@
                 parentId: S.dashboard.pages.current_page,
                 title: title,
                 description: desc,
+                type: container.find('#pagetype').val(),
                 secure: secure
             },
                 function (data) {

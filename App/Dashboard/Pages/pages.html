@@ -105,7 +105,7 @@
             </div>
             <div class="row hover">
                 <div class="col field-label">Title</div>
-                <div class="col field-input expand">{{field-create-title}}</div>
+                <div class="col field-input expand"><input type="text" id="txtcreatetitle" placeholder="New Page Title" /></div>
             </div>
             <div class="row pad-bottom-sm">
                 <div class="col field-label"></div>
@@ -113,16 +113,25 @@
             </div>
             <div class="row hover margin-bottom-sm">
                 <div class="col field-label">Summary</div>
-                <div class="col field-input expand">{{field-create-summary}}</div>
+                <div class="col field-input expand"><textarea id="txtcreatedesc">Write a description about your new page</textarea></div>
+            </div>
+            <div class="row hover">
+                <div class="col field-label">Page Type</div>
+                <div class="col field-input">
+                    <select id="pagetype">
+                        <option value="0" selected="selected">Web Page</option>
+                        <option value="2">Shadow Page</option>
+                    </select>
+                </div>
             </div>
             <div class="row text-right pad-top desc-chars font-faded"></div>
             <div class="row pad-top pad-bottom-sm title"><h6>Security</h6></div>
             <div class="row hover margin-bottom-lg">
                 <div class="col field-label"></div>
-                <div class="col field-input">
+                <div class="col field-text">
                     <label>
                         <input type="checkbox" class="chk-secure" /><span>Private</span>
-                        <span class="font-faded pad-left">Only users who are signed in can view the page</span>
+                        <span class="font-faded pad-left">Only administrators can view this web page</span>
                     </label>
                     
                 </div>

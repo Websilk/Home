@@ -96,7 +96,7 @@ S.editor.components = {
             },
             menu: $('.component-select .menu')
         },
-        visible: false, corners: 10, pad: 13, bar: 4, menu: { width: 40 },
+        visible: false, corners: 10, pad: 13, bar: 4, menu: { width: 40 }, locked: false, nomoreJitter: false, jitterbugs: null,
 
         init: function () {
             //set up static sizes for some resize bars
@@ -142,6 +142,7 @@ S.editor.components = {
         },
 
         hide: function () {
+            if (this.locked == true) { return;}
             var e = S.editor.components.selected;
             if (e != null) {
                 e[0].style.zIndex = '';
@@ -354,6 +355,17 @@ S.editor.components = {
 
         refresh: function () {
             //reposition all resize bars & menu system for the component select box
+
+            var components = $('.component');
+            if (!S.editor.components.select.jitterbugs || S.editor.components.select.jitterbugs.length != components.length)
+            {
+                //create jitterbugs
+                S.editor.components.select.jitterbugs = [];
+                $('.component').each(function (c) {
+                    S.editor.components.select.jitterbugs.push({ elem: c, active: false });
+                });
+            }
+
             if (S.editor.components.selected == null) { return;}
             var c = S.editor.components.selected;
             var pos = c.offset();

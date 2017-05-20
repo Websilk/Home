@@ -17,18 +17,21 @@ namespace Websilk
             S = WebsilkCore;
         }
 
-        public void Add(string name, string resource, bool joinDuplicates = true)
+        public void Add(string name, string resource, bool joinDuplicates = true, bool haveDuplicates = false)
         {
             if (_resources == null) { _resources = new Dictionary<string, string>(); }
             if (!_resources.ContainsKey(name)) { _resources.Add(name, resource); }
             else {
                 if (joinDuplicates == false)
                 {
-                    var i = 1;
-                    while (i < 100)
+                    if (haveDuplicates)
                     {
-                        if (!_resources.ContainsKey(name + i)) { _resources.Add(name + i, resource); break; }
-                        i++;
+                        var i = 1;
+                        while (i < 100)
+                        {
+                            if (!_resources.ContainsKey(name + i)) { _resources.Add(name + i, resource); break; }
+                            i++;
+                        }
                     }
                 }
                 else {

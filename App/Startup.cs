@@ -16,7 +16,13 @@ namespace Websilk
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddDistributedMemoryCache();
-            services.AddSession();
+            services.AddSession(opts =>
+            {
+                //set up cookie expiration
+                opts.CookieName = "Websilk";
+                opts.IdleTimeout = TimeSpan.FromMinutes(60);
+            });
+
 
             //add server-side scheduler service (like CRON jobs)
             services.AddSingleton<ISingularity, Singularity>(serviceProvider => Singularity.Instance);
@@ -141,7 +147,6 @@ namespace Websilk
                     Console.WriteLine("END GET {0} {1} ms {2}", context.Request.Path, tspan.Milliseconds, requestType);
                     Console.WriteLine("");
                 }
-                
             });
         }
 

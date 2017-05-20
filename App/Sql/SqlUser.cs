@@ -15,7 +15,7 @@ namespace Websilk.SqlQueries
             var parameters = new List<SqlParameter>();
             parameters.Add(new SqlParameter("@email", email));
             parameters.Add(new SqlParameter("@password", password));
-            return new SqlReader(S, "EXEC AuthenticateUser @email=@email, @password=@password", parameters);
+            return new SqlReader(S, "EXEC Security_AuthenticateUser @email=@email, @password=@password", parameters);
         }
 
         public SqlReader UpdatePassword(int userId, string password)
@@ -23,21 +23,21 @@ namespace Websilk.SqlQueries
             var parameters = new List<SqlParameter>();
             parameters.Add(new SqlParameter("@userId", userId.ToString()));
             parameters.Add(new SqlParameter("@password", password));
-            return new SqlReader(S, "EXEC UpdateUserPassword @userId=@userId, @password=@password", parameters);
+            return new SqlReader(S, "EXEC User_UpdatePassword @userId=@userId, @password=@password", parameters);
         }
 
         public string GetEmail(int userId)
         {
             var parameters = new List<SqlParameter>();
             parameters.Add(new SqlParameter("@userId", userId.ToString()));
-            return (string)S.Sql.ExecuteScalar("EXEC GetUserEmail @userId=@userId", parameters);
+            return (string)S.Sql.ExecuteScalar("EXEC User_GetEmail @userId=@userId", parameters);
         }
 
         public string GetPassword(string email)
         {
             var parameters = new List<SqlParameter>();
             parameters.Add(new SqlParameter("@email", email));
-            return (string)S.Sql.ExecuteScalar("EXEC GetUserPassword @email=@email", parameters);
+            return (string)S.Sql.ExecuteScalar("EXEC User_GetPassword @email=@email", parameters);
         }
 
         public SqlReader UpdateEmail(int userId, string email)
@@ -45,7 +45,7 @@ namespace Websilk.SqlQueries
             var parameters = new List<SqlParameter>();
             parameters.Add(new SqlParameter("@userId", userId.ToString()));
             parameters.Add(new SqlParameter("@email", email));
-            return new SqlReader(S, "EXEC UpdateUserEmail @userId=@userId, @email=@email", parameters);
+            return new SqlReader(S, "EXEC User_UpdateEmail @userId=@userId, @email=@email", parameters);
         }
         #endregion
 

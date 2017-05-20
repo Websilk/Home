@@ -14,7 +14,7 @@ namespace Websilk.SqlQueries
         {
             var parms = new List<SqlParameter>();
             parms.Add(new SqlParameter("@_category", category != "" ? category : "1"));
-            return new SqlReader(S, "EXEC GetComponents @category=@_category", parms);
+            return new SqlReader(S, "EXEC Components_GetList @category=@_category", parms);
         }
         #endregion
 
@@ -26,7 +26,7 @@ namespace Websilk.SqlQueries
                 new SqlParameter("@websiteId", websiteId),
                 new SqlParameter("@area", area)
             };
-            return new SqlReader(S, "EXEC GetBlocks @websiteId=@websiteId, @area=@area", parms);
+            return new SqlReader(S, "EXEC Blocks_GetList @websiteId=@websiteId, @area=@area", parms);
         }
 
         public SqlReader GetBlock(int blockId)
@@ -35,7 +35,7 @@ namespace Websilk.SqlQueries
             {
                 new SqlParameter("@blockId", blockId)
             };
-            return new SqlReader(S, "EXEC GetBlock @blockId=@blockId", parms);
+            return new SqlReader(S, "EXEC Block_Get @blockId=@blockId", parms);
         }
 
         public bool HasBlock(int websiteId, string name)
@@ -45,7 +45,7 @@ namespace Websilk.SqlQueries
                 new SqlParameter("@websiteId", websiteId),
                 new SqlParameter("@name", name)
             };
-            return (int)S.Sql.ExecuteScalar("EXEC HasBlock @websiteId=@websiteId, @name=@name", parms) > 0;
+            return (int)S.Sql.ExecuteScalar("EXEC Block_Exists @websiteId=@websiteId, @name=@name", parms) > 0;
         }
 
         public int CreateBlock(int websiteId, string area, string name)
@@ -56,7 +56,7 @@ namespace Websilk.SqlQueries
                 new SqlParameter("@area", area),
                 new SqlParameter("@name", name)
             };
-            return (int)S.Sql.ExecuteScalar("EXEC CreateBlock @websiteId=@websiteId, @area=@area, @name=@name", parms);
+            return (int)S.Sql.ExecuteScalar("EXEC Block_Create @websiteId=@websiteId, @area=@area, @name=@name", parms);
         }
         #endregion
     }

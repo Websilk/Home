@@ -219,7 +219,7 @@ namespace Websilk.Services
             var totalfiles = 0;
             var page_words = new List<string>();
             var parms = new List<SqlParameter>();
-            var reader = new SqlReader(S, "EXEC GetDocumentation");
+            var reader = new SqlReader(S, "EXEC Documentation_GetList");
             while (reader.Read())
             {
                 path = S.Server.MapPath("/Support/" + reader.Get("path") + ".html");
@@ -241,7 +241,7 @@ namespace Websilk.Services
                             new SqlParameter("@path", reader.Get("path")),
                             new SqlParameter("@keywords", file)
                         };
-                        S.Sql.ExecuteNonQuery("EXEC UpdateDocumentation @path=@path, @keywords=@keywords", parms);
+                        S.Sql.ExecuteNonQuery("EXEC Documentation_Update @path=@path, @keywords=@keywords", parms);
                         totalwords += page_words.Count();
                         totalfiles++;
                     }

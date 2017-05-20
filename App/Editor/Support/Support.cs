@@ -25,7 +25,7 @@ namespace Websilk.Services.Editor
             {
                 new SqlParameter("@keywords", keywords)
             };
-            var reader = new SqlReader(S, "EXEC SearchDocumentation @keywords=@keywords", parms);
+            var reader = new SqlReader(S, "EXEC Documentation_Search @keywords=@keywords", parms);
             while (reader.Read())
             {
                 result.Data["page"] = reader.Get("path");

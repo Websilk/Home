@@ -20,6 +20,10 @@
 	[layout]			 NVARCHAR (30) NOT NULL DEFAULT '',
 	[service]			 NVARCHAR (100) NOT NULL DEFAULT '',
     [title]              NVARCHAR (250) NOT NULL DEFAULT '',
+
+	/*title used in web page <head><title></title></head> */
+    [title_head]         NVARCHAR (250) NOT NULL DEFAULT '', 
+
     [description]        NVARCHAR (160) NOT NULL DEFAULT '',
     [path]               NVARCHAR (512) NOT NULL DEFAULT '',
     [pathIds]            NVARCHAR (100) NOT NULL DEFAULT '',

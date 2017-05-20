@@ -105,7 +105,7 @@ namespace Websilk
                 //get admin email address from database
                 var parameters = new List<SqlParameter>();
                 parameters.Add(new SqlParameter("@_userId", userId.ToString()));
-                emailAddr = (string)S.Sql.ExecuteScalar("EXEC GetUserEmail @userId=@_userId", parameters);
+                emailAddr = (string)S.Sql.ExecuteScalar("EXEC User_GetEmail @userId=@_userId", parameters);
                 if (emailAddr != "" && emailAddr != null) { update = true; }
             }
             if(update == true)

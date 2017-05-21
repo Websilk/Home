@@ -76,7 +76,7 @@ namespace Websilk
         public void CheckAdminPassword()
         {
             var Sql = new Sql(this, Util);
-            if ((int)Sql.ExecuteScalar("EXEC HasPassword @userId=1") == 0)
+            if ((int)Sql.ExecuteScalar("EXEC Security_HasPassword @userId=1") == 0)
             {
                 resetPass = true;
             }

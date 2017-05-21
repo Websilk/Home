@@ -7,10 +7,10 @@ namespace Websilk.SqlQueries
     {
         public enum enumPageType
         {
-            dynamic = 0,
-            service = 1,
-            shadow = 2,
-            clone = 3
+            none = -1, //used to signify not to update page type (in SQL)
+            dynamic = 0, //drag & drop (classsical) page type
+            service = 1, //Websilk.Services.Service page type
+            shadow = 2, //is dynamic, and loads its page layout (blocks) for all child pages
         }
 
         public Page(Core WebsilkCore) : base(WebsilkCore)
@@ -95,11 +95,28 @@ namespace Websilk.SqlQueries
             parameters.Add(new SqlParameter("@title", title));
             parameters.Add(new SqlParameter("@description", description));
             parameters.Add(new SqlParameter("@pageType", ((int)pageType).ToString()));
-            parameters.Add(new SqlParameter("@layout", service));
+            parameters.Add(new SqlParameter("@layout", layout));
             parameters.Add(new SqlParameter("@service", service));
             parameters.Add(new SqlParameter("@security", security == true ? "1" : "0"));
             parameters.Add(new SqlParameter("@enabled", enabled == true ? "1" : "0"));
             S.Sql.ExecuteNonQuery("EXEC Page_Create @ownerId=@ownerId, @websiteId=@websiteId, @parentId=@parentId, @title=@title, @description=@description, @pageType=@pageType, @layout=@layout, @service=@service, @security=@security, @enabled=@enabled", parameters);
+        }
+        #endregion
+
+        #region "Settings"
+        public void Update(int websiteId, int pageId, string titlehead, string description, enumPageType pageType, string layout = "", string service = "", bool security = false, bool enabled = true)
+        {
+            var parameters = new List<SqlParameter>();
+            parameters.Add(new SqlParameter("@websiteId", websiteId.ToString()));
+            parameters.Add(new SqlParameter("@pageId", pageId.ToString()));
+            parameters.Add(new SqlParameter("@titlehead", titlehead));
+            parameters.Add(new SqlParameter("@description", description));
+            parameters.Add(new SqlParameter("@pageType", ((int)pageType).ToString()));
+            parameters.Add(new SqlParameter("@layout", layout));
+            parameters.Add(new SqlParameter("@service", service));
+            parameters.Add(new SqlParameter("@security", security));
+            parameters.Add(new SqlParameter("@enabled", enabled));
+            S.Sql.ExecuteNonQuery("EXEC Page_Update @websiteId=@websiteId, @pageId=@pageId, @titlehead=@titlehead, @description=@description, @pageType=@pageType, @layout=@layout, @service=@service, @security=@security, @enabled=@enabled", parameters);
         }
         #endregion
     }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Text;
 
 namespace Websilk.Pages.DashboardPages
@@ -55,7 +56,7 @@ namespace Websilk.Services.Dashboard
         public string View(int websiteId, int parentId, int start, int length, int orderby, int viewType, string search)
         {
             GetPage();
-            if (!S.User.checkSecurity(websiteId, "dashboard/pages", 0)) { return ""; }
+            if (!S.User.checkSecurity(websiteId, "dashboard/pages", User.enumSecurity.read)) { return ""; }
 
             int parentPageId = 0;
             string pageTitle = "";
@@ -94,6 +95,7 @@ namespace Websilk.Services.Dashboard
             var secureSettings = S.User.checkSecurity(websiteId, "dashboard/pages", User.enumSecurity.update);
 
             var subpageTitle = "";
+            var titleHead = "";
             var pagePath = "";
             var pageLink = "";
             var pageSummary = "";
@@ -110,6 +112,8 @@ namespace Websilk.Services.Dashboard
             {
                 color = "empty";
                 subpageTitle = reader.Get("title");
+                titleHead = reader.Get("title_head");
+                if(titleHead == "") { titleHead = subpageTitle; }
                 pagePath = reader.Get("path");
                 pageSummary = reader.Get("description");
                 pageCreated = DateTime.Parse(reader.Get("datecreated")).ToString("MMMM dd, yyyy");
@@ -176,17 +180,18 @@ namespace Websilk.Services.Dashboard
                     //create
                     options[1] = false;
                 }
-                htm.Append("<li>" + RenderListItem(pageItem, color, subpageId, subpageTitle, pagePath, pageLink, pageSummary, pageCreated, options, hasChildren > 0) + "</li>");
+                htm.Append("<li>" + RenderListItem(pageItem, color, subpageId, subpageTitle, titleHead, pagePath, pageLink, pageSummary, pageCreated, options, hasChildren > 0) + "</li>");
             }
 
             htm.Append("</ul>");
             return htm.ToString();
         }
 
-        private string RenderListItem(Scaffold item, string color, int pageId, string pageTitle, string pagePath, string pageLink, string pageSummary, string createdate, bool[] options, bool isfolder = false)
+        private string RenderListItem(Scaffold item, string color, int pageId, string pageTitle, string pageTitleHead, string pagePath, string pageLink, string pageSummary, string createdate, bool[] options, bool isfolder = false)
         {
             item.Data["id"] = pageId.ToString();
             item.Data["title"] = pageTitle;
+            item.Data["title-head"] = pageTitleHead == pageTitle ? "" : pageTitleHead;
             item.Data["path"] = pagePath;
             item.Data["link"] = pageLink;
             item.Data["summary"] = pageSummary.Replace("\"", "&quot;");
@@ -200,7 +205,7 @@ namespace Websilk.Services.Dashboard
             }
             else
             {
-                item.Data["icon"] = "&nbsp;";
+                item.Data["icon"] = "<svg viewBox=\"0 0 15 15\"><use xlink:href=\"#icon-websites\" x=\"0\" y=\"0\" width=\"15\" height=\"15\" /></svg>";
             }
 
             return item.Render();
@@ -220,6 +225,44 @@ namespace Websilk.Services.Dashboard
 
             //return list of sub-pages
             return View(websiteId, parentId, 0, 100, 0, 0, "");
+        }
+        #endregion
+
+        #region "Settings"
+
+        public string ViewSettings(int id)
+        {
+            var scaffold = new Scaffold(S, "/dashboard/pages/settings.html");
+            var sqlPage = new SqlQueries.Page(S);
+            var reader = sqlPage.GetPageInfo(id);
+            if (reader.Read())
+            {
+                scaffold.Data["page-title"] = reader.Get("title");
+                scaffold.Data["url-title"] = reader.Get("title").ToLower();
+                scaffold.Data["parent-title"] = reader.Get("parenttitle");
+                scaffold.Data["title-head"] = reader.Get("title_head") != "" ? reader.Get("title_head") : reader.Get("title");
+                scaffold.Data["description"] = reader.Get("description");
+                scaffold.Data["secure"] = reader.GetBool("security") ? "checked=\"checked\"" : "";
+                scaffold.Data["active"] = reader.GetBool("enabled") ? "checked=\"checked\"" : "";
+                switch (reader.GetShort("pagetype"))
+                {
+                    case 0: scaffold.Data["pagetype"] = "1"; break;
+                    case 2: scaffold.Data["pagetype-shadow"] = "1"; break;
+                }
+            }
+
+            return scaffold.Render();
+        }
+
+        public string UpdateSettings(int websiteId, int id, string title, string description, int type, bool secure, bool active)
+        {
+            if (!S.User.checkSecurity(websiteId, "dashboard/pages", User.enumSecurity.update)) { return "err"; }
+
+            //create new web page
+            GetPage();
+            page.sql.Update(websiteId, id, title, description, (SqlQueries.Page.enumPageType)Enum.Parse(typeof(SqlQueries.Page.enumPageType), type.ToString()), "", "", secure, active);
+
+            return "success";
         }
         #endregion
     }

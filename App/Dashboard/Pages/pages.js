@@ -55,6 +55,7 @@
         var pageid = e.getAttribute('data-pageid');
         var link = e.getAttribute('data-link');
         var data = {
+            'id': pageid,
             'title': e.getAttribute('data-title'),
             'path': e.getAttribute('data-path'),
             'link': link,
@@ -63,7 +64,8 @@
             'created': 'created on ' + e.getAttribute('data-created'),
             'url': S.website.protocol + S.website.host + link.substr(1),
             'url-name': link.substr(1),
-            'link-create': 'S.dashboard.pages.create.view(this, ' + pageid + ')'
+            'link-create': 'S.dashboard.pages.create.view(this, ' + pageid + ')',
+            'link-settings': 'S.dashboard.pages.settings.view(this, ' + pageid + ')'
         }
         this.current_page = pageid;
         this.current_path.push(pageid);
@@ -113,7 +115,7 @@
                 e.preventDefault();
                 return false;
             });
-            container.find('.btn-page-settings a').on('click', function (e) { S.dashboard.pages.create.submit(this); });
+            container.find('.btn-page-create-new a').on('click', function (e) { S.dashboard.pages.create.submit(this); });
             container.find('.btn-page-cancel a').on('click', S.dashboard.pages.create.cancel);
             $('#txtcreatedesc').on('keyup', S.dashboard.pages.create.countChars);
             $('#txtcreatetitle').on('keyup', S.dashboard.pages.create.updateTitle);
@@ -225,8 +227,123 @@
                             container.find('.new-url').html('');
 
                             //update parent page list (if data-folder attribute doesn't exist)
-
+                            $('.page-item-for-' + S.dashboard.pages.current_page).attr('data-folder', 'true');
+                            $('.page-item-for-' + S.dashboard.pages.current_page + ' .icon').html('<svg viewBox="0 0 15 15"><use xlink:href="#icon-folder" x="0" y="0" width="15" height="15" /></svg>')
                         }
+                    }
+                }
+            );
+        }
+    },
+
+    settings: {
+        //page settings functions ///////////////////////////////
+        id: null, 
+        view: function (e, id) {
+            var data = { id: id };
+            S.ajax.post('Dashboard/Pages/ViewSettings', data, function (d) {
+                console.log(d);
+                var container = $(e).parents('.page-details').find('.page-create');
+                container.html('');
+                container.append(d.d);
+
+                //add event listeners for page create form
+                container.find('form').on('submit', function (e) {
+                    S.dashboard.pages.settings.submit(container.find('form').get());
+                    e.preventDefault();
+                    return false;
+                });
+
+                container.find('.btn-page-settings-update a').on('click', function (e) { S.dashboard.pages.settings.submit(this); });
+                container.find('.btn-page-cancel a').on('click', S.dashboard.pages.settings.cancel);
+                $('#description').on('keyup', S.dashboard.pages.settings.countChars);
+
+                //show settings section
+                var subpages = $(e).parents('.page-details').find('.slideshow');
+                subpages.addClass('hide');
+                container.addClass('view');
+
+                S.dashboard.pages.settings.id = id;
+            });
+        },
+
+        countChars: function (e) {
+            var container = $(e.target).parents('.page-create');
+            var field = container.find('#description');
+            var desc = field.val();
+            if (desc.length > 160) { desc = desc.substr(0, 160); field.val(desc); }
+            container.find('.desc-chars').html((160 - desc.length) + ' characters left');
+        },
+
+        cancel: function (e) {
+            var details = $(e).parents('.page-details')
+            var container = $(e).parents('.page-create');
+            container.removeClass('view');
+            setTimeout(function () {
+                container.html('');
+                if (S.dashboard.pages.current_page > 0) {
+                    var subpages = details.find('.slideshow');
+                    subpages.removeClass('hide');
+                } else {
+                    //show root page list
+                    var pagelist = details.find('.root-list');
+                    pagelist.show();
+                }
+            }, 100);
+        },
+
+        submit: function (e) {
+            var container = $(e).parents('.page-create');
+            var titlehead = container.find('#titlehead').val();
+            var desc = container.find('#description').val();
+            var secure = container.find('.chk-secure').prop('checked');
+            var active = container.find('.chk-active').prop('checked');
+            var msg = container.find('.message');
+            msg.hide();
+
+            //validate form
+            if (titlehead == '' || titlehead == null) {
+                S.message.show(msg, 'error', 'Page title cannot be empty');
+                return false;
+            }
+            if (['/'].find(function (a) { return titlehead.indexOf(a) >= 0; }) >= 0) {
+                S.message.show(msg, 'error', 'Page title cannot use certain special characters');
+                return false;
+            }
+            if (desc == '' || desc == null) {
+                S.message.show(msg, 'error', 'Page description cannot be empty');
+                return false;
+            }
+            if (!S.validate.text(desc, ['{', '}', '[', ']', '/', '\\'])) {
+                S.message.show(msg, 'error', 'Page description cannot use certain special characters');
+                return false;
+            }
+            if (desc.length > 160) {
+                S.message.show(msg, 'error', 'Page description cannot be more than 160 characters long');
+                return false;
+            }
+
+            //submit "page settings" form
+            S.ajax.post("Dashboard/Pages/UpdateSettings", {
+                websiteId: S.dashboard.website.id,
+                id: S.dashboard.pages.settings.id,
+                title: titlehead,
+                description: desc,
+                type: container.find('#pagetype').val() || -1,
+                secure: secure,
+                active: active
+            },
+                function (data) {
+                    if (data.d == 'err') {
+                        S.message.show(msg, 'error', 'An error occurred while trying to create your new web page');
+                        return false;
+                    } else {
+                        //show success message
+                        S.message.show(msg, '', 'Your page, "' + titlehead + '" has been updated successfully');
+                        //update existing UI
+                        $('.page-title-for-' + S.dashboard.pages.settings.id).html(titlehead);
+                        $('.page-summary-for-' + S.dashboard.pages.settings.id).html(desc);
+                        $('.page-item-for-' + S.dashboard.pages.settings.id).attr('data-title', titlehead);
                     }
                 }
             );

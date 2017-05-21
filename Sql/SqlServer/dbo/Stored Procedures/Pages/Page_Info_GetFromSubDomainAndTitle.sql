@@ -17,5 +17,5 @@ BEGIN
 	) 
 	AND p.[path]=@title AND p.deleted =0
 
-	EXEC GetPageInfoFromPageId @pageId=@pId
+	EXEC Page_Info_GetFromPageId @pageId=@pId
 END

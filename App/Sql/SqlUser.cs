@@ -55,7 +55,7 @@ namespace Websilk.SqlQueries
             var parameters = new List<SqlParameter>();
             parameters.Add(new SqlParameter("@websiteId", websiteId.ToString()));
             parameters.Add(new SqlParameter("@userId", userId.ToString()));
-            return new SqlReader(S, "EXEC GetSecurityForWebsite @websiteId=@websiteId, @userId=@userId", parameters);
+            return new SqlReader(S, "EXEC Security_GetWebsite @websiteId=@websiteId, @userId=@userId", parameters);
         }
 
 

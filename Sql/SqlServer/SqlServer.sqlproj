@@ -165,6 +165,7 @@
     <Build Include="dbo\Stored Procedures\Documentation\Documentation_Search.sql" />
     <Build Include="dbo\Stored Procedures\Documentation\Documentation_Update.sql" />
     <Build Include="dbo\Stored Procedures\Documentation\Documentation_GetList.sql" />
+    <Build Include="dbo\Stored Procedures\Pages\Page_Update.sql" />
   </ItemGroup>
   <ItemGroup>
     <ArtifactReference Include="$(DacPacRootPath)\Extensions\Microsoft\SQLDB\Extensions\SqlServer\110\SqlSchemas\master.dacpac">

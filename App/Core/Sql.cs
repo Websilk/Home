@@ -246,11 +246,18 @@ namespace Websilk
             return Int64.Parse(str);
         }
 
+        public int GetShort(string key)
+        {
+            string str = Get(key).ToLower().Replace("true", "1").Replace("false", "0");
+            if (str == "") { str = "0"; }
+            return short.Parse(str);
+        }
+
         public bool GetBool(string key)
         {
             string str = Get(key).ToLower();
             if (str == "") { str = "0"; }
-            return bool.Parse(str);
+            return str == "1" || str.ToLower() == "true" ? true : false;
         }
 
         public double GetDouble(string key)

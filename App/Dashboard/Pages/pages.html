@@ -50,7 +50,7 @@
                                 </svg>
                             </a>
                         </div>
-                        <div class="col page-title">
+                        <div class="col page-title page-title-for-#id#">
                             <h4>#title#</h4>
                         </div>
                     </div>
@@ -60,7 +60,7 @@
                 </div>
                 
                 <div class="row pad">
-                    <p class="summary pad-width pad-bottom-lg">
+                    <p class="summary pad-width pad-bottom-lg page-summary-for-#id#">
                         #summary#
                         <br /><br />
                         <span class="inline-block faded pad-height">#created#</span>
@@ -76,8 +76,7 @@
                         </a>
                     </div>
                     <div class="col btn-page-view pad-right"><a class="button apply" href="#url#" target="_blank">View</a></div>
-                    <div class="col btn-page-settings pad-right"><a class="button" href="javascript:">Settings</a></div>
-                    <div class="col btn-page-delete pad-right"><a class="button cancel" href="javascript:">Delete</a></div>
+                    <div class="col btn-page-settings pad-right"><a class="button" href="javascript:" onclick="#link-settings#">Settings</a></div>
                 </div>
             </div>
             <div class="col eight desktop-sm-seven laptop-one-total slideshow height">
@@ -113,7 +112,7 @@
             </div>
             <div class="row hover margin-bottom-sm">
                 <div class="col field-label">Summary</div>
-                <div class="col field-input expand"><textarea id="txtcreatedesc">Write a description about your new page</textarea></div>
+                <div class="col field-input expand"><textarea id="txtcreatedesc" placeholder="Write a description about your new page"></textarea></div>
             </div>
             <div class="row hover">
                 <div class="col field-label">Page Type</div>
@@ -138,57 +137,7 @@
             </div>
         </div>
         <div class="absolute bottom pad-bottom pad-left">
-            <div class="col btn-page-settings pad-right"><a class="button" href="javascript:">Create New Page</a></div>
-            <div class="col btn-page-cancel pad-right"><a class="button cancel" href="javascript:" onclick="S.dashboard.pages.create.cancel(this)">Done</a></div>
-        </div>
-        <button type="submit" class="hide"></button>
-    </form>
-</script>
-
-<script id="page_settings" type="text/html">
-    <form>
-        <div class="row pad pad-bottom-lg">
-            <div class="row page-title">
-                <h4>Page Settings for #page-title#</h4>
-                <div class="faded sub-title pad-height">#parent-title#</div>
-                <div class="row message hide"><span></span></div>
-            </div>
-            <div class="row hover">
-                <div class="col field-label">Title</div>
-                <div class="col field-input expand"><input type="text" id="txtcreatetitle" placeholder="New Page Title" /></div>
-            </div>
-            <div class="row pad-bottom-sm">
-                <div class="col field-label"></div>
-                <div class="col field-input expand faded page-url">#page-url#<span class="new-url"></span></div>
-            </div>
-            <div class="row hover margin-bottom-sm">
-                <div class="col field-label">Summary</div>
-                <div class="col field-input expand"><textarea id="txtcreatedesc">Write a description about your new page</textarea></div>
-            </div>
-            <div class="row hover">
-                <div class="col field-label">Page Type</div>
-                <div class="col field-input">
-                    <select id="pagetype">
-                        <option value="0" selected="selected">Web Page</option>
-                        <option value="2">Shadow Page</option>
-                    </select>
-                </div>
-            </div>
-            <div class="row text-right pad-top desc-chars font-faded"></div>
-            <div class="row pad-top pad-bottom-sm title"><h6>Security</h6></div>
-            <div class="row hover margin-bottom-lg">
-                <div class="col field-label"></div>
-                <div class="col field-text">
-                    <label>
-                        <input type="checkbox" class="chk-secure" /><span>Private</span>
-                        <span class="font-faded pad-left">Only administrators can view this web page</span>
-                    </label>
-
-                </div>
-            </div>
-        </div>
-        <div class="absolute bottom pad-bottom pad-left">
-            <div class="col btn-page-settings pad-right"><a class="button" href="javascript:">Create New Page</a></div>
+            <div class="col btn-page-create-new pad-right"><a class="button" href="javascript:">Create New Page</a></div>
             <div class="col btn-page-cancel pad-right"><a class="button cancel" href="javascript:" onclick="S.dashboard.pages.create.cancel(this)">Done</a></div>
         </div>
         <button type="submit" class="hide"></button>

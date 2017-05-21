@@ -66,6 +66,7 @@ namespace Websilk
         public int pageType = 0; //0 = default, 1 = service, 2 = shadow, 3 = clone
         public int pageParentId = 0;
         public string pageTitle = "";
+        public string pageTitleHead = ""; //custom page title used for <head><title></title></head>
         public string pagePathName = ""; //page title hierarchy
         public string pagePathIds = ""; //page id hierarchy
         public string PageTitleForBrowserTab = "";
@@ -242,6 +243,7 @@ namespace Websilk
                 ownerId = reader.GetInt("ownerId");
                 pageId = reader.GetInt("pageId");
                 pageTitle = reader.Get("title");
+                pageTitleHead = reader.Get("title_head");
                 pagePathName = reader.Get("path");
                 pagePathIds = reader.Get("pathIds");
                 pageDescription = S.Sql.Decode(reader.Get("description"));
@@ -266,8 +268,9 @@ namespace Websilk
                 pagePhoto = reader.Get("photo");
 
                 //set up page properties
+                if(pageTitleHead == "") { pageTitleHead = pageTitle; }
                 if(pageLayout == "") { pageLayout = "default"; }
-                PageTitleForBrowserTab = pageTitle + websiteTitleSeparator + websiteTitle;
+                PageTitleForBrowserTab = pageTitleHead + websiteTitleSeparator + websiteTitle;
                 pageFolder = "/Content/websites/" + websiteId + "/pages/" + pageId + "/";
 
                 //initialize theme Elements

@@ -19,7 +19,6 @@ BEGIN
 	SET NOCOUNT ON;
 	DECLARE @pageId int,
 			@websiteOwnerId int = 0, 
-			@path nvarchar(MAX), 
 			@pathIds nvarchar(MAX),
 			@datenow datetime
 
@@ -34,7 +33,10 @@ BEGIN
 	@datenow, @datenow, @datenow, @security, 0, @layout, @service, 0, 0, 0, @description, @enabled, 0)
 
 	/* update page heirarchy paths for title & ids */
-	UPDATE pages SET path=dbo.GetPagePath(@pageId), pathIds=dbo.GetPagePathIds(@pageId) WHERE pageid=@pageid
+	SET @pathIds = dbo.GetPagePathIds(@pageId)
+	SELECT * INTO #paths FROM dbo.SplitArray(@pathIds,'/')
+	UPDATE pages SET path=dbo.GetPagePath(@pageId), pathIds=@pathIds, pathlvl=(SELECT COUNT(*) FROM #paths) WHERE pageid=@pageid
+	DROP TABLE #paths
 	
 	RETURN @pageId
 END

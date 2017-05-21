@@ -3,6 +3,7 @@
     [ownerId]            INT            NOT NULL,
     [websiteId]          INT            NOT NULL,
     [parentId]           INT            NULL,
+    [templateId]         INT            NULL, /* when creating new child pages, clone the contents of a template page */
     [pagetype]			 SMALLINT		NULL, 
     [favorite]           BIT            NULL DEFAULT 0,
     [security]           BIT            NULL DEFAULT 0,
@@ -27,6 +28,7 @@
     [description]        NVARCHAR (160) NOT NULL DEFAULT '',
     [path]               NVARCHAR (512) NOT NULL DEFAULT '',
     [pathIds]            NVARCHAR (100) NOT NULL DEFAULT '',
+    [pathlvl] INT NOT NULL DEFAULT 0, 
     CONSTRAINT [PK_Pages] PRIMARY KEY ([pageId])
 );
 

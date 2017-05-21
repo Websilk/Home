@@ -131,9 +131,15 @@ S.editor.components = {
             this.visible = true;
 
             //add event to window scroll event listener
-            S.events.doc.scroll.callback.add('component-select', null,
+            S.events.doc.scroll.callback.add('component-select',
                 function () {
-                    S.editor.components.select.refresh.call(S.editor.components.select);
+                    S.editor.components.select.redraw.start.call(S.editor.components.select);
+                },
+                function () {
+                    S.editor.components.select.redraw.calculate.call(S.editor.components.select);
+                },
+                function () {
+                    S.editor.components.select.redraw.paint.call(S.editor.components.select);
                 },
                 function () {
                     S.editor.components.select.refresh.call(S.editor.components.select);
@@ -353,88 +359,101 @@ S.editor.components = {
             },
         },
 
+        redraw: {
+            box: null, menutop: null, win: null,
+
+            start: function () {
+                //update any references while starting a redraw
+                this.elem.menuwin = $('.component-select .menu .menu-window');
+            },
+
+            calculate: function () {
+                //makes calculations to change the position of the resize bars
+                if (S.editor.components.selected == null) { return; }
+                var c = S.editor.components.selected;
+                var pos = c.offset();
+                var w = c.width();
+                var h = c.height();
+                var maxw = w + (this.pad * 2);
+                var maxh = h + (this.pad * 2);
+                var win = S.window.pos();
+                var rightspace = (win.w + win.scrollx) - (pos.left - this.pad + maxw);
+                var bottomspace = (win.h + win.scrolly) - (pos.top - this.pad + maxh);
+                var topspace = pos.top - this.pad;
+                var toolh = S.editor.toolbar.height;
+                var scrollbarv = S.window.verticalScrollbarWidth();
+
+                //set up select box dimensions (with window-bound constraints)
+                var box = {
+                    x: pos.left - this.pad < 0 ? 0 : pos.left - this.pad,
+                    y: topspace < toolh ? toolh : topspace,
+                    w: rightspace < 0 ? maxw + rightspace : maxw,
+                    h: (bottomspace < 0 ? maxh + bottomspace : maxh) + (topspace < toolh ? topspace - toolh : 0)
+                };
+
+                if (box.x < 0) { box.x = 5; }
+                if (box.y - win.scrolly - toolh < 0) { box.y = win.scrolly + toolh; }
+                if (box.w > win.w - scrollbarv) { box.w = win.w - scrollbarv - (box.x * 2); }
+                if (box.h > win.h - toolh) { box.h = win.h - toolh; }
+
+                this.redraw.box = box;
+                this.redraw.win = win;
+                this.redraw.menutop = win.scrolly > box.y ? win.scrolly - box.y : 0;
+            },
+
+            paint: function () {
+                //repositions the resize bars based on calculations
+                if (S.editor.components.selected == null) { return; }
+                var r = this.elem.resize;
+                var m = this.elem.menu;
+                var box = this.redraw.box;
+                var win = this.redraw.win;
+                var menutop = this.redraw.menutop;
+
+                //set component shield before resizing box within boundaries
+                this.elem.compShield.css({ top: box.y, left: box.x, width: box.w, height: box.h });
+
+                //reposition component select box container
+                this.elem.compSel.css({ top: box.y, left: box.x });
+
+                //reposition all resize bars
+                r.top.css({ left: this.corners, width: box.w - (this.corners * 2) });
+                r.topRight.css({ left: box.w - this.corners, width: this.corners });
+                r.rightTop.css({ left: box.w - this.bar, height: this.corners });
+                r.right.css({ top: this.corners, left: box.w - this.bar, height: box.h - (this.corners * 2) });
+                r.rightBottom.css({ top: box.h - this.corners, left: box.w - this.bar, height: this.corners });
+                r.bottomRight.css({ top: box.h - this.bar, left: box.w - this.corners, width: this.corners });
+                r.bottom.css({ top: box.h - this.bar, left: this.corners, width: box.w - (this.corners * 2) });
+                r.bottomLeft.css({ top: box.h - this.bar, width: this.corners });
+                r.leftBottom.css({ top: box.h - this.corners, height: this.corners });
+                r.left.css({ top: this.corners, height: box.h - (this.corners * 2) });
+
+                //reposition menu system
+                if (win.w - (box.x + box.w) < 50) {
+                    //inner menu
+                    m.addClass('inner').css({ left: box.w - 36, top: menutop + 4 });
+                } else {
+                    //outer menu
+                    m.removeClass('inner').css({ left: box.w, top: menutop });
+                }
+                if (win.w - (box.x + box.w) < 250) {
+                    //inner menu window
+                    m.find('.menu-window').addClass('inner');
+                } else {
+                    //outer menu window
+                    m.find('.menu-window').removeClass('inner');
+                }
+
+                //execute all registered events
+                this.events.refresh.execute();
+            }
+        },
+
         refresh: function () {
             //reposition all resize bars & menu system for the component select box
-
-            var components = $('.component');
-            if (!S.editor.components.select.jitterbugs || S.editor.components.select.jitterbugs.length != components.length)
-            {
-                //create jitterbugs
-                S.editor.components.select.jitterbugs = [];
-                $('.component').each(function (c) {
-                    S.editor.components.select.jitterbugs.push({ elem: c, active: false });
-                });
-            }
-
-            if (S.editor.components.selected == null) { return;}
-            var c = S.editor.components.selected;
-            var pos = c.offset();
-            var w = c.width();
-            var h = c.height();
-            var r = this.elem.resize;
-            var m = this.elem.menu;
-            var maxw = w + (this.pad * 2);
-            var maxh = h + (this.pad * 2);
-            var win = S.window.pos();
-            var rightspace = (win.w + win.scrollx) - (pos.left - this.pad + maxw);
-            var bottomspace = (win.h + win.scrolly) - (pos.top - this.pad + maxh);
-            var topspace = pos.top - this.pad;
-            var toolh = S.editor.toolbar.height;
-            var scrollbarv = S.window.verticalScrollbarWidth();
-
-            //set up select box dimensions (with window-bound constraints)
-            var box = {
-                x: pos.left - this.pad < 0 ? 0 : pos.left - this.pad, 
-                y: topspace < toolh ? toolh : topspace,
-                w: rightspace < 0 ? maxw + rightspace : maxw, 
-                h: (bottomspace < 0 ? maxh + bottomspace : maxh) + (topspace < toolh ? topspace - toolh : 0)
-            };
-
-            //set component shield before resizing box within boundaries
-            this.elem.compShield.css({ top: box.y, left: box.x, width: box.w, height: box.h });
-
-            if (box.x < 0) { box.x = 5; }
-            if (box.y - win.scrolly - toolh < 0) { box.y = win.scrolly + toolh; }
-            if (box.w > win.w - scrollbarv) { box.w = win.w - scrollbarv - (box.x * 2); }
-            if (box.h > win.h - toolh) { box.h = win.h - toolh; }
-
-            //reposition component select box container
-            this.elem.compSel.css({ top: box.y, left: box.x });
-
-            //reposition all resize bars
-            r.top.css({ left: this.corners, width: box.w - (this.corners * 2) });
-            r.topRight.css({ left: box.w - this.corners, width: this.corners });
-            r.rightTop.css({ left: box.w - this.bar, height: this.corners });
-            r.right.css({ top: this.corners, left: box.w - this.bar, height: box.h - (this.corners * 2) });
-            r.rightBottom.css({ top: box.h - this.corners, left: box.w - this.bar, height: this.corners });
-            r.bottomRight.css({ top: box.h - this.bar, left: box.w - this.corners, width: this.corners });
-            r.bottom.css({ top: box.h - this.bar, left: this.corners, width: box.w - (this.corners * 2) });
-            r.bottomLeft.css({ top: box.h - this.bar, width: this.corners });
-            r.leftBottom.css({ top: box.h - this.corners, height: this.corners });
-            r.left.css({ top: this.corners, height: box.h - (this.corners * 2) });
-
-            //reposition menu system
-            var menutop = 0;
-            if (win.scrolly > box.y) {
-                menutop = win.scrolly - box.y;
-            }
-            if (win.w - (box.x + box.w) < 50) {
-                //inner menu
-                m.addClass('inner').css({ left: box.w - 36, top: menutop + 4 });
-            } else {
-                //outer menu
-                m.removeClass('inner').css({ left: box.w, top: menutop });
-            }
-            if (win.w - (box.x + box.w) < 250) {
-                //inner menu window
-                m.find('.menu-window').addClass('inner');
-            } else {
-                //outer menu window
-                m.find('.menu-window').removeClass('inner');
-            }
-
-            //execute all registered events
-            this.events.refresh.execute();
+            this.redraw.start.call(this);
+            this.redraw.calculate.call(this);
+            this.redraw.paint.call(this);
         },
 
         events: {

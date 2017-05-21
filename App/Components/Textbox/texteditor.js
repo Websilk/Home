@@ -99,7 +99,7 @@
                 pos.left = 13;
             }
             pos.height = e.height();
-            if (pos.top + win.scrolly <= 50) {
+            if (pos.top + win.scrolly <= 50 && (win.scrolly - pos.top) + pos.height < win.h) {
                 //show toolbar below component
                 self.toolbar.css({ left: pos.left - 13, top: pos.top + pos.height + 13 });
             } else {

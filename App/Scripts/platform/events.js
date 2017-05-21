@@ -65,53 +65,46 @@
         },
 
         scroll: {
-            timer: { started: false, fps: 60, timeout: 250, date: new Date(), callback: null },
+            ticking: false,
             last: { scrollx: 0, scrolly: 0 },
 
             trigger: function () {
-                this.timer.date = new Date();
-                if (this.timer.started == false) { this.start(); }
-            },
-
-            start: function () {
-                if (this.timer.started == true) { return; }
-                this.timer.started = true;
-                this.timer.date = new Date();
-                this.callback.execute('onStart');
-                this.go();
-            },
-
-            go: function () {
-                if (this.timer.started == false) { return; }
-                this.last.scrollx = window.scrollX;
-                this.last.scrolly = window.scrollY;
-                S.window.scrollx = this.last.scrollx;
-                S.window.scrolly = this.last.scrolly;
-                this.callback.execute('onGo');
-
-                if (new Date() - this.timer.date > this.timer.timeout) {
-                    this.stop();
-                } else {
-                    this.timer.callback = setTimeout(function () { S.events.doc.scroll.go(); }, 1000 / this.timer.fps)
+                if (!S.events.doc.scroll.ticking) {
+                    S.events.doc.scroll.last.scrollx = window.scrollX;
+                    S.events.doc.scroll.last.scrolly = window.scrollY;
+                    S.window.scrollx = S.events.doc.scroll.last.scrollx;
+                    S.window.scrolly = S.events.doc.scroll.last.scrolly;
+                    S.events.doc.scroll.callback.execute('onGo');
+                    S.events.doc.scroll.ticking = true;
+                    requestAnimationFrame(S.events.doc.scroll.animate);
                 }
             },
 
+            start: function () {
+                this.ticking = false;
+                this.callback.execute('onStart');
+            },
+
+            animate: function () {
+                var self = S.events.doc.scroll;
+                S.events.doc.scroll.ticking = false;
+                self.callback.execute('onAnimate');
+            },
+
             stop: function () {
-                if (this.timer.started == false) { return; }
-                this.timer.started = false;
-                this.last.scrollx = window.scrollX;
-                this.last.scrolly = window.scrollY;
-                S.window.scrollx = this.last.scrollx;
-                S.window.scrolly = this.last.scrolly;
-                this.callback.execute('onStop');
+                S.events.doc.scroll.last.scrollx = window.scrollX;
+                S.events.doc.scroll.last.scrolly = window.scrollY;
+                S.window.scrollx = S.events.doc.scroll.last.scrollx;
+                S.window.scrolly = S.events.doc.scroll.last.scrolly;
+                S.events.doc.scroll.callback.execute('onStop');
             },
 
             callback: {
                 //register & execute callbacks when the window resizes
                 items: [],
 
-                add: function (elem, onStart, onGo, onStop) {
-                    this.items.push({ elem: elem, onStart: onStart, onGo: onGo, onStop: onStop });
+                add: function (elem, onStart, onGo, onAnimate, onStop) {
+                    this.items.push({ elem: elem, onStart: onStart, onGo: onGo, onAnimate: onAnimate, onStop: onStop });
                 },
 
                 remove: function (elem) {
@@ -131,9 +124,18 @@
                                 } break;
 
                             case 'onGo':
+                                //first, go (calculate stuff)
                                 for (var x = 0; x < this.items.length; x++) {
                                     if (typeof this.items[x].onGo == 'function') {
                                         this.items[x].onGo();
+                                    }
+                                }
+                                break;
+
+                            case 'onAnimate':
+                                for (var x = 0; x < this.items.length; x++) {
+                                    if (typeof this.items[x].onAnimate == 'function') {
+                                        this.items[x].onAnimate();
                                     }
                                 } break;
 

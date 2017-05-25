@@ -131,6 +131,20 @@ namespace Websilk
                 Cache.Add(key, value);
             }
         }
+
+        public T GetFromCache<T>(string key, Func<T> value, bool serialize = true)
+        {
+            if(Cache[key] == null)
+            {
+                var obj = value();
+                SaveToCache(key, serialize ? S.Util.Serializer.WriteObjectAsString(obj) : obj);
+                return obj;
+            }
+            else
+            {
+                return serialize ? (T)S.Util.Serializer.ReadObject((string)Cache[key], typeof(T)) : (T)Cache[key];
+            }
+        }
         #endregion
     }
 }

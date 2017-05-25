@@ -61,109 +61,74 @@ namespace Websilk
         public SqlDataReader ExecuteReader(string sql, List<SqlParameter> parameters = null)
         {
             if (_started == false) { Start(); }
+            if(conn.State == System.Data.ConnectionState.Closed) { conn.Open(); }
+            cmd.Parameters.Clear();
             cmd.CommandText = sql;
-            GetParameters(parameters);
-            reader = cmd.ExecuteReader();
-            return reader;
+            try
+            {
+                if (parameters != null) { parameters.ForEach(a => cmd.Parameters.Add(a)); }
+                return cmd.ExecuteReader();
+                conn.Close();
+            }
+            catch (Exception ex)
+            {
+                S.LogError(LogErrorType.sql, ex);
+                throw ex;
+            }
         }
 
         public void ExecuteNonQuery(string sql, List<SqlParameter> parameters = null)
         {
             if (_started == false) { Start(); }
+            if (conn.State == System.Data.ConnectionState.Closed) { conn.Open(); }
+            cmd.Parameters.Clear();
             cmd.CommandText = sql;
-            GetParameters(parameters);
-            cmd.ExecuteNonQuery();
+            try
+            {
+                if (parameters != null) { parameters.ForEach(a => cmd.Parameters.Add(a)); }
+                cmd.ExecuteNonQuery();
+                conn.Close();
+            }
+            catch (Exception ex)
+            {
+                S.LogError(LogErrorType.sql, ex);
+                throw ex;
+            }
         }
 
         public object ExecuteScalar(string sql, List<SqlParameter> parameters = null)
         {
             if (_started == false) { Start(); }
-            cmd.CommandText = sql;
-            GetParameters(parameters);
-            return cmd.ExecuteScalar();
-        }
-
-        private void GetParameters(List<SqlParameter> parameters)
-        {
+            if (conn.State == System.Data.ConnectionState.Closed) { conn.Open(); }
             cmd.Parameters.Clear();
-            if(parameters != null)
+            cmd.CommandText = sql;
+            try
             {
-                foreach(var p in parameters)
-                {
-                    cmd.Parameters.Add(p);
-                }
+                if (parameters != null) { parameters.ForEach(a => cmd.Parameters.Add(a)); }
+                var obj = cmd.ExecuteScalar();
+                conn.Close();
+                return obj;
             }
-        }
-
-        #region "Get"
-        public string Get(string key)
-        {
-            var v = reader[key];
-            if (v is DBNull) { return ""; }
-            string s = v.ToString();
-            if (string.IsNullOrEmpty(s)) { return ""; }
-            return (reader[key]).ToString();
-        }
-
-        public int GetInt(string key)
-        {
-            string s = Get(key);
-            if (Util.Str.IsNumeric(s)) { 
-            return int.Parse(reader[key].ToString());
-            }
-            return 0;
-        }
-
-        public Int64 GetInt64(string key)
-        {
-            string s = Get(key);
-            if (Util.Str.IsNumeric(s))
+            catch (Exception ex)
             {
-                return Int64.Parse(s);
+                S.LogError(LogErrorType.sql, ex);
+                throw ex;
             }
-            return 0;
         }
 
-        public bool GetBool(string key)
+        public async Task<int> ExecuteNonQueryAsync(string sql, params SqlParameter[] parameters)
         {
-            string s = Get(key);
-            return bool.Parse(s);
+            using (var newConnection = new SqlConnection(GetConnectionString()))
+            using (var newCommand = new SqlCommand(sql, newConnection))
+            {
+                if (parameters != null) newCommand.Parameters.AddRange(parameters);
+                await newConnection.OpenAsync().ConfigureAwait(false);
+                return await newCommand.ExecuteNonQueryAsync().ConfigureAwait(false);
+            }
         }
 
-        public double GetDouble(string key)
-        {
-            string s = Get(key);
-            return double.Parse(s);
-        }
-
-        public DateTime  GetDateTime(string key)
-        {
-            string s = Get(key);
-            return DateTime.Parse(s);
-        }
-        #endregion
-
-        #endregion
-
-        #region "Encode / Decode"
-        /// <summary>
-        /// Encodes the the string so that it can be used for SQL 
-        /// (removing any SQL injection attempts)
-        /// </summary>
-        /// <param name="str"></param>
-        /// <returns></returns>
-        public string Encode(string str)
-        {
-            return str.Replace("'","{q}");
-        }
-
-        public string Decode(string str)
-        {
-            return str.Replace("{q}","'");
-        }
         #endregion
     }
-
 
     public class SqlReader
     {
@@ -171,52 +136,101 @@ namespace Websilk
         private Core S;
         [JsonIgnore]
         private int _i = -1;
-        public List<Dictionary<string, string>> Rows = new List<Dictionary<string, string>>();
+        public List<Dictionary<string, object>> Rows = new List<Dictionary<string, object>>();
 
-        public SqlReader(Core WebsilkCore, string query, List<SqlParameter> parameters = null)
+        public SqlReader(Core FreightCore, string query = "", List<SqlParameter> parameters = null, string cachedName = "")
         {
-            S = WebsilkCore;
-            var reader = S.Sql.ExecuteReader(query, parameters);
-            switch(S.Sql.dataType){
-                case enumSqlDataTypes.SqlClient:
-                    ReadFromSqlClient(reader);
-                    break;
-                case enumSqlDataTypes.MySql:
-                    ReadFromMySql(reader);
-                    break;
+            S = FreightCore;
+            if(query == "") { return; }
+            if(cachedName != "")
+            {
+                Rows = S.Vars.Get(cachedName, new Func<List<Dictionary<string, object>>>(() =>
+                {
+                    var reader = S.Sql.ExecuteReader(query, parameters);
+                    var rows = GetRows(reader);
+                    reader.Close();
+                    S.Sql.Close();
+                    reader.Dispose();
+                    return rows;
+                }));
+            }
+            else
+            {
+                var reader = S.Sql.ExecuteReader(query, parameters);
+                Rows = GetRows(reader);
+                reader.Close();
+                S.Sql.Close();
+                reader.Dispose();
             }
         }
 
-        private void ReadFromSqlClient(SqlDataReader reader)
+        public List<Dictionary<string, object>> GetRows(SqlDataReader reader)
         {
-            if(reader.HasRows == true)
+            var rows = new List<Dictionary<string, object>>();
+            if (reader.HasRows == true)
             {
-                Dictionary<string, string> item;
+                Dictionary<string, object> item;
                 string key = "";
                 while (reader.Read() == true)
                 {
-                    item = new Dictionary<string, string>();
-                    for (int i= 0; i < reader.FieldCount; i++){
+                    item = new Dictionary<string, object>();
+                    for (int i = 0; i < reader.FieldCount; i++)
+                    {
                         key = reader.GetName(i);
-                        item.Add(key.ToLower(), reader[key].ToString());
+                        item.Add(key.ToLower(), reader[key] is DBNull ? null : reader[key]);
                     }
-                    Rows.Add(item);
+                    rows.Add(item);
                 }
             }
-            reader.Dispose();
+            return rows;
         }
 
-        private void ReadFromMySql(SqlDataReader reader)
+        public SqlReader GetReader(SqlDataReader reader)
         {
-            //TODO: figure this out later
+            var sql = new SqlReader(S);
+            sql.Rows = sql.GetRows(reader);
+            return sql;
+        }
+
+        public List<SqlReader> GetReaders(SqlDataReader reader)
+        {
+            var list = new List<SqlReader>();
+            while (reader.HasRows)
+            {
+                list.Add(GetReader(reader));
+                reader.NextResult();
+            }
+            return list;
+        }
+
+        public SqlReader GetReaderFromPosition(int start, int length = 0)
+        {
+            var rows = new List<Dictionary<string, object>>();
+            for (var i = start; i < Rows.Count && (i < start + length - 1 || length == 0); i++)
+            {
+                rows.Add(Rows[i]);
+                i++;
+            }
+            var reader = new SqlReader(S, "");
+            reader.Rows = rows;
+            return reader;
+        }
+
+        public bool HasRows
+        {
+            get
+            {
+                return Rows.Count > 0;
+            }
         }
 
         public bool Read()
         {
-            if(Rows.Count > _i + 1)
+            if (Rows.Count > _i + 1)
             {
                 _i++; return true;
-            }else { return false; }
+            }
+            else { return false; }
 
         }
 
@@ -226,62 +240,104 @@ namespace Websilk
             set { _i = value; }
         }
 
+        public void ResetPosition()
+        {
+            _i = -1;
+        }
+
+        public bool ContainsKey(string key)
+        {
+            return Rows[_i].ContainsKey(key.ToLower());
+        }
+
+        public object GetObj(string key)
+        {
+            if (Rows[_i].ContainsKey(key.ToLower()) == true) { return Rows[_i][key.ToLower()]; }
+            return null;
+        }
+
         public string Get(string key)
         {
-            if(Rows[_i].ContainsKey(key.ToLower()) == true) { return Rows[_i][key.ToLower()]; }
-            return "";
+            return (string)GetObj(key) ?? "";
         }
 
         public int GetInt(string key)
         {
-            string str = Get(key).ToLower().Replace("true", "1").Replace("false", "0");
-            if(str == "") { str = "0"; }
-            return int.Parse(str);
-        }
-
-        public Int64 GetInt64(string key)
-        {
-            string str = Get(key).ToLower().Replace("true", "1").Replace("false", "0");
-            if (str == "") { str = "0"; }
-            return Int64.Parse(str);
+            var obj = GetObj(key);
+            if(obj == null) { return 0; }
+            if(Type.GetTypeCode(obj.GetType()) == TypeCode.Int64)
+            {
+                return Convert.ToInt32(obj);
+            }
+            return (int)obj;
         }
 
         public int GetShort(string key)
         {
-            string str = Get(key).ToLower().Replace("true", "1").Replace("false", "0");
-            if (str == "") { str = "0"; }
-            return short.Parse(str);
+            var obj = GetObj(key);
+            if (obj == null) { return 0; }
+            return (short)obj;
+        }
+
+        public Int64 GetInt64(string key)
+        {
+            var obj = GetObj(key);
+            if (obj == null) { return 0; }
+            return (Int64)obj;
         }
 
         public bool GetBool(string key)
         {
-            string str = Get(key).ToLower();
-            if (str == "") { str = "0"; }
-            return str == "1" || str.ToLower() == "true" ? true : false;
+            var obj = GetObj(key);
+            if (obj == null) { return false; }
+            if(obj.GetType() == typeof(bool)) { return (bool)obj; }
+            return (int)obj == 1 ? true : false;
         }
 
         public double GetDouble(string key)
         {
-            string str = Get(key).ToLower().Replace("true", "1").Replace("false", "0");
-            if (str == "") { str = "0"; }
-            return double.Parse(str);
+            var obj = GetObj(key);
+            if (obj == null) { return 0; }
+            return (double)obj;
+        }
+
+        public decimal GetDecimal(string key)
+        {
+            var obj = GetObj(key);
+            if (obj == null) { return 0; }
+            return (decimal)obj;
         }
 
         public DateTime GetDateTime(string key)
         {
-            string str = Get(key).ToLower();
-            if (str == "") { return new DateTime(); }
-            return DateTime.Parse(str);
+            var obj = GetObj(key);
+            if(obj == null) { return DateTime.Now; }
+            return (DateTime)obj;
+        }
+
+        public Byte[] GetBinary(string key)
+        {
+            var obj = GetObj(key);
+            if (obj == null) { return new Byte[0]; }
+            return (Byte[])obj;
         }
     }
 
-    public class SqlQuery
+    public static class SqlReaders
     {
-        protected Core S;
-
-        public SqlQuery(Core WebsilkCore)
+        public static List<SqlReader> GetReaders(Core S, string sql, List<SqlParameter> parameters = null)
         {
-            S = WebsilkCore;
+            var sqlReader = new SqlReader(S);
+            var list = new List<SqlReader>();
+            var reader = S.Sql.ExecuteReader(sql, parameters);
+            do
+            {
+                list.Add(sqlReader.GetReader(reader));
+
+            } while (reader.NextResult());
+            reader.Close();
+            S.Sql.Close();
+            return list;
         }
     }
 }

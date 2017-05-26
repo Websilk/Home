@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
+using System.Threading.Tasks;
 using Newtonsoft.Json;
 
 namespace Websilk
@@ -72,7 +73,6 @@ namespace Websilk
             }
             catch (Exception ex)
             {
-                S.LogError(LogErrorType.sql, ex);
                 throw ex;
             }
         }
@@ -91,7 +91,6 @@ namespace Websilk
             }
             catch (Exception ex)
             {
-                S.LogError(LogErrorType.sql, ex);
                 throw ex;
             }
         }
@@ -111,14 +110,13 @@ namespace Websilk
             }
             catch (Exception ex)
             {
-                S.LogError(LogErrorType.sql, ex);
                 throw ex;
             }
         }
 
         public async Task<int> ExecuteNonQueryAsync(string sql, params SqlParameter[] parameters)
         {
-            using (var newConnection = new SqlConnection(GetConnectionString()))
+            using (var newConnection = new SqlConnection(Server.sqlConnection))
             using (var newCommand = new SqlCommand(sql, newConnection))
             {
                 if (parameters != null) newCommand.Parameters.AddRange(parameters);
@@ -144,11 +142,11 @@ namespace Websilk
             if(query == "") { return; }
             if(cachedName != "")
             {
-                Rows = S.Vars.Get(cachedName, new Func<List<Dictionary<string, object>>>(() =>
+                Rows = S.Server.GetFromCache(cachedName, new Func<List<Dictionary<string, object>>>(() =>
                 {
                     var reader = S.Sql.ExecuteReader(query, parameters);
                     var rows = GetRows(reader);
-                    reader.Close();
+                    reader.Dispose();
                     S.Sql.Close();
                     reader.Dispose();
                     return rows;
@@ -158,7 +156,7 @@ namespace Websilk
             {
                 var reader = S.Sql.ExecuteReader(query, parameters);
                 Rows = GetRows(reader);
-                reader.Close();
+                reader.Dispose();
                 S.Sql.Close();
                 reader.Dispose();
             }
@@ -335,9 +333,19 @@ namespace Websilk
                 list.Add(sqlReader.GetReader(reader));
 
             } while (reader.NextResult());
-            reader.Close();
+            reader.Dispose();
             S.Sql.Close();
             return list;
+        }
+    }
+    
+    public class SqlQuery
+    {
+        protected Core S;
+
+        public SqlQuery(Core WebsilkCore)
+        {
+            S = WebsilkCore;
         }
     }
 }

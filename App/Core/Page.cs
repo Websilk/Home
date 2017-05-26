@@ -74,12 +74,12 @@ namespace Websilk
         public string pageLayout = "default";
         public string pageService = ""; //if pageType = 1, the name of the C# StaticPage class to execute, Websilk.Pages.[pageService]
         public string pageDescription = "";
-        public string pageFavIcon = "";
+        public bool pageFavIcon = false;
         public string pageFolder = "";
         public string pagePhoto = "";
         public DateTime pageCreated;
         public DateTime pageModified;
-        public int pageSecurity = 0;
+        public bool pageSecurity = false;
         public string pageVersion = ""; //either empty or a history stamp
 
         //website info
@@ -232,7 +232,7 @@ namespace Websilk
             {
                 reader.Read();
 
-                if(reader.GetInt("security") > 0 && S.User.userId == 0)
+                if(reader.GetBool("security") == true && S.User.userId == 0)
                 {
                     //redirect user to access denied page
                     getPageInfo(reader.GetInt("pagedenied"));
@@ -246,10 +246,10 @@ namespace Websilk
                 pageTitleHead = reader.Get("title_head");
                 pagePathName = reader.Get("path");
                 pagePathIds = reader.Get("pathIds");
-                pageDescription = S.Sql.Decode(reader.Get("description"));
+                pageDescription = reader.Get("description");
                 pageCreated = reader.GetDateTime("datecreated");
-                pageSecurity = reader.GetInt("security");
-                pageType = reader.GetInt("pagetype");
+                pageSecurity = reader.GetBool("security");
+                pageType = reader.GetShort("pagetype");
                 pageLayout = reader.Get("layout");
                 pageService = reader.Get("service");
                 pageParentId = reader.GetInt("parentid");
@@ -264,7 +264,7 @@ namespace Websilk
                 websitePageAccessDenied = reader.GetInt("pagedenied");
                 websitePage404 = reader.GetInt("page404");
                 googleWebPropertyId = reader.Get("googlewebpropertyid");
-                pageFavIcon = reader.Get("icon");
+                pageFavIcon = reader.GetBool("icon");
                 pagePhoto = reader.Get("photo");
 
                 //set up page properties

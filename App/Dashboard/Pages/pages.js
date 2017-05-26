@@ -56,7 +56,7 @@
         var link = e.getAttribute('data-link');
         var data = {
             'id': pageid,
-            'title': e.getAttribute('data-title'),
+            'title': e.getAttribute('data-titlehead') != '' ? e.getAttribute('data-titlehead') : e.getAttribute('data-title'),
             'path': e.getAttribute('data-path'),
             'link': link,
             'date-created': e.getAttribute('data-created'),
@@ -77,6 +77,9 @@
 
         //add new slide to slideshow
         slides.add($('#page_details').html(), data);
+
+        //update title
+        data.title = e.getAttribute('data-title');
 
         //load sub pages list
         if (isfolder == true) {

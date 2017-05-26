@@ -116,7 +116,7 @@ namespace Websilk.Services.Dashboard
                 if(titleHead == "") { titleHead = subpageTitle; }
                 pagePath = reader.Get("path");
                 pageSummary = reader.Get("description");
-                pageCreated = DateTime.Parse(reader.Get("datecreated")).ToString("MMMM dd, yyyy");
+                pageCreated = reader.GetDateTime("datecreated").ToString("MMMM dd, yyyy");
                 subpageId = reader.GetInt("pageid");
                 hasChildren = reader.GetInt("haschildren");
                 pageLink = "/" + (pagePath).Replace(" ", "-");
@@ -191,7 +191,7 @@ namespace Websilk.Services.Dashboard
         {
             item.Data["id"] = pageId.ToString();
             item.Data["title"] = pageTitle;
-            item.Data["title-head"] = pageTitleHead == pageTitle ? "" : pageTitleHead;
+            item.Data["title-head"] = (pageTitleHead == pageTitle ? "" : pageTitleHead);
             item.Data["path"] = pagePath;
             item.Data["link"] = pageLink;
             item.Data["summary"] = pageSummary.Replace("\"", "&quot;");

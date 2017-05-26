@@ -120,7 +120,7 @@ namespace Websilk
             return "";
         }
 
-        public void SaveToCache(string key, string value)
+        public void SaveToCache(string key, object value)
         {
             if (Cache.ContainsKey(key))
             {
@@ -137,12 +137,12 @@ namespace Websilk
             if(Cache[key] == null)
             {
                 var obj = value();
-                SaveToCache(key, serialize ? S.Util.Serializer.WriteObjectAsString(obj) : obj);
+                SaveToCache(key, serialize ? (object)Util.Serializer.WriteObjectAsString(obj) : obj);
                 return obj;
             }
             else
             {
-                return serialize ? (T)S.Util.Serializer.ReadObject((string)Cache[key], typeof(T)) : (T)Cache[key];
+                return serialize ? (T)Util.Serializer.ReadObject((string)Cache[key], typeof(T)) : (T)Cache[key];
             }
         }
         #endregion

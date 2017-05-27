@@ -63,10 +63,8 @@
                 switch (k) {
                     case 67: //c (copy)
                         return false;
-                        break;
                     case 86: //v (paste)
                         return false;
-                        break;
                     case 88: //x (cut)
                         break;
                     case 89: //y (redo)

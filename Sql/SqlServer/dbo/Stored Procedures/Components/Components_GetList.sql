@@ -13,7 +13,7 @@ BEGIN
 	SELECT * FROM (
 		SELECT TOP (@start + @length) ROW_NUMBER() OVER(ORDER BY orderindex ASC) AS rownum, 
 		componentId, [namespace], title, [description] 
-		FROM components WHERE category=@category
+		FROM Components WHERE category=@category
 	) AS tbl WHERE rownum >= @start AND rownum <= @start + @length
 END
 

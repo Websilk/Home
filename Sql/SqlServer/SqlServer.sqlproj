@@ -77,6 +77,7 @@
     <Folder Include="dbo\Stored Procedures\Log" />
     <Folder Include="dbo\Stored Procedures\Blocks" />
     <Folder Include="dbo\Stored Procedures\Documentation" />
+    <Folder Include="dbo\Stored Procedures\Pages\Shadow" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="dbo\Tables\ErrorLog.sql" />
@@ -166,6 +167,9 @@
     <Build Include="dbo\Stored Procedures\Documentation\Documentation_Update.sql" />
     <Build Include="dbo\Stored Procedures\Documentation\Documentation_GetList.sql" />
     <Build Include="dbo\Stored Procedures\Pages\Page_Update.sql" />
+    <Build Include="dbo\Stored Procedures\Pages\Shadow\Pages_Shadow_GetList.sql" />
+    <Build Include="dbo\Tables\ApplicationsOwned.sql" />
+    <Build Include="dbo\Tables\Applications.sql" />
   </ItemGroup>
   <ItemGroup>
     <ArtifactReference Include="$(DacPacRootPath)\Extensions\Microsoft\SQLDB\Extensions\SqlServer\110\SqlSchemas\master.dacpac">

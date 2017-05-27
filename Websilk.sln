@@ -13,9 +13,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Websilk", "App\Websilk.csproj", "{8BDEA53B-38E6-4527-9162-45D99C7A2640}"
 EndProject
 Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "SqlServer", "Sql\SqlServer\SqlServer.sqlproj", "{F550C6AC-987E-4C40-88DA-9BCF2CD734CB}"
-	ProjectSection(ProjectDependencies) = postProject
-		{8BDEA53B-38E6-4527-9162-45D99C7A2640} = {8BDEA53B-38E6-4527-9162-45D99C7A2640}
-	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

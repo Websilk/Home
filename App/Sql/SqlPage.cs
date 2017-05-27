@@ -86,7 +86,7 @@ namespace Websilk.SqlQueries
         #endregion
 
         #region "Create"
-        public void Create(int ownerId, int websiteId, int parentId, string title, string description, enumPageType pageType, string layout = "", string service = "", bool security = false, bool enabled = true)
+        public void Create(int ownerId, int websiteId, int parentId, string title, string description, enumPageType pageType, int shadowId, int shadowChildId, string layout = "", string service = "", bool security = false, bool enabled = true)
         {
             var parameters = new List<SqlParameter>();
             parameters.Add(new SqlParameter("@ownerId", ownerId.ToString()));
@@ -94,29 +94,46 @@ namespace Websilk.SqlQueries
             parameters.Add(new SqlParameter("@parentId", parentId.ToString()));
             parameters.Add(new SqlParameter("@title", title));
             parameters.Add(new SqlParameter("@description", description));
-            parameters.Add(new SqlParameter("@pageType", ((int)pageType).ToString()));
+            parameters.Add(new SqlParameter("@pageType", pageType));
+            parameters.Add(new SqlParameter("@shadowId", shadowId));
+            parameters.Add(new SqlParameter("@shadowChildId", shadowChildId));
             parameters.Add(new SqlParameter("@layout", layout));
             parameters.Add(new SqlParameter("@service", service));
             parameters.Add(new SqlParameter("@security", security == true ? "1" : "0"));
             parameters.Add(new SqlParameter("@enabled", enabled == true ? "1" : "0"));
-            S.Sql.ExecuteNonQuery("EXEC Page_Create @ownerId=@ownerId, @websiteId=@websiteId, @parentId=@parentId, @title=@title, @description=@description, @pageType=@pageType, @layout=@layout, @service=@service, @security=@security, @enabled=@enabled", parameters);
+            S.Sql.ExecuteNonQuery("EXEC Page_Create @ownerId=@ownerId, @websiteId=@websiteId, @parentId=@parentId, @title=@title, @description=@description, @pageType=@pageType, @shadowId=@shadowId, @shadowChildId=@shadowChildId, @layout=@layout, @service=@service, @security=@security, @enabled=@enabled", parameters);
         }
         #endregion
 
         #region "Settings"
-        public void Update(int websiteId, int pageId, string titlehead, string description, enumPageType pageType, string layout = "", string service = "", bool security = false, bool enabled = true)
+        public void Update(int websiteId, int pageId, string titlehead, string description, enumPageType pageType, int shadowId, int shadowChildId, string layout = "", string service = "", bool security = false, bool enabled = true)
         {
-            var parameters = new List<SqlParameter>();
-            parameters.Add(new SqlParameter("@websiteId", websiteId.ToString()));
-            parameters.Add(new SqlParameter("@pageId", pageId.ToString()));
-            parameters.Add(new SqlParameter("@titlehead", titlehead));
-            parameters.Add(new SqlParameter("@description", description));
-            parameters.Add(new SqlParameter("@pageType", ((int)pageType).ToString()));
-            parameters.Add(new SqlParameter("@layout", layout));
-            parameters.Add(new SqlParameter("@service", service));
-            parameters.Add(new SqlParameter("@security", security));
-            parameters.Add(new SqlParameter("@enabled", enabled));
-            S.Sql.ExecuteNonQuery("EXEC Page_Update @websiteId=@websiteId, @pageId=@pageId, @titlehead=@titlehead, @description=@description, @pageType=@pageType, @layout=@layout, @service=@service, @security=@security, @enabled=@enabled", parameters);
+            var parms = new List<SqlParameter>()
+            {
+                new SqlParameter("@websiteId", websiteId.ToString()),
+                new SqlParameter("@pageId", pageId.ToString()),
+                new SqlParameter("@titlehead", titlehead),
+                new SqlParameter("@description", description),
+                new SqlParameter("@pageType", ((int)pageType).ToString()),
+                new SqlParameter("@shadowId", shadowId),
+                new SqlParameter("@shadowChildId", shadowChildId),
+                new SqlParameter("@layout", layout),
+                new SqlParameter("@service", service),
+                new SqlParameter("@security", security),
+                new SqlParameter("@enabled", enabled)
+            };
+            S.Sql.ExecuteNonQuery("EXEC Page_Update @websiteId=@websiteId, @pageId=@pageId, @titlehead=@titlehead, @description=@description, @pageType=@pageType, @shadowId=@shadowId, @shadowChildId=@shadowChildId, @layout=@layout, @service=@service, @security=@security, @enabled=@enabled", parms);
+        }
+        #endregion
+
+        #region "Shadow Templates"
+        public SqlReader GetShadowTemplatesForWebsite(int websiteId)
+        {
+            var parms = new List<SqlParameter>()
+            {
+                new SqlParameter("@websiteId", websiteId)
+            };
+            return new SqlReader(S, "EXEC Pages_Shadow_GetList @websiteId=@websiteId", parms);
         }
         #endregion
     }

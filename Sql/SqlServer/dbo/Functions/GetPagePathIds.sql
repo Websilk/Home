@@ -14,9 +14,9 @@ BEGIN
 		@Result nvarchar(MAX),
 		@parentId int = 0
 
-	SELECT @parentId=parentId FROM pages WHERE pageid=@pageId 
+	SELECT @parentId=parentId FROM Pages WHERE pageId=@pageId 
 	
-	IF @parentId is not null AND @parentId > 0 BEGIN
+	IF @parentId IS NOT NULL AND @parentId > 0 BEGIN
 		SET @Result = dbo.GetPagePathIds(@parentId) + '/' + CONVERT(nvarchar(MAX), @pageId)
 	END 
 	ELSE BEGIN

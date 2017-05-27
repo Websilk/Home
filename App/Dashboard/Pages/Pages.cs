@@ -31,6 +31,19 @@ namespace Websilk.Pages.DashboardPages
                 scaffold.Data["page-list"] = servePage.View(websiteId, 0, 1, 1000, 4, 0, "");
                 S.javascriptFiles.Add("dash-pages", "/js/dashboard/pages/pages.js");
                 S.javascript.Add("dash-pages", "S.dashboard.pages.init();");
+
+                //get list of available shadow templates
+                var reader = page.sql.GetShadowTemplatesForWebsite(page.websiteId);
+                var js = "S.dashboard.pages.shadow_templates = [";
+                var i = 0;
+                while (reader.Read())
+                {
+                    if(i > 0) { js += ","; }
+                    js += "{id:" + reader.GetInt("pageId").ToString() + ", title:'" + reader.Get("title").Replace("'", "\\'") + "'}";
+                    i++;
+                }
+                js += "];";
+                S.javascript.Add("dash-page-shadows", js);
             }
             
             inject.html = scaffold.Render();
@@ -215,13 +228,13 @@ namespace Websilk.Services.Dashboard
 
         #region "Create"
 
-        public string Create(int websiteId, int parentId, string title, string description, int type, bool secure, string layout = "", string service = "")
+        public string Create(int websiteId, int parentId, string title, string description, int type, int shadowId, int shadowChildId, bool secure, string layout = "", string service = "")
         {
             if (!S.User.checkSecurity(websiteId, "dashboard/pages", User.enumSecurity.create)) { return "err"; }
 
             //create new web page
             GetPage();
-            page.sql.Create(S.User.userId, websiteId, parentId, title, description, (SqlQueries.Page.enumPageType)Enum.Parse(typeof(SqlQueries.Page.enumPageType), type.ToString()), layout, service, secure);
+            page.sql.Create(S.User.userId, websiteId, parentId, title, description, (SqlQueries.Page.enumPageType)Enum.Parse(typeof(SqlQueries.Page.enumPageType), type.ToString()), shadowId, shadowChildId, layout, service, secure);
 
             //return list of sub-pages
             return View(websiteId, parentId, 0, 100, 0, 0, "");
@@ -244,6 +257,10 @@ namespace Websilk.Services.Dashboard
                 scaffold.Data["description"] = reader.Get("description");
                 scaffold.Data["secure"] = reader.GetBool("security") ? "checked=\"checked\"" : "";
                 scaffold.Data["active"] = reader.GetBool("enabled") ? "checked=\"checked\"" : "";
+                scaffold.Data["use-shadow"] = reader.GetInt("shadowId") > 0 ? "checked=\"checked\"" : "";
+                scaffold.Data["use-child-shadow"] = reader.GetInt("shadowChildId") > 0 ? "checked=\"checked\"" : "";
+                scaffold.Data["shadow-id"] = reader.GetInt("shadowId").ToString();
+                scaffold.Data["shadow-child-id"] = reader.GetInt("shadowChildId").ToString();
                 switch (reader.GetShort("pagetype"))
                 {
                     case 0: scaffold.Data["pagetype"] = "1"; break;
@@ -254,16 +271,20 @@ namespace Websilk.Services.Dashboard
             return scaffold.Render();
         }
 
-        public string UpdateSettings(int websiteId, int id, string title, string description, int type, bool secure, bool active)
+        public string UpdateSettings(int websiteId, int id, string title, string description, int type, int shadowId, int shadowChildId, bool secure, bool active)
         {
             if (!S.User.checkSecurity(websiteId, "dashboard/pages", User.enumSecurity.update)) { return "err"; }
 
             //create new web page
             GetPage();
-            page.sql.Update(websiteId, id, title, description, (SqlQueries.Page.enumPageType)Enum.Parse(typeof(SqlQueries.Page.enumPageType), type.ToString()), "", "", secure, active);
+            page.sql.Update(websiteId, id, title, description, (SqlQueries.Page.enumPageType)Enum.Parse(typeof(SqlQueries.Page.enumPageType), type.ToString()), shadowId, shadowChildId, "", "", secure, active);
 
             return "success";
         }
+        #endregion
+
+        #region "Shadow Templates"
+        
         #endregion
     }
 }

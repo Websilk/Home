@@ -121,25 +121,60 @@
                 <div class="col field-label">Summary</div>
                 <div class="col field-input expand"><textarea id="txtcreatedesc" placeholder="Write a description about your new page"></textarea></div>
             </div>
-            <div class="row hover">
-                <div class="col field-label">Page Type</div>
-                <div class="col field-input">
-                    <select id="pagetype">
-                        <option value="0" selected="selected">Web Page</option>
-                        <option value="2">Shadow Page</option>
-                    </select>
-                </div>
-            </div>
             <div class="row text-right pad-top desc-chars font-faded"></div>
+
             <div class="row pad-top pad-bottom-sm title"><h6>Security</h6></div>
-            <div class="row hover margin-bottom-lg">
+            <div class="row hover margin-bottom-sm">
                 <div class="col field-label"></div>
                 <div class="col field-text">
                     <label>
                         <input type="checkbox" class="chk-secure" /><span>Private</span>
                         <span class="font-faded pad-left">Only administrators can view this web page</span>
                     </label>
-                    
+                </div>
+            </div>
+            <div class="row pad-top pad-bottom-sm">
+                <div class="col title"><h6>Shadow Template</h6></div>
+                <div class="col right"><a href="javascript:" class="button special">New Shadow Template</a></div>
+            </div>
+            <div class="row hover">
+                <div class="col field-label"></div>
+                <div class="col field-text pad-right" style="width:400px;">
+                    <label>
+                        <input type="checkbox" class="chk-use-shadow" /><span>Use a Shadow Template for this web page</span>
+                    </label>
+                </div>
+                <div class="shadow-list" style="display:none;">
+                    <div class="col field-text icon tiny pad-right">
+                        <svg viewBox="0 0 32 32">
+                            <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#icon-arrow-right" x="0" y="0" width="32" height="32"></use>
+                        </svg>
+                    </div>
+                    <div class="col field-input pad-right">
+                        <select id="shadowId">
+                            {{shadow-list}}
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="row hover margin-bottom-lg">
+                <div class="col field-label"></div>
+                <div class="col field-text pad-right" style="width:400px;">
+                    <label>
+                        <input type="checkbox" class="chk-use-child-shadow" /><span>Assign a Shadow Template to new child pages</span>
+                    </label>
+                </div>
+                <div class="shadow-child-list" style="display:none;">
+                    <div class="col field-text icon tiny pad-right">
+                        <svg viewBox="0 0 32 32">
+                            <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#icon-arrow-right" x="0" y="0" width="32" height="32"></use>
+                        </svg>
+                    </div>
+                    <div class="col field-input">
+                        <select id="shadowChildId">
+                            {{shadow-list}}
+                        </select>
+                    </div>
                 </div>
             </div>
         </div>

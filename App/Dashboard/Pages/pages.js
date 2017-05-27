@@ -1,5 +1,5 @@
 ﻿S.dashboard.pages = {
-    current_page: 0, current_path: [], page_info: null, slides: null,
+    current_page: 0, current_path: [], page_info: null, slides: null, shadow_templates: [],
 
     init: function(){
         this.slides = new S.slides('.pages-info > .slideshow');
@@ -104,7 +104,8 @@
             var data = {
                 'parent-title': info.path != '' ? 'For page "' + info.path.replace(/\//g, ' > ') + '"' : '',
                 'page-url': info['url-name'] + '/',
-                'create-title': pageid == 0 ? 'Page' : 'Sub Page'
+                'create-title': pageid == 0 ? 'Page' : 'Sub Page',
+                'shadow-list': ''
             }
             var scaffold = new S.scaffold(htm, data);
             var container = $(e).parents('.page-details').find('.page-create');
@@ -122,6 +123,30 @@
             container.find('.btn-page-cancel a').on('click', S.dashboard.pages.create.cancel);
             $('#txtcreatedesc').on('keyup', S.dashboard.pages.create.countChars);
             $('#txtcreatetitle').on('keyup', S.dashboard.pages.create.updateTitle);
+            container.find('.chk-use-shadow').on('change', function (e) {
+                if (e.target.checked) {
+                    $('.shadow-list').show();
+                } else {
+                    $('.shadow-list').hide();
+                }
+            });
+            container.find('.chk-use-child-shadow').on('change', function (e) {
+                if (e.target.checked) {
+                    $('.shadow-child-list').show();
+                } else {
+                    $('.shadow-child-list').hide();
+                }
+            });
+
+            //load shadow template list into drop down lists
+            var list = '';
+            var templates = S.dashboard.pages.shadow_templates;
+            for (var x = 0; x < templates.length; x++) {
+                list += '<option value="' + templates[x].id + '">' + templates[x].title + '</option>';
+            }
+            $('#shadowId, #shadowChildId').html(list);
+
+
             if (pageid > 0) {
                 var subpages = $(e).parents('.page-details').find('.slideshow');
                 subpages.addClass('hide');
@@ -201,15 +226,22 @@
                 return false;
             }
 
-            //submit "create page" form
-            S.ajax.post("Dashboard/Pages/Create", {
+            data = {
                 websiteId: S.dashboard.website.id,
                 parentId: S.dashboard.pages.current_page,
+                type:0,
                 title: title,
                 description: desc,
-                type: container.find('#pagetype').val(),
+                shadowId: container.find('#shadowId').val(),
+                shadowChildId: container.find('#shadowChildId').val(),
                 secure: secure
-            },
+            };
+
+            if (data.shadowId == '' || !container.find('.chk-use-shadow')[0].checked) { data.shadowId = 0; }
+            if (data.shadowChildId == '' || !container.find('.chk-use-child-shadow')[0].checked) { data.shadowChildId = 0; }
+
+            //submit "create page" form
+            S.ajax.post("Dashboard/Pages/Create", data,
                 function (data) {
                     if (data.d == 'err') {
                         S.message.show(msg, 'error', 'An error occurred while trying to create your new web page');
@@ -260,6 +292,48 @@
                 container.find('.btn-page-settings-update a').on('click', function (e) { S.dashboard.pages.settings.submit(this); });
                 container.find('.btn-page-cancel a').on('click', S.dashboard.pages.settings.cancel);
                 $('#description').on('keyup', S.dashboard.pages.settings.countChars);
+
+                //add events for shadow templates
+                container.find('.chk-use-shadow').on('change', function (e) {
+                    if (e.target.checked) {
+                        $('.shadow-list').show();
+                    } else {
+                        $('.shadow-list').hide();
+                    }
+                });
+                container.find('.chk-use-child-shadow').on('change', function (e) {
+                    if (e.target.checked) {
+                        $('.shadow-child-list').show();
+                    } else {
+                        $('.shadow-child-list').hide();
+                    }
+                });
+
+                //check shadow checkboxes
+                if (container.find('.chk-use-shadow')[0].checked) {
+                    $('.shadow-list').show();
+                } else {
+                    $('.shadow-list').hide();
+                }
+                if (container.find('.chk-use-child-shadow')[0].checked) {
+                    $('.shadow-child-list').show();
+                } else {
+                    $('.shadow-child-list').hide();
+                }
+
+                //load shadow template list into drop down lists
+                var list = '';
+                var templates = S.dashboard.pages.shadow_templates;
+                for (var x = 0; x < templates.length; x++) {
+                    list += '<option value="' + templates[x].id + '">' + templates[x].title + '</option>';
+                }
+                container.find('#shadowId, #shadowChildId').html(list);
+
+                //select shadow template from list
+                container.find('#shadowId option').removeAttr('selected');
+                container.find('#shadowId option[value="' + container.find('#shadowId').attr('data-id') + '"]').attr('selected', 'selected');
+                container.find('#shadowChildId option').removeAttr('selected');
+                container.find('#shadowChildId option[value="' + container.find('#shadowChildId').attr('data-id') + '"]').attr('selected', 'selected');
 
                 //show settings section
                 var subpages = $(e).parents('.page-details').find('.slideshow');
@@ -326,16 +400,23 @@
                 return false;
             }
 
-            //submit "page settings" form
-            S.ajax.post("Dashboard/Pages/UpdateSettings", {
+            var data = {
                 websiteId: S.dashboard.website.id,
                 id: S.dashboard.pages.settings.id,
                 title: titlehead,
                 description: desc,
-                type: container.find('#pagetype').val() || -1,
+                type: 0,
+                shadowId: $('#shadowId').val(),
+                shadowChildId: $('#shadowChildId').val(),
                 secure: secure,
                 active: active
-            },
+            };
+
+            if (!$('.chk-use-shadow')[0].checked) { data.shadowId = 0; }
+            if (!$('.chk-use-child-shadow')[0].checked) { data.shadowChildId = 0; }
+
+            //submit "page settings" form
+            S.ajax.post("Dashboard/Pages/UpdateSettings", data,
                 function (data) {
                     if (data.d == 'err') {
                         S.message.show(msg, 'error', 'An error occurred while trying to create your new web page');

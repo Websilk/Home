@@ -11,7 +11,8 @@ AS
 BEGIN
 	SET NOCOUNT ON;
 
-    SELECT p.websiteid, p.pageid, p.parentid, p.ownerId, w.title AS websitetitle, p.title, p.title_head, p.pagetype, p.layout, p.[service], p.[path], p.pathIds,
+    SELECT p.websiteid, p.pageid, p.parentid, p.ownerId, w.title AS websitetitle, p.title, p.title_head, p.pagetype, 
+	p.shadowId, p.shadowChildId, p.layout, p.[service], p.[path], p.pathIds,
 	(CASE WHEN p.parentid IS NOT NULL THEN (SELECT title FROM pages WHERE pageid=p.parentid) ELSE NULL END) AS parenttitle, 
 	(SELECT COUNT(*) FROM pages WHERE pathIds LIKE p.pathIds + '/%' AND pathlvl = p.pathlvl + 1) AS subpages,
 	w.theme, w.colors, w.colorsEditor, w.colorsDash, p.[description], w.pagedenied, w.page404, w.[status], w.icon, p.[security], p.datecreated, p.[enabled], p.deleted,

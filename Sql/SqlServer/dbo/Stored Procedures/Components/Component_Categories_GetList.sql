@@ -12,7 +12,7 @@ BEGIN
 	SET NOCOUNT ON;
 	SELECT * FROM (
 		SELECT DISTINCT a.title, a.name, a.description, a.applicationid
-		FROM applicationsowned o 
+		FROM applicationsOwned o 
 		LEFT JOIN applications a 
 		ON a.applicationid=o.applicationid 
 		WHERE o.websiteid=@websiteId

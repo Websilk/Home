@@ -127,7 +127,7 @@ namespace Websilk.Services.Editor
                 inject.html = component.Render();
                 inject.js =  S.javascriptFiles.renderJavascriptFiles(false, S.javascript.renderJavascript(false));
                 inject.css = S.css.renderCss(false);
-                inject.cssId = "comp" + component.id;
+                inject.cssId = "css_component_c" + component.id;
 
 
                 //inject html resources

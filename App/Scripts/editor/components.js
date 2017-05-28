@@ -1104,7 +1104,7 @@ S.editor.components = {
                     if (p.top > 0) { noTop = false; }
                     if (p.width > 0) { noWidth = false; }
                     if (p.height > 0 && p.height != null) { noHeight = false; }
-                    if (p.forceNewLine == false) { noMargin = false; }
+                    if (p.forceNewLine == true) { noMargin = false; }
                     if (p.padding.top > 0 || p.padding.right > 0 || p.padding.bottom > 0 || p.padding.left > 0) { noPadding = false; }
                 }
 
@@ -1186,9 +1186,12 @@ S.editor.components = {
                     }
                     
                     //force new line
-                    if (p.forceNewLine == true && !noMargin) {
+                    console.log(p);
+                    console.log(noMargin);
+                    if (p.forceNewLine == true && noMargin == false) {
                         style += 'margin:0 auto;';
                     }
+                    console.log(style);
 
                     //compile style with CSS selector
                     if (style != '') {

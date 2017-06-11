@@ -65,7 +65,10 @@
             'url': S.website.protocol + S.website.host + link.substr(1),
             'url-name': link.substr(1),
             'link-create': 'S.dashboard.pages.create.view(this, ' + pageid + ')',
-            'link-settings': 'S.dashboard.pages.settings.view(this, ' + pageid + ')'
+            'link-settings': 'S.dashboard.pages.settings.view(this, ' + pageid + ')',
+            'shadow-template': e.getAttribute('data-use-template') != '1',
+            'shadow-template-name': e.getAttribute('data-template-name') || '',
+            'shadow-template-url': e.getAttribute('data-template-url') || ''
         }
         this.current_page = pageid;
         this.current_path.push(pageid);
@@ -139,13 +142,10 @@
             });
 
             //load shadow template list into drop down lists
-            var list = '';
-            var templates = S.dashboard.pages.shadow_templates;
-            for (var x = 0; x < templates.length; x++) {
-                list += '<option value="' + templates[x].id + '">' + templates[x].title + '</option>';
-            }
-            $('#shadowId, #shadowChildId').html(list);
+            S.dashboard.pages.shadow.loadList();
 
+            //set up new shadow template button
+            $('.btn-shadow-create').on('click', S.dashboard.pages.shadow.create.view);
 
             if (pageid > 0) {
                 var subpages = $(e).parents('.page-details').find('.slideshow');
@@ -277,7 +277,6 @@
         view: function (e, id) {
             var data = { id: id };
             S.ajax.post('Dashboard/Pages/ViewSettings', data, function (d) {
-                console.log(d);
                 var container = $(e).parents('.page-details').find('.page-create');
                 container.html('');
                 container.append(d.d);
@@ -322,18 +321,16 @@
                 }
 
                 //load shadow template list into drop down lists
-                var list = '';
-                var templates = S.dashboard.pages.shadow_templates;
-                for (var x = 0; x < templates.length; x++) {
-                    list += '<option value="' + templates[x].id + '">' + templates[x].title + '</option>';
-                }
-                container.find('#shadowId, #shadowChildId').html(list);
+                S.dashboard.pages.shadow.loadList();
 
                 //select shadow template from list
                 container.find('#shadowId option').removeAttr('selected');
                 container.find('#shadowId option[value="' + container.find('#shadowId').attr('data-id') + '"]').attr('selected', 'selected');
                 container.find('#shadowChildId option').removeAttr('selected');
                 container.find('#shadowChildId option[value="' + container.find('#shadowChildId').attr('data-id') + '"]').attr('selected', 'selected');
+
+                //set up new shadow template button
+                $('.btn-shadow-create').on('click', S.dashboard.pages.shadow.create.view);
 
                 //show settings section
                 var subpages = $(e).parents('.page-details').find('.slideshow');
@@ -425,12 +422,84 @@
                         //show success message
                         S.message.show(msg, '', 'Your page, "' + titlehead + '" has been updated successfully');
                         //update existing UI
-                        $('.page-title-for-' + S.dashboard.pages.settings.id).html(titlehead);
-                        $('.page-summary-for-' + S.dashboard.pages.settings.id).html(desc);
-                        $('.page-item-for-' + S.dashboard.pages.settings.id).attr('data-title', titlehead);
+                        $('.page-title-for-' + S.dashboard.pages.settings.id + ' h4').html(titlehead);
+                        $('.page-summary-for-' + S.dashboard.pages.settings.id + ' .summary-details').html(desc);
+
+                        var opt = $('#shadowId option[value="' + $('#shadowId').val() + '"]');
+
+                        $('.page-item-for-' + S.dashboard.pages.settings.id)
+                            .attr('data-title', titlehead)
+                            .attr('data-use-template', $('.chk-use-shadow')[0].checked ? '1' : '')
+                            .attr('data-template-name', opt.html().trim())
+                            .attr('data-template-url', opt.attr('data-url'));
+
+                        //show or hide shadow template
+                        var template = $('.shadow-template-for-' + S.dashboard.pages.settings.id);
+                        if ($('.chk-use-shadow')[0].checked) {
+                            template.show();
+                        } else {
+                            template.hide();
+                        }
+                        template.find('.shadow-name').html(opt.html().trim());
+                        template.find('.shadow-url')[0].href = opt.attr('data-url');
                     }
                 }
             );
+        }
+    },
+
+    shadow: { //shadow templates
+        loadList: function () {
+            var shadowId = $('#shadowId').val();
+            var shadowChildId = $('#shadowChildId').val();
+            var list = '';
+            var templates = S.dashboard.pages.shadow_templates;
+            for (var x = 0; x < templates.length; x++) {
+                list += '<option value="' + templates[x].id + '" data-url="' + templates[x].url + '">' + templates[x].title + '</option>';
+            }
+            $('#shadowId, #shadowChildId').html(list);
+            $('#shadowId').val(shadowId);
+            $('#shadowChildId').val(shadowChildId);
+        },
+
+        create: {
+            view: function () {
+                //view popup to create new shadow template
+                S.popup.show('New Shadow Template', $('#shadow_template_create').html());
+                $('.btn-shadow-save').on('click', S.dashboard.pages.shadow.create.save);
+            },
+
+            save: function () {
+                //save new shadow template
+                var msg = $('.popup .message');
+                msg.hide();
+                var data = {
+                    websiteId: S.website.id,
+                    name: $('#shadow_name').val()
+                }
+                if (!S.validate.alphaNumeric(data.name, [' '])) {
+                    S.message.show(msg, 'error', 'No special characters are allowed');
+                    return;
+                }
+
+                //submit "new shadow template" form
+                S.ajax.post("Dashboard/Pages/CreateShadowTemplate", data,
+                    function (d) {
+                        if (d.d == 'err') {
+                            S.message.show(msg, 'error', 'An error occurred while trying to create a new shadow template');
+                            return false;
+                        } else {
+                            //show success message
+                            S.message.show(msg, '', 'Your shadow template, "' + data.name + '" has been created successfully');
+                            $('#shadow_name').val('');
+                            eval(d.d);
+
+                            //load shadow template list into drop down lists
+                            S.dashboard.pages.shadow.loadList();
+                        }
+                    }
+                );
+            }
         }
     },
 

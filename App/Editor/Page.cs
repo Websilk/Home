@@ -198,13 +198,13 @@ namespace Websilk.Services.Editor
             GetPage();
 
             //load layout list ////////////////////////////////////////////////////////////////
-            if (!S.Server.Cache.ContainsKey("blocks-" + page.websiteId + '-' + area))
+            if (!S.Server.Cache.ContainsKey("blocks-" + page.websiteId + '-' + area.ToLower()))
             {
                 //get list of layouts for page theme (from disk)
                 var reader = sql.GetBlockList(page.websiteId, area.ToLower());
                 while (reader.Read())
                 {
-                    htm.Append("<option value=\"" + reader.Get("blockId") + "\">" +
+                    htm.Append("<option value=\"" + reader.GetInt("blockId") + "\">" +
                         S.Util.Str.Capitalize(reader.Get("name")) + "</option>");
                 }
                 S.Server.Cache["blocks-" + page.websiteId + '-' + area] = htm.ToString();
@@ -217,14 +217,19 @@ namespace Websilk.Services.Editor
             }
         }
 
-        public string AddBlock(string blockId, int insertAt, string name, string area, bool isPageLevelBlock = false, bool changeOnly = false)
+        public Inject AddBlock(string blockId, int insertAt, string name, string area, string element, bool isPageLevelBlock = false, bool changeOnly = false)
         {
+            var inject = new Inject();
+            inject.element = "#" + element;
+            inject.inject = enumInjectTypes.after;
+            inject.cssId = "block_" + blockId;
             GetPage();
             var sqlEditor = new SqlQueries.Editor(S);
             if (blockId == "" && name != "")
             {
                 if (sqlEditor.HasBlock(page.websiteId, name) == true){
-                    return "exists";
+                    inject.html = "exists";
+                    return inject;
                 }
             }
             var id = blockId;
@@ -236,6 +241,9 @@ namespace Websilk.Services.Editor
             //load page(s) from file/cache
             var newpage = tuple.Item3;
 
+            //load list of panels belonging to page
+            var panels = tuple.Item4;
+
             //check if block already exists on the page
             for (var x = 0; x < newpage.areas.Count; x++)
             {
@@ -243,10 +251,14 @@ namespace Websilk.Services.Editor
                 {
                     if(newpage.areas[x].blocks[y].id == blockId)
                     {
-                        return "duplicate";
+                        inject.html = "duplicate";
+                        return inject;
                     }
                 }
             }
+
+            //clean cache
+            S.Server.Cache.Remove("blocks-" + page.websiteId + '-' + area.ToLower());
 
             var block = new Websilk.Page.structBlock() { id = "" };
             for(var x = 0; x < newpage.areas.Count; x++)
@@ -258,6 +270,7 @@ namespace Websilk.Services.Editor
                     {
                         //create new block
                         id = sqlEditor.CreateBlock(page.websiteId, area.ToLower(), name).ToString();
+                        inject.cssId = "block_" + id;
                     }
                     block = page.loadBlock(id);
                     newpage.areas[x].blocks.Insert(insertAt, block);
@@ -278,20 +291,24 @@ namespace Websilk.Services.Editor
                 S.Server.Cache.Remove("blocks-" + page.websiteId + '-' + area);
 
                 //load components into block-level panel
-                var panel = page.CreatePanel(block.name.Replace(" ", "_").ToLower(), block.name, area, block.id, block.name, block.isPage);
+                var panelId = block.name.Replace(" ", "_").ToLower();
+                var panel = page.CreatePanel(panelId, block.name, area, block.id, block.name, block.isPage);
+                panel.AddCell(panelId);
                 panel.hasSiblings = true;
-                var panels = new List<Panel>();
-                page.loadComponents(block, panel, ref panels, true);
+                panels.Add(panel);
+                page.loadComponents(block, panel, ref panels);
 
                 //render panel & components
-                return panel.Render();
+                inject.html = panel.Render();
+                inject.js = RenderJs();
+                inject.css = RenderCss();
             }
-            return "error";
+            return inject;
         }
 
-        public string ChangeBlock(string blockId, int insertAt, string name, string area, bool isPageLevelBlock = false)
+        public Inject ChangeBlock(string blockId, int insertAt, string name, string area, string element, bool isPageLevelBlock = false)
         {
-            return AddBlock(blockId, insertAt, name, area, isPageLevelBlock = false, true);
+            return AddBlock(blockId, insertAt, name, area, element, isPageLevelBlock = false, true);
         }
 
         public string RemoveBlock(string blockId, string area)

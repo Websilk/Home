@@ -95,6 +95,8 @@ namespace Websilk
 
         [JsonIgnore]
         public bool hasSiblings = false;
+        [JsonIgnore]
+        public bool isDisabled = false; //cannot drag & drop components into panel (page editor only)
 
         public structArrangement arrangement;
         public List<structCell> cells;
@@ -149,6 +151,7 @@ namespace Websilk
                 //render cell
                 var divcell = new Utility.DOM.Element("div");
                 divcell.Classes.Add("is-cell");
+                if (isDisabled) { divcell.Classes.Add("is-disabled"); }
                 divcell.id = "cell_" + cell.id.Replace("-", "_").Replace(" ","_");
                 divcell.innerHTML = cell.head + comps.ToString() + cell.foot;
                 htm.Append(divcell.Render());

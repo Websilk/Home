@@ -152,6 +152,7 @@
 .show-empty-cells {
     .webpage {
         .is-cell{min-height:50px; outline-style:dashed; outline-width:4px; outline-offset:-2px;}
+        .is-cell.is-disabled{min-height:auto; outline-width:0px;}
     }
 }
 .show-blocks {
@@ -162,7 +163,11 @@
 }
 
 /* component specific */
-.component.c-textbox{word-break: break-word;}
+.component.c-textbox{word-break: break-word;
+    .placeholder-area{padding:20px 20px; text-align:center; border:4px solid;
+        &.is-body-area{padding:300px 20px;}
+    }
+}
 .text-toolbar{position:absolute; z-index:3001;
               & > div{width:340px; padding:5px;}
 } 

@@ -111,5 +111,15 @@ namespace Websilk
                 page.getPageInfo(pageId);
             }
         }
+
+        protected string RenderJs()
+        {
+            return S.javascriptFiles.renderJavascriptFiles(false, S.javascript.renderJavascript(false));
+        }
+
+        protected string RenderCss()
+        {
+            return S.css.renderCss(false);
+        }
     }
 }

@@ -29,6 +29,7 @@ namespace Websilk.Pages.DashboardPages
                 servePage.page = page;
                 scaffold = new Scaffold(S, "/Dashboard/Pages/pages.html");
                 scaffold.Data["page-list"] = servePage.View(websiteId, 0, 1, 1000, 4, 0, "");
+                scaffold.Data["page-create"] = S.Server.LoadFileFromCache("/Dashboard/Pages/create.html");
                 S.javascriptFiles.Add("dash-pages", "/js/dashboard/pages/pages.js");
                 S.javascript.Add("dash-pages", "S.dashboard.pages.init();");
 
@@ -39,7 +40,7 @@ namespace Websilk.Pages.DashboardPages
                 while (reader.Read())
                 {
                     if(i > 0) { js += ","; }
-                    js += "{id:" + reader.GetInt("pageId").ToString() + ", title:'" + reader.Get("title").Replace("'", "\\'") + "'}";
+                    js += "{id:" + reader.GetInt("pageId").ToString() + ", title:'" + reader.Get("title").Replace("'", "\\'") + "', url:'/" + reader.Get("path").Replace(" ", "-") + "'}";
                     i++;
                 }
                 js += "];";
@@ -113,6 +114,9 @@ namespace Websilk.Services.Dashboard
             var pageLink = "";
             var pageSummary = "";
             var pageCreated = "";
+            var useTemplate = false;
+            var templateName = "";
+            var templateUrl = "";
             var subpageId = 0;
             var hasChildren = 0;
             var color = "";
@@ -130,6 +134,9 @@ namespace Websilk.Services.Dashboard
                 pagePath = reader.Get("path");
                 pageSummary = reader.Get("description");
                 pageCreated = reader.GetDateTime("datecreated").ToString("MMMM dd, yyyy");
+                useTemplate = reader.GetInt("shadowId") > 0;
+                templateName = reader.Get("templatename");
+                templateUrl = "/" + reader.Get("templatepath");
                 subpageId = reader.GetInt("pageid");
                 hasChildren = reader.GetInt("haschildren");
                 pageLink = "/" + (pagePath).Replace(" ", "-");
@@ -193,14 +200,14 @@ namespace Websilk.Services.Dashboard
                     //create
                     options[1] = false;
                 }
-                htm.Append("<li>" + RenderListItem(pageItem, color, subpageId, subpageTitle, titleHead, pagePath, pageLink, pageSummary, pageCreated, options, hasChildren > 0) + "</li>");
+                htm.Append("<li>" + RenderListItem(pageItem, color, subpageId, subpageTitle, titleHead, pagePath, pageLink, pageSummary, useTemplate, templateName, templateUrl, pageCreated, options, hasChildren > 0) + "</li>");
             }
 
             htm.Append("</ul>");
             return htm.ToString();
         }
 
-        private string RenderListItem(Scaffold item, string color, int pageId, string pageTitle, string pageTitleHead, string pagePath, string pageLink, string pageSummary, string createdate, bool[] options, bool isfolder = false)
+        private string RenderListItem(Scaffold item, string color, int pageId, string pageTitle, string pageTitleHead, string pagePath, string pageLink, string pageSummary, bool useTemplate, string templateName, string templateUrl, string createdate, bool[] options, bool isfolder = false)
         {
             item.Data["id"] = pageId.ToString();
             item.Data["title"] = pageTitle;
@@ -211,6 +218,9 @@ namespace Websilk.Services.Dashboard
             item.Data["created"] = createdate;
             item.Data["color"] = color;
             item.Data["folder"] = isfolder == true ? "true" : "false";
+            item.Data["use-template"] = useTemplate ? "1" : "";
+            item.Data["template-name"] = templateName;
+            item.Data["template-url"] = templateUrl;
 
             if (isfolder == true)
             {
@@ -284,7 +294,28 @@ namespace Websilk.Services.Dashboard
         #endregion
 
         #region "Shadow Templates"
-        
+        public string CreateShadowTemplate(int websiteId, string name)
+        {
+            if (!S.User.checkSecurity(websiteId, "dashboard/pages", User.enumSecurity.create)) { return "err"; }
+
+            //create new shadow template
+            GetPage();
+            page.sql.Create(S.User.userId, websiteId, 0, name, "", SqlQueries.Page.enumPageType.shadow, 0, 0);
+
+            //get a list of shadow templates
+            var reader = page.sql.GetShadowTemplatesForWebsite(page.websiteId);
+            var js = "S.dashboard.pages.shadow_templates = [";
+            var i = 0;
+            while (reader.Read())
+            {
+                if (i > 0) { js += ","; }
+                js += "{id:" + reader.GetInt("pageId").ToString() + ", title:'" + reader.Get("title").Replace("'", "\\'") + "', url:'/" + reader.Get("path").Replace(" ", "-") + "'}";
+                i++;
+            }
+            js += "];";
+            return js;
+
+        }
         #endregion
     }
 }

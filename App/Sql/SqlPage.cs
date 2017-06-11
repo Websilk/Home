@@ -135,6 +135,16 @@ namespace Websilk.SqlQueries
             };
             return new SqlReader(S, "EXEC Pages_Shadow_GetList @websiteId=@websiteId", parms);
         }
+
+        public bool ShadowTemplateNameExists(int websiteId, string name)
+        {
+            var parms = new List<SqlParameter>()
+            {
+                new SqlParameter("@websiteId", websiteId),
+                new SqlParameter("@name", name)
+            };
+            return (bool)S.Sql.ExecuteScalar("EXEC Pages_Shadow_Exists @websiteId=@websiteId, @name=@name", parms);
+        }
         #endregion
     }
 }

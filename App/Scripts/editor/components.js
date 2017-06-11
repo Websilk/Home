@@ -35,9 +35,6 @@ S.editor.components = {
                 //override drag element object with clone
                 item.dragElem = clone;
 
-                //update body tag
-                $('body').addClass('show-empty-cells');
-
                 //start component tracking
                 S.editor.components.track.drag.start.call(S.editor.components.track);
             },
@@ -50,14 +47,15 @@ S.editor.components = {
                 S.editor.components.track.drag.end();
                 S.editor.components.hover.isdragging = false;
 
-                //update body tag
-                $('body').removeClass('show-empty-cells');
-
                 //send an AJAX request to create the new component on the page
                 var cid = '';
                 var track = S.editor.components.track;
                 if (track.component) { cid = track.component.id; }
-                if (cid.length > 0) { cid = cid.substring(1);}
+                if (cid.length > 0) {
+                    cid = cid.substring(1);
+                }
+
+                
                 var data = {
                     name: item.elem.getAttribute('data-id'),
                     layerId: S.page.id,
@@ -652,7 +650,6 @@ S.editor.components = {
                 var c = S.editor.components.selected;
                 if (self.component != c[0]) {
                     self.component = c;
-                    console.log(S.editor.components.select.properties);
                 } else {
 
                 }
@@ -678,7 +675,7 @@ S.editor.components = {
 
         reinit: function () {
             //reinitialize component hover events (in case of new components loaded onto the page)
-            $('.webpage .component').off().on('hover', function (e) { S.editor.components.hover.mouseover.call(S.editor.components.hover, e.target); });
+            $('.webpage .component').off().filter(function (a) { return a.className.indexOf('is-temporary') < 0;}).on('hover', function (e) { S.editor.components.hover.mouseover.call(S.editor.components.hover, e.target); });
         },
 
         hovered: function (elem) {
@@ -881,6 +878,10 @@ S.editor.components = {
                 this.hoverIndex = 0;
                 this.hoverStart = true;
                 this.cells = [];
+                //update body tag
+                $('body').addClass('show-empty-cells');
+
+                //get list of panel cells
                 $('.is-cell').each(function (e) {
                     S.editor.components.track.cells.push(S.editor.components.track.getCell($(e)));
                 });
@@ -893,15 +894,18 @@ S.editor.components = {
                 var comp;
                 var found = false;
                 this.timer.date = new Date();
+                if (cell.disabled == true) { cell = { rect: { top: -1000, right: -1000, left: -100, bottom: -100 } };}
 
                 if (!S.math.intersect(cell.rect, cursor) || this.hoverStart === true) {
                     //intersecting a different cell
                     for (var i = 0; i < this.cells.length; i++) {
                         cell = this.cells[i];
-                        if (S.math.intersect(cell.rect, cursor)) {
-                            this.hoverIndex = i;
-                            found = true;
-                            break;
+                        if (cell.disabled == false) {
+                            if (S.math.intersect(cell.rect, cursor)) {
+                                this.hoverIndex = i;
+                                found = true;
+                                break;
+                            }
                         }
                     }
                     if (found) {
@@ -917,20 +921,27 @@ S.editor.components = {
                         $('.editor > .temp').append(div);
                         this.hoverComp = 1;
                         this.drop = '';
+                        this.cell = cell.elem;
+                        console.log('found');
                     } else {
-                        cell = this.cells[0];
+                        cell = null;
                         this.hoverIndex = 0;
+                        this.cell = null;
+                        console.log('lost');
                     }
                     if (this.hoverStart === true) { this.hoverStart = false; }
-                    this.cell = cell.elem;
                 }
-                this.getComponentHoveredOver(cursor, cell, cell.comps, found);
+                if (cell != null) { this.getComponentHoveredOver(cursor, cell, cell.comps, found); }
             },
 
             end: function () {
                 $('.editor > .clone *, ' +
-                 '.editor > .temp > .cellbox, ' +
-                 '.editor > .temp > .compline').remove();
+                    '.editor > .temp > .cellbox, ' +
+                    '.editor > .temp > .compline'
+                ).remove();
+                
+                //update body tag
+                $('body').removeClass('show-empty-cells');
             }
         },
 
@@ -949,7 +960,8 @@ S.editor.components = {
                 },
                 width: pdim.width,
                 height: pdim.height,
-                comps: comps
+                comps: comps,
+                disabled: e.hasClass('is-disabled')
             };
         },
 
@@ -1186,12 +1198,9 @@ S.editor.components = {
                     }
                     
                     //force new line
-                    console.log(p);
-                    console.log(noMargin);
                     if (p.forceNewLine == true && noMargin == false) {
                         style += 'margin:0 auto;';
                     }
-                    console.log(style);
 
                     //compile style with CSS selector
                     if (style != '') {

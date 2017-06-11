@@ -63,7 +63,7 @@ namespace Websilk
         //page info
         public int ownerId = 0;
         public int pageId = 0;
-        public int pageType = 0; //0 = default, 1 = service, 2 = shadow, 3 = clone
+        public int pageType = 0; //0 = default, 1 = service, 2 = shadow
         public int pageParentId = 0;
         public string pageTitle = "";
         public string pageTitleHead = ""; //custom page title used for <head><title></title></head>
@@ -357,6 +357,7 @@ namespace Websilk
                 }
                 //initialize a new page
                 page = new structPage();
+                page.pageId = pageId;
                 page.areas = new List<structArea>();
             }
 
@@ -509,6 +510,24 @@ namespace Websilk
                     {
                         panel = GetPanelById(panels, block.name.Replace(" ", "_").Replace("-", "_").ToLower());
                         panel.hasSiblings = hasSiblings;
+                        if(isEditable == true && pageType == 2 && block.isPage == true)
+                        {
+                            //replace panel content with placeholder content
+                            panel.cells[0].components.Clear();
+                            var text = (Components.Textbox)createNewComponent("Textbox", panel.id, panel.cells[0].id, block.id);
+                            text.text = "<div class=\"placeholder-area" + 
+                                (block.name.ToLower() == "page body" ? " is-body-area" : "") + 
+                                "\"><h4>Shadow Template - Page Block: " + block.name.Replace("Page ","") + "</h4>" + 
+                                "<div>Because this page is a Shadow Template, you cannot add components to the page-level block \"" + block.name.Replace("Page ", "") + "\".</div>" +
+                                "</div>";
+                            var comp = loadComponent(text, panel, panel.cells[0], ref panels, true, false);
+                            var pos = text.position[4];
+                            pos.widthType = Component.enumWidthType.percent;
+                            pos.width = 100;
+                            text.position[4] = pos;
+                            text.isTemporary = true;
+                            panel.isDisabled = true;
+                        }
                         htm.Append(panel.Render());
                     }
                     scaffold.Data[area.name] = htm.ToString();
@@ -664,8 +683,24 @@ namespace Websilk
                 {
                     if(page.areas[x].blocks[y].isPage == false)
                     {
+                        //remove components from custom (non-page-level) blocks
                         var block = page.areas[x].blocks[y];
                         block.components = new List<Component>();
+                        page.areas[x].blocks[y] = block;
+                    }
+                    else
+                    {
+                        //remove unwanted (temporary) components
+                        var block = page.areas[x].blocks[y];
+                        var comps = new List<Component>();
+                        for (var z = 0; z < block.components.Count; z++)
+                        {
+                            if (!block.components[z].isTemporary)
+                            {
+                                comps.Add(block.components[z]);
+                            }
+                        }
+                        block.components = comps;
                         page.areas[x].blocks[y] = block;
                     }
                 }

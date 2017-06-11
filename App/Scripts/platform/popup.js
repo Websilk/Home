@@ -9,7 +9,8 @@
             offsetHeight: options.offsetHeight != null ? options.offsetHeight : 0,
             offsetTop: options.offsetTop != null ? options.offsetTop : 0,
             position: options.position != null ? options.position : 'center',
-            close: options.close != null ? options.close : true
+            close: options.close != null ? options.close : true,
+            className: options.className != null ? options.className : ''
         };
         this.options = opts;
 
@@ -17,7 +18,7 @@
         var div = document.createElement('div');
         var forpopup = $('body > .for-popup');
         var popup = $(div);
-        div.className = 'popup box';
+        div.className = 'popup box ' + opts.className;
 
         popup.css({ width: opts.width });
         popup.addClass(opts.position);
@@ -35,12 +36,18 @@
             forpopup.css({ padding: opts.padding });
         }
 
+        var htm = '<div class="row">';
+
+        if (title != '') {
+            htm += '<div class="col pad"><h6>' + title + '</h6></div>';
+        }
         if (opts.close == true) {
             //add close button to top of page
-            html = $('#template_popup_close').html() + html;
+            htm += $('#template_popup_close').html();
         }
+        htm += '</div>';
 
-        popup.html(html);
+        popup.html(htm + html);
         this.elem = popup;
 
         $('body > .for-popup .popup').remove();
@@ -69,8 +76,6 @@
         var win = S.window.pos();
         var pos = S.popup.elem.position();
         pos.height = S.popup.elem.height();
-        console.log(pos);
-        console.log(S.popup.elem);
         S.popup.elem.css({ maxHeight: win.height - (S.popup.options.padding * 2), top: S.popup.options.offsetTop.toString().indexOf('%') > 0 ? S.popup.options.offsetTop : win.scrolly + ((win.h - pos.height) / 3) + S.popup.options.offsetTop });
     }
 }

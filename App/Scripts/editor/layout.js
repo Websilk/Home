@@ -169,7 +169,8 @@
                 blockId: $('#block_list').val(),
                 name: $('#block_name').val(),
                 insertAt: index,
-                area: area
+                area: area,
+                element: id
             }
 
             //validate
@@ -180,31 +181,39 @@
 
             //load block onto page via AJAX
             S.ajax.post(changeOnly === true ? 'Editor/Page/ChangeBlock' : 'Editor/Page/AddBlock', data,
-                function (data) {
-                    if (data.d == 'error') {
+                function (d) {
+                    console.log(d);
+                    if (d.d.html == 'error') {
                         alert('an error has occurred');
                         return;
                     }
-                    if (data.d == 'duplicate') {
+                    if (d.d.html == 'duplicate') {
                         alert('This block is already loaded onto the page');
                         return;
                     }
+                    if (d.d.html == 'exists') {
+                        alert('That block name already exists');
+                        return;
+                    }
                     //load new block onto the page
-                    $('#' + id).addClass('has-siblings').after(data.d);
+                    $('#' + id).addClass('has-siblings');
+                    S.ajax.callback.inject(d);
 
                     if (changeOnly === true) {
+
                         $('#' + id).remove();
                     }
                     S.popup.hide();
                     S.editor.layout.hide();
                     S.editor.layout.show();
+                    S.editor.components.hover.init();
                 }
             );
         }
     },
 
     remove: function () {
-        //load a new or existing block onto the page
+        //remove an existing block from the page, including all associated components
         if (!confirm('Do you really want to remove this block from the page?')) { return false; }
 
         var opt = $(this).parents('.options');
@@ -224,7 +233,13 @@
                     return;
                 }
                 //remove existing block from the page
-                var parent = $('#' + id).parent();
+                var block = $('#' + id);
+                var parent = block.parent();
+                var comps = block.find('.component');
+                comps.each(function (c) {
+                    //remove each component from the page
+                    S.components.remove(c.id.substr(1));
+                });
                 $('#' + id).remove();
                 if (parent.children().length == 1) {
                     parent.children().removeClass('has-siblings');

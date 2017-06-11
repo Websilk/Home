@@ -94,6 +94,8 @@ namespace Websilk
         //internal variables
         [JsonIgnore]
         public bool isLoaded = true;
+        [JsonIgnore]
+        public bool isTemporary = false; //used for temporary components (non-editable)
 
         //rendering objects
         [JsonIgnore]
@@ -414,6 +416,7 @@ namespace Websilk
             //set up div container for component
             div.id = "c" + id;
             div.Classes.Add("component c-" + Name.Replace(" ", "-").ToLower());
+            if(isTemporary == true) { div.Classes.Add("is-temporary"); }
 
             //finally, render contents of component
             div.innerHTML = scaffold.Render();

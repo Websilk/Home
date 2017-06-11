@@ -33,7 +33,9 @@
             var item = this.items[index];
 
             //check to see if there are any other components on the page of the same type
-            if (this.items.find(function (a) { return a.name == item.name && a.id != item.id; }).length == 0) {
+            var others = this.items.find(function (a) { return a.name == item.name && a.id != item.id; });
+            console.log(others);
+            if (others) {
                 //no more components of the same type exist
             }
 
@@ -43,7 +45,7 @@
             }
 
             //finally, remove the component DOM element from the page & remove the item from the array
-            $('#c' + item.id).remove();
+            $('#c' + item.id + ', #css_component_c' + item.id).remove();
             this.items.splice(index, 1);
         }
     }

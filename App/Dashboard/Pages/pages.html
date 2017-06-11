@@ -67,12 +67,33 @@
                 </div>
                 
                 <div class="row pad">
-                    <p class="summary pad-width pad-bottom-lg page-summary-for-#id#">
-                        #summary#
+                    <p class="summary pad-width page-summary-for-#id#">
+                        <span class="summary-details">#summary#</span>
                         <br /><br />
-                        <span class="inline-block faded pad-height">#created#</span>
+                        <span class="inline-block faded pad-top-sm">#created#</span>
                     </p>
                 </div>
+
+                
+                <div class="pad-bottom shadow-template-for-#id#" #shadow-template# style="display:none" #/shadow-template# >
+                    <div class="row foot pad">
+                        <div class="col icon tiny pad-top-sm pad-right-sm">
+                            <svg viewBox="0 0 32 32">
+                                <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#icon-arrow-right" x="0" y="0" width="32" height="32"></use>
+                            </svg>
+                        </div>
+                        <div class="col">
+                            <div><h6>Uses Shadow Template</h6></div>
+                            <div class="shadow-name bold">#shadow-template-name#</div>
+                        </div>
+                        <div class="col right">
+                            <a href="#shadow-template-url#" class="button apply shadow-url" target="_blank">View</a>
+                        </div>
+                    </div>
+                </div>
+                
+
+                <div class="pad-bottom-lg"><div class="pad-bottom">&nbsp;</div></div>
 
                 <div class="absolute bottom pad-bottom pad-left">
                     <div class="col btn-page-create pad-right">
@@ -102,86 +123,22 @@
 </script>
 
 <script id="page_create" type="text/html">
-    <form>
-        <div class="row pad pad-bottom-lg">
-            <div class="row page-title">
-                <h4>Create #create-title#</h4>
-                <div class="faded sub-title pad-height">#parent-title#</div>
-                <div class="row message hide"><span></span></div>
-            </div>
-            <div class="row hover">
-                <div class="col field-label">Title</div>
-                <div class="col field-input expand"><input type="text" id="txtcreatetitle" placeholder="New Page Title" /></div>
-            </div>
-            <div class="row pad-bottom-sm">
-                <div class="col field-label"></div>
-                <div class="col field-input expand faded page-url">#page-url#<span class="new-url"></span></div>
-            </div>
-            <div class="row hover margin-bottom-sm">
-                <div class="col field-label">Summary</div>
-                <div class="col field-input expand"><textarea id="txtcreatedesc" placeholder="Write a description about your new page"></textarea></div>
-            </div>
-            <div class="row text-right pad-top desc-chars font-faded"></div>
+    {{page-create}}
+</script>
 
-            <div class="row pad-top pad-bottom-sm title"><h6>Security</h6></div>
-            <div class="row hover margin-bottom-sm">
-                <div class="col field-label"></div>
-                <div class="col field-text">
-                    <label>
-                        <input type="checkbox" class="chk-secure" /><span>Private</span>
-                        <span class="font-faded pad-left">Only administrators can view this web page</span>
-                    </label>
-                </div>
-            </div>
-            <div class="row pad-top pad-bottom-sm">
-                <div class="col title"><h6>Shadow Template</h6></div>
-                <div class="col right"><a href="javascript:" class="button special">New Shadow Template</a></div>
-            </div>
-            <div class="row hover">
-                <div class="col field-label"></div>
-                <div class="col field-text pad-right" style="width:400px;">
-                    <label>
-                        <input type="checkbox" class="chk-use-shadow" /><span>Use a Shadow Template for this web page</span>
-                    </label>
-                </div>
-                <div class="shadow-list" style="display:none;">
-                    <div class="col field-text icon tiny pad-right">
-                        <svg viewBox="0 0 32 32">
-                            <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#icon-arrow-right" x="0" y="0" width="32" height="32"></use>
-                        </svg>
-                    </div>
-                    <div class="col field-input pad-right">
-                        <select id="shadowId">
-                            {{shadow-list}}
-                        </select>
-                    </div>
-                </div>
-            </div>
-            <div class="row hover margin-bottom-lg">
-                <div class="col field-label"></div>
-                <div class="col field-text pad-right" style="width:400px;">
-                    <label>
-                        <input type="checkbox" class="chk-use-child-shadow" /><span>Assign a Shadow Template to new child pages</span>
-                    </label>
-                </div>
-                <div class="shadow-child-list" style="display:none;">
-                    <div class="col field-text icon tiny pad-right">
-                        <svg viewBox="0 0 32 32">
-                            <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#icon-arrow-right" x="0" y="0" width="32" height="32"></use>
-                        </svg>
-                    </div>
-                    <div class="col field-input">
-                        <select id="shadowChildId">
-                            {{shadow-list}}
-                        </select>
-                    </div>
-                </div>
+<script id="shadow_template_create" type="text/html">
+    <div class="size-lg">
+        <div class="pad-width">
+            <div class="row message hide"><span></span></div>
+        </div>
+        <div class="row field pad-left pad-top">Name</div>
+        <div class="row hover input expand pad-width">
+            <input type="text" id="shadow_name" placeholder="My Template" />
+        </div>
+        <div class="row pad-height text-center">
+            <div class="col">
+                <a href="javascript:" class="button apply btn-shadow-save">Create Shadow Template</a>
             </div>
         </div>
-        <div class="absolute bottom pad-bottom pad-left">
-            <div class="col btn-page-create-new pad-right"><a class="button" href="javascript:">Create New Page</a></div>
-            <div class="col btn-page-cancel pad-right"><a class="button cancel" href="javascript:" onclick="S.dashboard.pages.create.cancel(this)">Done</a></div>
-        </div>
-        <button type="submit" class="hide"></button>
-    </form>
+    </div>
 </script>

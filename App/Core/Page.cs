@@ -514,7 +514,13 @@ namespace Websilk
                         {
                             //replace panel content with placeholder content
                             panel.cells[0].components.Clear();
+                            var cell = panel.cells[0];
                             var text = (Components.Textbox)createNewComponent("Textbox", panel.id, panel.cells[0].id, block.id);
+                            if (block.name == "Page Body")
+                            {
+                                cell.css += "height:100%;";
+                                text.css = "height:100%;";
+                            }
                             text.text = "<div class=\"placeholder-area" + 
                                 (block.name.ToLower() == "page body" ? " is-body-area" : "") + 
                                 "\"><h4>Shadow Template - Page Block: " + block.name.Replace("Page ","") + "</h4>" + 
@@ -527,6 +533,7 @@ namespace Websilk
                             text.position[4] = pos;
                             text.isTemporary = true;
                             panel.isDisabled = true;
+                            panel.cells[0] = cell;
                         }
                         htm.Append(panel.Render());
                     }

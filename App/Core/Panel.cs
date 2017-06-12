@@ -152,6 +152,7 @@ namespace Websilk
                 var divcell = new Utility.DOM.Element("div");
                 divcell.Classes.Add("is-cell");
                 if (isDisabled) { divcell.Classes.Add("is-disabled"); }
+                if(cell.css != "") { divcell.Attributes.Add("style",cell.css); }
                 divcell.id = "cell_" + cell.id.Replace("-", "_").Replace(" ","_");
                 divcell.innerHTML = cell.head + comps.ToString() + cell.foot;
                 htm.Append(divcell.Render());

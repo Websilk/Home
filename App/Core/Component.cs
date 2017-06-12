@@ -352,7 +352,7 @@ namespace Websilk
             }
 
             //add compiled CSS to renderer
-            S.css.Add("block_" + blockId, css.ToString());
+            S.css.Add("block_" + blockId, css.ToString() + (this.css != "" ? "#c" + id + "{" + this.css + "}" : ""));
 
             //add component reference (with instance-specific resource references) to page
             js.Append("S.components.add('" + id + "', '" + Name + "', [");

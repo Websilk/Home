@@ -297,9 +297,15 @@ namespace Websilk.Services.Dashboard
         public string CreateShadowTemplate(int websiteId, string name)
         {
             if (!S.User.checkSecurity(websiteId, "dashboard/pages", User.enumSecurity.create)) { return "err"; }
+            GetPage();
+
+            //check for existing shadow template
+            if(page.sql.ShadowTemplateNameExists(websiteId, name))
+            {
+                return "exists";
+            }
 
             //create new shadow template
-            GetPage();
             page.sql.Create(S.User.userId, websiteId, 0, name, "", SqlQueries.Page.enumPageType.shadow, 0, 0);
 
             //get a list of shadow templates

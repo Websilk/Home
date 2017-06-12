@@ -55,20 +55,21 @@ S.editor.components = {
                     cid = cid.substring(1);
                 }
 
-                
-                var data = {
-                    name: item.elem.getAttribute('data-id'),
-                    layerId: S.page.id,
-                    panelId: $(track.cell).parent('.is-panel').get(0).id.replace('panel_', ''),
-                    cellId: track.cell.id.replace('cell_', ''),
-                    componentId: cid,
-                    append: track.drop === 'after' ? 1 : 0
-                };
-                S.ajax.post('Editor/Components/Create', data, function (d) {
-                    S.ajax.callback.inject(d);
-                    S.editor.components.hover.reinit(); //reinitialize component events
-                    S.editor.save.add(d.newId, 'new', {});
-                });
+                if (track.cell != null) {
+                    var data = {
+                        name: item.elem.getAttribute('data-id'),
+                        layerId: S.page.id,
+                        panelId: $(track.cell).parent('.is-panel').get(0).id.replace('panel_', ''),
+                        cellId: track.cell.id.replace('cell_', ''),
+                        componentId: cid,
+                        append: track.drop === 'after' ? 1 : 0
+                    };
+                    S.ajax.post('Editor/Components/Create', data, function (d) {
+                        S.ajax.callback.inject(d);
+                        S.editor.components.hover.reinit(); //reinitialize component events
+                        S.editor.save.add(d.newId, 'new', {});
+                    });
+                }
             }
         },
     },
@@ -894,13 +895,17 @@ S.editor.components = {
                 var comp;
                 var found = false;
                 this.timer.date = new Date();
-                if (cell.disabled == true) { cell = { rect: { top: -1000, right: -1000, left: -100, bottom: -100 } };}
+
+                if (cell.disabled == true || this.hoverStart == true || this.component == null) {
+                    //create dummy cell to begin with
+                    cell = { rect: { top: -1000, right: -100000, left: -100, bottom: -100000 } };
+                }
 
                 if (!S.math.intersect(cell.rect, cursor) || this.hoverStart === true) {
                     //intersecting a different cell
                     for (var i = 0; i < this.cells.length; i++) {
                         cell = this.cells[i];
-                        if (cell.disabled == false) {
+                        if (cell.disabled !== true) {
                             if (S.math.intersect(cell.rect, cursor)) {
                                 this.hoverIndex = i;
                                 found = true;
@@ -922,12 +927,14 @@ S.editor.components = {
                         this.hoverComp = 1;
                         this.drop = '';
                         this.cell = cell.elem;
-                        console.log('found');
-                    } else {
+                        this.component = cell.elem;
+                    } else if(this.component != null) {
                         cell = null;
                         this.hoverIndex = 0;
                         this.cell = null;
-                        console.log('lost');
+                        this.component = null;
+                        $('.editor > .temp > .compline').remove();
+                        $('.editor > .temp > .cellbox').remove();
                     }
                     if (this.hoverStart === true) { this.hoverStart = false; }
                 }

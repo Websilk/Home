@@ -485,7 +485,11 @@
                 //submit "new shadow template" form
                 S.ajax.post("Dashboard/Pages/CreateShadowTemplate", data,
                     function (d) {
-                        if (d.d == 'err') {
+
+                        if (d.d == 'exists') {
+                            S.message.show(msg, 'error', 'A shadow template with the name "' + data.name + '" already exists');
+                            return false;
+                        } else if (d.d == 'err') {
                             S.message.show(msg, 'error', 'An error occurred while trying to create a new shadow template');
                             return false;
                         } else {

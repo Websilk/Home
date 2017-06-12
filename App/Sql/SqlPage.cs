@@ -143,7 +143,7 @@ namespace Websilk.SqlQueries
                 new SqlParameter("@websiteId", websiteId),
                 new SqlParameter("@name", name)
             };
-            return (bool)S.Sql.ExecuteScalar("EXEC Pages_Shadow_Exists @websiteId=@websiteId, @name=@name", parms);
+            return (int)S.Sql.ExecuteScalar("EXEC Pages_Shadow_Exists @websiteId=@websiteId, @name=@name", parms) > 0;
         }
         #endregion
     }

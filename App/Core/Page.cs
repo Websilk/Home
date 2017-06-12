@@ -944,7 +944,7 @@ namespace Websilk
             return contractResolver;
         }
 
-        public void SavePage(structPage page, bool saveToDisk = false)
+        public void SavePage(structPage page, bool saveToDisk = true)
         {
             StripCustomBlocks(page);
             var path = GetPageFilePath(page.pageId, editFolder, editType);
@@ -962,7 +962,7 @@ namespace Websilk
             }
         }
 
-        public void SaveBlock(structBlock block, bool saveToDisk = false)
+        public void SaveBlock(structBlock block, bool saveToDisk = true)
         {
             var path = GetBlockFilePath(block.id, editFolder, editType);
             var serialize = S.Util.Serializer.WriteObjectAsString(block, Formatting.None, TypeNameHandling.Auto, IgnorablePagePropertiesResolver(saveToDisk));

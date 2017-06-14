@@ -26,6 +26,7 @@ namespace Websilk
         {
             //structure used to save page content to JSON file
             public int pageId;
+            public int shadowId;
             public string layout;
             public List<structArea> areas;
         }
@@ -81,6 +82,9 @@ namespace Websilk
         public DateTime pageModified;
         public bool pageSecurity = false;
         public string pageVersion = ""; //either empty or a history stamp
+
+        //shadow template info (if available)
+        public int shadowTemplateId = 0; //shadow template used to load custom blocks for the page
 
         //website info
         public int websiteId = 0;
@@ -266,6 +270,7 @@ namespace Websilk
                 googleWebPropertyId = reader.Get("googlewebpropertyid");
                 pageFavIcon = reader.GetBool("icon");
                 pagePhoto = reader.Get("photo");
+                shadowTemplateId = reader.GetInt("shadowId");
 
                 //set up page properties
                 if(pageTitleHead == "") { pageTitleHead = pageTitle; }
@@ -335,15 +340,26 @@ namespace Websilk
         {
             //get a list of components to load onto the page
             var page = new structPage();
-            var file = S.Server.LoadFileFromCache(GetPageFilePath(pageId, editFolder, editType), false, !fromCache);
-            if(file != "")
+            page.pageId = pageId;
+            page.areas = new List<structArea>();
+
+            //load shadow page first (if available)
+            if(shadowTemplateId > 0)
             {
-                page = (structPage)S.Util.Serializer.ReadObject(file, typeof(structPage));
+                var shadow = S.Server.LoadFileFromCache(GetPageFilePath(shadowTemplateId, editFolder, editType), false, !fromCache);
+                combinePages(ref page, shadow, fromCache);
+            }
+            
+            //load page from file (or cache)
+            var file = S.Server.LoadFileFromCache(GetPageFilePath(pageId, editFolder, editType), false, !fromCache);
+            if (file != "")
+            {
+                combinePages(ref page, file, fromCache);
             }
             else
             {
-                //check if website has been initialized yet
-                if(Url.path == "login")
+                //check if website has been initialized yet (in dev environment only)
+                if (S.Server.environment == Server.enumEnvironment.development && Url.path == "login")
                 {
                     if (!S.Server.Cache.ContainsKey("init_website"))
                     {
@@ -355,28 +371,46 @@ namespace Websilk
                         return loadPage();
                     }
                 }
-                //initialize a new page
-                page = new structPage();
-                page.pageId = pageId;
-                page.areas = new List<structArea>();
             }
 
-            if (page.areas.Count > 0)
+            //finally, load page blocks
+            loadBlocks(page, fromCache);
+            return page;
+        }
+
+        public void combinePages(ref structPage page, string file, bool fromCache = true)
+        {
+            var newpage = new structPage();
+            if (file != "")
             {
-                foreach (var area in page.areas)
+                newpage = (structPage)S.Util.Serializer.ReadObject(file, typeof(structPage));
+            }
+            else
+            {
+                //initialize a new page
+                newpage = new structPage();
+                newpage.pageId = pageId;
+                newpage.areas = new List<structArea>();
+            }
+
+            //combine new page with page
+            for(var x = 0; x < newpage.areas.Count; x++)
+            {
+                var y = page.areas.FindIndex(a => a.name == newpage.areas[x].name);
+                if(y >= 0)
                 {
-                    //load blocks associated with this page
-                    for (var x = 0; x < area.blocks.Count; x++)
+                    var area = page.areas[y];
+                    for(var z = 0; z < newpage.areas[x].blocks.Count; z++)
                     {
-                        if(area.blocks[x].isPage == false && area.blocks[x].id.IndexOf("page_") < 0)
-                        {
-                            //external block
-                            area.blocks[x] = loadBlock(area.blocks[x].id, fromCache);
-                        }
+                        area.blocks.Add(newpage.areas[x].blocks[z]);
                     }
+                    page.areas[y] = area;
+                }
+                else
+                {
+                    page.areas.Add(newpage.areas[x]);
                 }
             }
-            return page;
         }
 
         /// <summary>
@@ -636,6 +670,25 @@ namespace Websilk
                 (specialFolder != "" ? specialFolder + "/" : "") +
                 (blockType != "" ? blockType + "_" : "") + "block.json";
             return path;
+        }
+
+        public void loadBlocks(structPage page, bool fromCache = true)
+        {
+            if (page.areas.Count > 0)
+            {
+                foreach (var area in page.areas)
+                {
+                    //load blocks associated with this page
+                    for (var x = 0; x < area.blocks.Count; x++)
+                    {
+                        if (area.blocks[x].isPage == false && area.blocks[x].id.IndexOf("page_") < 0)
+                        {
+                            //external block
+                            area.blocks[x] = loadBlock(area.blocks[x].id, fromCache);
+                        }
+                    }
+                }
+            }
         }
 
         public structBlock loadBlock(string blockid, bool fromCache = true)
@@ -953,8 +1006,34 @@ namespace Websilk
 
         public void SavePage(structPage page, bool saveToDisk = true)
         {
+            //strip components from custom blocks
             StripCustomBlocks(page);
+
+            //first, save shadow template (if available)
+            if(page.shadowId > 0)
+            {
+                SaveShadowTemplate(ref page, saveToDisk);
+            }
+
+            //next, save page
             var path = GetPageFilePath(page.pageId, editFolder, editType);
+            var serialize = S.Util.Serializer.WriteObjectAsString(page, Formatting.None, TypeNameHandling.Auto, IgnorablePagePropertiesResolver(saveToDisk));
+            S.Server.SaveToCache(path, serialize);
+            if (saveToDisk == true)
+            {
+                //schedule save to file system
+                S.Server.ScheduleEveryMinute.ScheduleSaveFile(S.Server.MapPath(path), serialize);
+
+                //schedule save page to history on file system
+                var now = DateTime.Now;
+                var historyPath = GetPageFilePath(page.pageId, "history/" + now.ToString("yyyy"), now.ToString("MM_dd_H_mm"));
+                S.Server.ScheduleEveryMinute.ScheduleSaveFile(S.Server.MapPath(historyPath), serialize);
+            }
+        }
+
+        public void SaveShadowTemplate(ref structPage page, bool saveToDisk = true)
+        {
+            var path = GetPageFilePath(page.shadowId, editFolder, editType);
             var serialize = S.Util.Serializer.WriteObjectAsString(page, Formatting.None, TypeNameHandling.Auto, IgnorablePagePropertiesResolver(saveToDisk));
             S.Server.SaveToCache(path, serialize);
             if (saveToDisk == true)

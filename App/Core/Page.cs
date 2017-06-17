@@ -1031,21 +1031,55 @@ namespace Websilk
             }
         }
 
-        public void SaveShadowTemplate(ref structPage page, bool saveToDisk = true)
+        public void SaveShadowTemplate(ref structPage oldpage, bool saveToDisk = true)
         {
-            var path = GetPageFilePath(page.shadowId, editFolder, editType);
-            var serialize = S.Util.Serializer.WriteObjectAsString(page, Formatting.None, TypeNameHandling.Auto, IgnorablePagePropertiesResolver(saveToDisk));
-            S.Server.SaveToCache(path, serialize);
-            if (saveToDisk == true)
+            //move shadow template blocks to a new page object
+            var page = new structPage()
             {
-                //schedule save to file system
-                S.Server.ScheduleEveryMinute.ScheduleSaveFile(S.Server.MapPath(path), serialize);
+                pageId = oldpage.shadowId,
+                areas = new List<structArea>(),
+                shadowId = 0
+            };
 
-                //schedule save page to history on file system
-                var now = DateTime.Now;
-                var historyPath = GetPageFilePath(page.pageId, "history/" + now.ToString("yyyy"), now.ToString("MM_dd_H_mm"));
-                S.Server.ScheduleEveryMinute.ScheduleSaveFile(S.Server.MapPath(historyPath), serialize);
+            var newpage = new structPage()
+            {
+                pageId = oldpage.pageId,
+                shadowId = oldpage.shadowId,
+                areas = new List<structArea>()
+            };
+
+            foreach(var area in oldpage.areas)
+            {
+                page.areas.Add(new structArea()
+                {
+                    name = area.name,
+                    blocks = new List<structBlock>()
+                });
+                newpage.areas.Add(new structArea()
+                {
+                    name = area.name,
+                    blocks = new List<structBlock>()
+                });
+                foreach(var block in area.blocks)
+                {
+                    if(block.isPage == true)
+                    {
+                        //add block to new page object
+                        newpage.areas[newpage.areas.Count - 1].blocks.Add(block);
+                    }
+                    else
+                    {
+                        //add block to shadow template object
+                        page.areas[page.areas.Count - 1].blocks.Add(block);
+                    }
+                }
             }
+
+            //replace old page object with new page object (without custom blocks)
+            oldpage = newpage;
+
+            //finally, save shadow template page
+            SavePage(page, saveToDisk);
         }
 
         public void SaveBlock(structBlock block, bool saveToDisk = true)

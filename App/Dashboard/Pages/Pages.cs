@@ -136,10 +136,10 @@ namespace Websilk.Services.Dashboard
                 pageCreated = reader.GetDateTime("datecreated").ToString("MMMM dd, yyyy");
                 useTemplate = reader.GetInt("shadowId") > 0;
                 templateName = reader.Get("templatename");
-                templateUrl = "/" + reader.Get("templatepath");
+                templateUrl = "/" + reader.Get("templatepath").Replace(" ", "-");
                 subpageId = reader.GetInt("pageid");
                 hasChildren = reader.GetInt("haschildren");
-                pageLink = "/" + (pagePath).Replace(" ", "-");
+                pageLink = "/" + pagePath.Replace(" ", "-");
                 options = new bool[] { true, true, true, true }; //edit, create, settings, delete
 
                 //disable delete button

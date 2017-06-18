@@ -27,6 +27,7 @@ namespace Websilk
             //structure used to save page content to JSON file
             public int pageId;
             public int shadowId;
+            public bool isShadow;
             public string layout;
             public List<structArea> areas;
         }
@@ -341,6 +342,7 @@ namespace Websilk
             //get a list of components to load onto the page
             var page = new structPage();
             page.pageId = pageId;
+            page.shadowId = shadowTemplateId;
             page.areas = new List<structArea>();
 
             //load shadow page first (if available)
@@ -378,7 +380,7 @@ namespace Websilk
             return page;
         }
 
-        public void combinePages(ref structPage page, string file, bool fromCache = true)
+        public void combinePages(ref structPage page, string file, bool isShadow, bool fromCache = true)
         {
             var newpage = new structPage();
             if (file != "")
@@ -388,9 +390,12 @@ namespace Websilk
             else
             {
                 //initialize a new page
-                newpage = new structPage();
-                newpage.pageId = pageId;
-                newpage.areas = new List<structArea>();
+                newpage = new structPage()
+                {
+                    pageId = pageId,
+                    isShadow = isShadow,
+                    areas = new List<structArea>()
+                };
             }
 
             //combine new page with page
@@ -402,7 +407,34 @@ namespace Websilk
                     var area = page.areas[y];
                     for(var z = 0; z < newpage.areas[x].blocks.Count; z++)
                     {
-                        area.blocks.Add(newpage.areas[x].blocks[z]);
+                        if(newpage.isShadow == false)
+                        {
+                            if(newpage.areas[x].blocks[z].isPage == true)
+                            {
+                                //add page block components to existing page block
+                                var b = area.blocks.FindIndex(a => a.id == area.blocks[z].id);
+                                if(b >= 0)
+                                {
+                                    foreach(var c in newpage.areas[x].blocks[z].components)
+                                    {
+                                        area.blocks[b].components.Add(c);
+                                    }
+                                }
+                                else
+                                {
+                                    area.blocks.Add(newpage.areas[x].blocks[z]);
+                                }
+                            }
+                            else
+                            {
+                                area.blocks.Add(newpage.areas[x].blocks[z]);
+                            }
+                        }
+                        else
+                        {
+                            area.blocks.Add(newpage.areas[x].blocks[z]);
+                        }
+                        
                     }
                     page.areas[y] = area;
                 }
@@ -1066,6 +1098,17 @@ namespace Websilk
                     {
                         //add block to new page object
                         newpage.areas[newpage.areas.Count - 1].blocks.Add(block);
+
+                        //add page-level block to shadow template object (to remember the order in which the page-level blocks are loaded)
+                        var b = new structBlock()
+                        {
+                            id = block.id,
+                            isPage = true,
+                            name = block.name,
+                            components = new List<Component>(),
+                            changed = block.changed
+                        };
+                        page.areas[page.areas.Count - 1].blocks.Add(b);
                     }
                     else
                     {

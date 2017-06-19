@@ -172,6 +172,7 @@
     <Build Include="dbo\Tables\ApplicationsOwned.sql" />
     <Build Include="dbo\Tables\Applications.sql" />
     <Build Include="dbo\Stored Procedures\Pages\Shadow\Pages_Shadow_Exists.sql" />
+    <Build Include="dbo\Stored Procedures\Pages\Page_Delete.sql" />
   </ItemGroup>
   <ItemGroup>
     <ArtifactReference Include="$(DacPacRootPath)\Extensions\Microsoft\SQLDB\Extensions\SqlServer\110\SqlSchemas\master.dacpac">

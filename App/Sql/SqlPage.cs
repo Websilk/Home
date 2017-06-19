@@ -88,20 +88,21 @@ namespace Websilk.SqlQueries
         #region "Create"
         public void Create(int ownerId, int websiteId, int parentId, string title, string description, enumPageType pageType, int shadowId, int shadowChildId, string layout = "", string service = "", bool security = false, bool enabled = true)
         {
-            var parameters = new List<SqlParameter>();
-            parameters.Add(new SqlParameter("@ownerId", ownerId.ToString()));
-            parameters.Add(new SqlParameter("@websiteId", websiteId.ToString()));
-            parameters.Add(new SqlParameter("@parentId", parentId.ToString()));
-            parameters.Add(new SqlParameter("@title", title));
-            parameters.Add(new SqlParameter("@description", description));
-            parameters.Add(new SqlParameter("@pageType", pageType));
-            parameters.Add(new SqlParameter("@shadowId", shadowId));
-            parameters.Add(new SqlParameter("@shadowChildId", shadowChildId));
-            parameters.Add(new SqlParameter("@layout", layout));
-            parameters.Add(new SqlParameter("@service", service));
-            parameters.Add(new SqlParameter("@security", security == true ? "1" : "0"));
-            parameters.Add(new SqlParameter("@enabled", enabled == true ? "1" : "0"));
-            S.Sql.ExecuteNonQuery("EXEC Page_Create @ownerId=@ownerId, @websiteId=@websiteId, @parentId=@parentId, @title=@title, @description=@description, @pageType=@pageType, @shadowId=@shadowId, @shadowChildId=@shadowChildId, @layout=@layout, @service=@service, @security=@security, @enabled=@enabled", parameters);
+            var parms = new List<SqlParameter>(){
+                new SqlParameter("@ownerId", ownerId.ToString()),
+                new SqlParameter("@websiteId", websiteId.ToString()),
+                new SqlParameter("@parentId", parentId.ToString()),
+                new SqlParameter("@title", title),
+                new SqlParameter("@description", description),
+                new SqlParameter("@pageType", pageType),
+                new SqlParameter("@shadowId", shadowId),
+                new SqlParameter("@shadowChildId", shadowChildId),
+                new SqlParameter("@layout", layout),
+                new SqlParameter("@service", service),
+                new SqlParameter("@security", security == true ? "1" : "0"),
+                new SqlParameter("@enabled", enabled == true ? "1" : "0")
+            };
+            S.Sql.ExecuteNonQuery("EXEC Page_Create @ownerId=@ownerId, @websiteId=@websiteId, @parentId=@parentId, @title=@title, @description=@description, @pageType=@pageType, @shadowId=@shadowId, @shadowChildId=@shadowChildId, @layout=@layout, @service=@service, @security=@security, @enabled=@enabled", parms);
         }
         #endregion
 
@@ -123,6 +124,16 @@ namespace Websilk.SqlQueries
                 new SqlParameter("@enabled", enabled)
             };
             S.Sql.ExecuteNonQuery("EXEC Page_Update @websiteId=@websiteId, @pageId=@pageId, @titlehead=@titlehead, @description=@description, @pageType=@pageType, @shadowId=@shadowId, @shadowChildId=@shadowChildId, @layout=@layout, @service=@service, @security=@security, @enabled=@enabled", parms);
+        }
+
+        public void Delete(int websiteId, int pageId)
+        {
+            var parms = new List<SqlParameter>()
+            {
+                new SqlParameter("@websiteId", websiteId),
+                new SqlParameter("@pageId", pageId)
+            };
+            S.Sql.ExecuteNonQuery("EXEC Page_Delete @websiteId=@websiteId, @pageId=@pageId", parms);
         }
         #endregion
 

@@ -56,7 +56,9 @@
         var link = e.getAttribute('data-link');
         var data = {
             'id': pageid,
-            'title': e.getAttribute('data-titlehead') != '' ? e.getAttribute('data-titlehead') : e.getAttribute('data-title'),
+            'title': e.getAttribute('data-title'),
+            'title-head': e.getAttribute('data-titlehead') != '' ? e.getAttribute('data-titlehead') : "",
+            'has-title-head': e.getAttribute('data-titlehead') != '' ? true : false,
             'path': e.getAttribute('data-path'),
             'link': link,
             'date-created': e.getAttribute('data-created'),
@@ -290,7 +292,7 @@
 
                 container.find('.btn-page-settings-update a').on('click', function (e) { S.dashboard.pages.settings.submit(this); });
                 container.find('.btn-page-cancel a').on('click', S.dashboard.pages.settings.cancel);
-                $('#description').on('keyup', S.dashboard.pages.settings.countChars);
+                container.find('#description').on('keyup', S.dashboard.pages.settings.countChars);
 
                 //add events for shadow templates
                 container.find('.chk-use-shadow').on('change', function (e) {
@@ -330,7 +332,10 @@
                 container.find('#shadowChildId option[value="' + container.find('#shadowChildId').attr('data-id') + '"]').attr('selected', 'selected');
 
                 //set up new shadow template button
-                $('.btn-shadow-create').on('click', S.dashboard.pages.shadow.create.view);
+                container.find('.btn-shadow-create').on('click', S.dashboard.pages.shadow.create.view);
+
+                //set up delete button
+                container.find('.btn-page-delete a').on('click', S.dashboard.pages.settings.delete);
 
                 //show settings section
                 var subpages = $(e).parents('.page-details').find('.slideshow');
@@ -445,6 +450,28 @@
                     }
                 }
             );
+        },
+
+        delete: function (e) {
+            if (confirm("Do you really want to delete this page? If so, all child pages will be moved to the trash bin along with this page. Afterwards, you can permenantly delete your pages from within the trash bin.")) {
+                data = {
+                    websiteId: S.website.id,
+                    id: S.dashboard.pages.settings.id
+                };
+                //submit page for deletion
+                S.ajax.post("Dashboard/Pages/Delete", data,
+                    function (data) {
+                        if (data.d == 'err') {
+                            S.message.show(msg, 'error', 'An error occurred while trying to delete your web page');
+                            return false;
+                        } else {
+                            //remove page from list & go back to previous slide
+                            $('.page-item-for-' + S.dashboard.pages.settings.id).remove();
+                            S.dashboard.pages.goback(e);
+                        }
+                    }
+                );
+            }
         }
     },
 

@@ -291,6 +291,17 @@ namespace Websilk.Services.Dashboard
 
             return "success";
         }
+        
+        public string Delete(int websiteId, int id)
+        {
+            if (!S.User.checkSecurity(websiteId, "dashboard/pages", User.enumSecurity.update)) { return "err"; }
+
+            //move page to trash can
+            GetPage();
+            page.sql.Delete(websiteId, id);
+
+            return "success";
+        }
         #endregion
 
         #region "Shadow Templates"

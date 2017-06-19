@@ -12,7 +12,39 @@
     }
 </style>
 
-<div class="section pages-info margin-lg">
+<div class="section pages-info margin-width-lg margin-top-lg">
+    <div class="row">
+        <div class="col icon pad-sm">
+            <svg viewBox="0 0 36 36">
+                <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#icon-pages" x="0" y="0" width="36" height="36"></use>
+            </svg>
+        </div>
+        <div class="col pad-top">
+            <h5>Pages</h5>
+        </div>
+        <div class="col right">
+            <ul class="tabs">
+                <li class="tab-pages selected">
+                    <div class="row hover pad-width-lg pad-height">
+                        <div class="col"><h6>Web Pages</h6></div>
+                    </div>
+                </li>
+                <li class="tab-shadow-templates">
+                    <div class="row hover pad-width-lg pad-height">
+                        <div class="col"><h6>Shadow Templates</h6></div>
+                    </div>
+                </li>
+                <li class="tab-trash">
+                    <div class="row hover pad-width-lg pad-height">
+                        <div class="col"><h6>Trash Bin</h6></div>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<div class="section pages-info margin-width-lg margin-top">
     <div class="slideshow">
         <div class="slides">
             <div class="row page-details">
@@ -50,7 +82,7 @@
                                 </svg>
                             </a>
                         </div>
-                        <div class="col page-title page-title-for-#id#">
+                        <div class="col page-title">
                             <h4>#title#</h4>
                         </div>
                     </div>
@@ -67,6 +99,7 @@
                 </div>
                 
                 <div class="row pad">
+                    #has-title-head#<h6 class="pad-width page-title-for-#id#">#title-head#</h6>#/has-title-head#
                     <p class="summary pad-width page-summary-for-#id#">
                         <span class="summary-details">#summary#</span>
                         <br /><br />

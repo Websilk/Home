@@ -24,6 +24,7 @@
             'url-name': S.website.host.substr(0, S.website.host.length - 1),
             'link-create': ''
         };
+        $('.pages-info .url-path').html('http://' + S.website.host + '/');
     },
 
     goback: function (e, count) {
@@ -54,6 +55,7 @@
         var isfolder = e.getAttribute('data-folder') == "true" ? true : false;
         var pageid = e.getAttribute('data-pageid');
         var link = e.getAttribute('data-link');
+        var links = link.substr(1).split('/');
         var data = {
             'id': pageid,
             'title': e.getAttribute('data-title'),
@@ -71,6 +73,17 @@
             'shadow-template': e.getAttribute('data-use-template') != '1',
             'shadow-template-name': e.getAttribute('data-template-name') || '',
             'shadow-template-url': e.getAttribute('data-template-url') || ''
+        }
+
+        //create slideshow navigation anchor links for each page in the hierarchy
+        var alinks = [links.length];
+        for (var x = 0; x < links.length; x++) {
+            if (x == links.length - 1) {
+                alinks[x] = links[x].replace(' ', '-');
+            } else {
+                alinks[x] = '<a class="no-link" href="javascript:" onclick="S.dashboard.pages.goback(this,' + (links.length - 1 - x) + ')">' + links[x].replace(' ', '-') + '</a>/';
+            }
+            
         }
         this.current_page = pageid;
         this.current_path.push(pageid);
@@ -94,9 +107,12 @@
                     if (data.d != 'err') {
                         list.html(data.d);
                         list.find('.columns-list').addClass('small');
+                        $('.slide-for-' + pageid).find('.url-path').html('<a class="no-link" href="javascript:" onclick="S.dashboard.pages.goback(this,' + (links.length) + ')">' + S.website.host.replace('/', '') + '</a>/' + alinks.join(''));
                     }
                 }
             );
+        } else {
+            $('.slide-for-' + pageid).find('.url-path').html('<a class="no-link" href="javascript:" onclick="S.dashboard.pages.goback(this,' + (links.length) + ')">' + S.website.host.replace('/', '') + '</a>/' + alinks.join(''));
         }
         slides.next();
     },

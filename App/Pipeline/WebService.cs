@@ -141,6 +141,10 @@ namespace Websilk.Pipeline
                         paramVals[x] = double.Parse(param);
                         break;
 
+                    case "datetime":
+                        paramVals[x] = DateTime.Parse(param);
+                        break;
+
                     default:
                         paramVals[x] = param;
                         break;

@@ -70,8 +70,8 @@ namespace Websilk.Editor
             var absPath = S.Server.MapPath(pagePath);
             if (File.Exists(absPath))
             {
-                var pageMem = S.Util.Serializer.WriteObjectAsString(page.loadPageAndLayout(page.pageId, true), Formatting.None, TypeNameHandling.Auto, page.IgnorablePagePropertiesResolver());
-                var pageDrive = S.Util.Serializer.WriteObjectAsString(page.loadPageAndLayout(page.pageId, true, false), Formatting.None, TypeNameHandling.Auto, page.IgnorablePagePropertiesResolver());
+                var pageMem = S.Util.Serializer.WriteObjectToString(page.loadPageAndLayout(page.pageId, true), Formatting.None, TypeNameHandling.Auto, page.IgnorablePagePropertiesResolver());
+                var pageDrive = S.Util.Serializer.WriteObjectToString(page.loadPageAndLayout(page.pageId, true, false), Formatting.None, TypeNameHandling.Auto, page.IgnorablePagePropertiesResolver());
                 if (pageMem != pageDrive)
                 {
                     //page data differs between page in-memory & page file(s) (including in-memory blocks & block files)

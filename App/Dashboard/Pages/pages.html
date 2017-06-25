@@ -1,17 +1,21 @@
 ﻿<style type="text/css">
+    .pages-body{overflow:hidden;}
+    .pages-body > .section{position:relative;}
     .pages-list{width:100%;}
-    .pages-info .sub-title{white-space:normal;}
-    .pages-info .btn-goback{width:50px;}
-    .pages-info .page-url{white-space:nowrap;}
+    .tab-body-pages .sub-title{white-space:normal;}
+    .tab-body-pages .btn-goback{width:50px;}
+    .tab-body-pages .page-url{white-space:nowrap;}
     .page-details{overflow:hidden;}
+    .slides > .row:nth-child(n+2) .pages-list{padding-bottom:50px;}
     .page-create{height:100%;}
+    .page-details-side > .absolute.bottom{width:100%; box-sizing:border-box;}
+    .tab-body-history .spreadsheet td:nth-child(4){width:160px;}
 
     @media (max-width:1024px){
-        .pages-info > .slideshow > .slides{ align-items:flex-start;}
-        .pages-info > .slideshow > .slides > .page-details{display:block;}
+        .tab-body-pages > .slideshow > .slides{ align-items:flex-start;}
+        .tab-body-pages > .slideshow > .slides > .page-details{display:block;}
     }
 </style>
-
 <div class="section pages-info margin-width-lg margin-top-lg">
     <div class="row">
         <div class="col icon small pad">
@@ -29,6 +33,11 @@
                         <div class="col pad-top-sm">Web Pages</div>
                     </div>
                 </li>
+                <li class="tab-history">
+                    <div class="row hover pad-width-lg pad-height">
+                        <div class="col pad-top-sm">History</div>
+                    </div>
+                </li>
                 <li class="tab-shadow-templates">
                     <div class="row hover pad-width-lg pad-height">
                         <div class="col pad-top-sm">Shadow Templates</div>
@@ -44,21 +53,24 @@
     </div>
 </div>
 
-<div class="section pages-info margin-width-lg margin-top">
-    <div class="slideshow">
-        <div class="slides">
-            <div class="row page-details">
-                <div class="pages-list">
-                    <div class="col page-create expander eight desktop-sm-seven laptop-one-total"></div>
-                    <div class="root-list">
-                        {{page-list}}
-                        <div class="row pad inline-block">
-                            <div class="col btn-page-create pad-right">
-                                <a class="button circle" href="javascript:" onclick="S.dashboard.pages.create.view(this, 0)">
-                                    <svg viewBox="0 0 25 25" class="medium">
-                                        <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#icon-plus" x="0" y="0" width="25" height="25"></use>
-                                    </svg>
-                                </a>
+<div class="pages-body">
+
+    <div class="section tab-body-pages is-selected margin-width-lg margin-top">
+        <div class="slideshow">
+            <div class="slides">
+                <div class="row page-details">
+                    <div class="pages-list">
+                        <div class="col page-create expander eight desktop-sm-seven laptop-one-total"></div>
+                        <div class="root-list">
+                            {{page-list}}
+                            <div class="row pad inline-block">
+                                <div class="col btn-page-create pad-right">
+                                    <a class="button circle" href="javascript:" onclick="S.dashboard.pages.create.view(this, 0)">
+                                        <svg viewBox="0 0 25 25" class="medium">
+                                            <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#icon-plus" x="0" y="0" width="25" height="25"></use>
+                                        </svg>
+                                    </a>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -66,13 +78,20 @@
             </div>
         </div>
     </div>
+
+    <div class="section tab-body-history margin-width-lg margin-top" style="display:none;"></div>
+
+    <div class="section tab-body-shadow-templates margin-width-lg margin-top" style="display:none;"></div>
+
+    <div class="section tab-body-trash margin-width-lg margin-top" style="display:none;"></div>
+
 </div>
 
 <script id="page_details" type="text/html">
     <div class="row page-details slide-for-#id#">
         <div class="row">
             <div class="col page-create expander eight desktop-sm-seven laptop-one-total"></div>
-            <div class="col four desktop-sm-five laptop-one-total box-dark height">
+            <div class="col page-details-side four desktop-sm-five laptop-one-total box-dark height">
                 <div class="row head pad">
                     <div class="row title">
                         <div class="col btn-goback pad-right">
@@ -125,7 +144,6 @@
                     </div>
                 </div>
                 
-
                 <div class="pad-bottom-lg"><div class="pad-bottom">&nbsp;</div></div>
 
                 <div class="absolute bottom pad-bottom pad-left">
@@ -138,6 +156,13 @@
                     </div>
                     <div class="col btn-page-view pad-right"><a class="button apply" href="#url#" target="_blank">View</a></div>
                     <div class="col btn-page-settings pad-right"><a class="button" href="javascript:" onclick="#link-settings#">Settings</a></div>
+                    <div class="col btn-page-history right pad-right">
+                        <a class="button circle" href="javascript:" title="History log for page titled '#title#'">
+                            <svg viewBox="0 0 36 36">
+                                <use xlink:href="#icon-history" x="0" y="0" width="36" height="36"></use>
+                            </svg>
+                        </a>
+                    </div>
                 </div>
             </div>
             <div class="col eight desktop-sm-seven laptop-one-total slideshow height">

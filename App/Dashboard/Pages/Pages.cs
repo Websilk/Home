@@ -304,6 +304,40 @@ namespace Websilk.Services.Dashboard
         }
         #endregion
 
+        #region "History"
+        public string ViewHistory(int id, DateTime startDate, int length)
+        {
+            var history = new Scaffold(S, "/Dashboard/Pages/history.html");
+            var item = new Scaffold(S, "/Dashboard/Pages/history-item.html");
+            var html = new StringBuilder();
+            GetPage();
+            var reader = page.sql.GetPageHistoryList(page.websiteId, id, startDate, length);
+            while (reader.Read())
+            {
+                var date = reader.GetDateTime("historymodified");
+                item.Data = new Dictionary<string, string>
+                {
+                    ["id"] = reader.GetInt("pageId").ToString(),
+                    ["title"] = reader.Get("title").ToString(),
+                    ["path"] = reader.Get("path").Replace(" ", "-"),
+                    ["url"] = "/" + reader.Get("path").Replace(" ", "-") + "?history=" + date.ToString("yyyy") + "-" + date.ToString("MM-dd-H-mm"),
+                    ["user"] = reader.Get("displayname"),
+                    ["date"] = reader.GetDateTime("historymodified").ToString("MM-dd-yyyy hh:mm tt")
+                };
+
+                if(id == 0)
+                {
+                    item.Data["has-path"] = "1";
+                    item.Data["has-title"] = "1";
+                }
+                html.Append(item.Render());
+            }
+            history.Data["history"] = html.ToString();
+
+            return history.Render();
+        }
+        #endregion 
+
         #region "Shadow Templates"
         public string CreateShadowTemplate(int websiteId, string name)
         {

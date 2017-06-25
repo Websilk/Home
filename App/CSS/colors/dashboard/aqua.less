@@ -24,6 +24,16 @@ body{font-family: Jaldi, Arial, Helvetica, sans-serif;}
     .message(error,   #dc8a8a, transparent, #b30b0b);
     .message(alert,   #dbdb86, transparent, #d79c0c); 
     .message(confirm, #92e061, transparent, #228f4b); 
+
+    @perc:3%;
+    @perc2:1%;
+    .table(
+        #d2e8ea, #444, #0c7946, #00ab5b, #00ab5b, #0c7946,
+        #fafafa, #ddf0f0, #5EC7CE, #444, #1e3b41, #00343e, #009B87, #00C5C7, #00C5C7, #00C5C7, #009B87, #00C5C7, #00C5C7, #00C5C7,
+        darken(#fafafa, @perc), darken(#ddf0f0, @perc2), darken(#5EC7CE, @perc2), darken(#444, @perc), darken(#1e3b41, @perc), 
+        darken(#00343e, @perc), darken(#009B87, @perc), darken(#00C5C7, @perc), darken(#00C5C7, @perc), darken(#00C5C7, @perc), 
+        darken(#009B87, @perc), darken(#00C5C7, @perc), darken(#00C5C7, @perc), darken(#00C5C7, @perc)
+    );
 }
 
 .box .section, .popup{

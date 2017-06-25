@@ -16,9 +16,12 @@ namespace Websilk.Services
         {
             //access this test from http://localhost:7770/api/Init/Website?name=home
             var response = new WebRequest();
+            response.contentType = "text/html";
+
             if (S.Server.environment != Server.enumEnvironment.development)
             {
                 //exit function if not in development environment
+                response.html = "This is a development environment feature.";
                 return response;
             }
             //generate all pages for the default website
@@ -34,7 +37,6 @@ namespace Websilk.Services
             //generate documentation as well
             var docs = Documentation();
             
-            response.contentType = "text/html";
             response.html = "Generated generic content for all web pages at " + DateTime.Now.ToString("h:mm:ss") + ".";
             return response;
         }
@@ -129,7 +131,8 @@ namespace Websilk.Services
 
             //save page to file
 
-            var serialize = S.Util.Serializer.WriteObjectAsString(page, Formatting.None, TypeNameHandling.Auto, P.IgnorablePagePropertiesResolver());
+            //var serialize = S.Util.Serializer.CompressObjectToString(page);
+            var serialize = S.Util.Serializer.WriteObjectToString(page);
             var path = S.Server.MapPath("/Content/websites/" + P.websiteId + "/pages/" + P.pageId + "/");
             if (!Directory.Exists(path))
             {

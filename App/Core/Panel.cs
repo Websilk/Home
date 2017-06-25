@@ -1,11 +1,11 @@
 ﻿using System.Text;
 using System.Collections.Generic;
 using Newtonsoft.Json;
+using ProtoBuf;
 
 namespace Websilk
 {
-
-
+    [ProtoContract]
     public class Panel
     {
         //arrangement settings for panel cells //////////////////////////////////
@@ -18,64 +18,85 @@ namespace Websilk
             book = 3
         }
 
+        [ProtoContract]
         public struct structArrangeGrid
         {
 
         }
 
+        [ProtoContract]
         public struct structArrangeRows
         {
 
         }
 
+        [ProtoContract]
         public struct structArrangeSlideshow
         {
 
         }
 
+        [ProtoContract]
         public struct structArrangeBook
         {
 
         }
 
+        [ProtoContract]
         public struct structArrangement
         {
+            [ProtoMember(1)]
             public enumArrangeType type;
+            [ProtoMember(2)]
             public structCellGrid grid;
+            [ProtoMember(3)]
             public structCellRows rows;
+            [ProtoMember(4)]
             public structCellSlideshow slideshow;
+            [ProtoMember(5)]
             public structCellBook book;
         }
 
         //settings for a panel cell //////////////////////////////////
 
+        [ProtoContract]
         public struct structCellGrid
         {
             
         }
 
+        [ProtoContract]
         public struct structCellRows
         {
 
         }
 
+        [ProtoContract]
         public struct structCellSlideshow
         {
 
         }
 
+        [ProtoContract]
         public struct structCellBook
         {
 
         }
 
+        [ProtoContract]
         public struct structCell
         {
+            [ProtoMember(1)]
             public string id;
+            [ProtoMember(2)]
             public string head;
+            [ProtoMember(3)]
             public string foot;
+            [ProtoMember(4)]
             public string css;
+            [ProtoMember(5)]
             public bool overflow;
+            [ProtoMember(6)]
             [JsonIgnore]
             public List<Component> components;
         }
@@ -86,11 +107,17 @@ namespace Websilk
         [JsonIgnore]
         private Page page;
 
+        [ProtoMember(1)]
         public string name = ""; //a human-readable name for reference only
+        [ProtoMember(2)]
         public string id = ""; //a unique ID
+        [ProtoMember(3)]
         public string blockId = "";
+        [ProtoMember(4)]
         public bool isPageBlock = false;
+        [ProtoMember(5)]
         public string areaName = ""; //name of layout area this panel belongs to
+        [ProtoMember(6)]
         public string blockName = ""; //name of block section to load into
 
         [JsonIgnore]
@@ -98,7 +125,9 @@ namespace Websilk
         [JsonIgnore]
         public bool isDisabled = false; //cannot drag & drop components into panel (page editor only)
 
+        [ProtoMember(7)]
         public structArrangement arrangement;
+        [ProtoMember(8)]
         public List<structCell> cells;
 
         [JsonIgnore]

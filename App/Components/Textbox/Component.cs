@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using ProtoBuf;
 
 namespace Websilk.Components
 {
     public class Textbox: Component
     {
+        [ProtoMember(1)]
         public string text = "";
 
         public Textbox() { }

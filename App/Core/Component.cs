@@ -2,9 +2,28 @@
 using System.Text;
 using System.Collections.Generic;
 using Newtonsoft.Json;
+using ProtoBuf;
 
 namespace Websilk
 {
+    
+    [ProtoContract]
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    
+    //For proper serialization compression, we MUST include all 
+    //component references here that will be used within the platform
+
+    [ProtoInclude(10, typeof(Components.Login))]
+    [ProtoInclude(11, typeof(Components.Textbox))]
+
+    //the Vender area is made up of auto-generated code. To auto-generate 
+    //this code, log into the Websilk Dashboard and navigate to Settings > Advanced, 
+    //then click the button labeled "Import Vendor Applications"
+
+    //[Vender]
+    //[/Vender]
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     public class Component
     {
         public enum enumAlign
@@ -41,27 +60,45 @@ namespace Websilk
             window = 2
         }
 
+        [ProtoContract]
         public struct structPadding
         {
+            [ProtoMember(1)]
             public int top;
+            [ProtoMember(2)]
             public int right;
+            [ProtoMember(3)]
             public int bottom;
+            [ProtoMember(4)]
             public int left;
         }
 
+        [ProtoContract]
         public struct structPosition
         {
+            [ProtoMember(1)]
             public int left;
+            [ProtoMember(2)]
             public int top;
+            [ProtoMember(3)]
             public int width;
+            [ProtoMember(4)]
             public int height;
+            [ProtoMember(5)]
             public bool isUsed;
+            [ProtoMember(6)]
             public bool forceNewLine;
+            [ProtoMember(7)]
             public enumAlign align;
+            [ProtoMember(8)]
             public enumPosition position;
+            [ProtoMember(9)]
             public enumIsFixed fixedAlign;
+            [ProtoMember(10)]
             public enumWidthType widthType;
+            [ProtoMember(11)]
             public enumHeightType heightType;
+            [ProtoMember(12)]
             public structPadding padding;
         }
 
@@ -70,15 +107,24 @@ namespace Websilk
         [JsonIgnore]
         public Page Page;
 
+
+        [ProtoMember(1)]
         public string id = ""; //unique ID
+        [ProtoMember(2)]
         public string blockId = "";
+        [ProtoMember(3)]
         public string panelId = ""; //unique ID of panel this component belongs to
+        [ProtoMember(4)]
         public string panelCellId = ""; //unique ID of panel cell this component belongs to
 
         //data stored about the component
+        [ProtoMember(5)]
         public List<structPosition> position;
+        [ProtoMember(6)]
         public string css = "";
-        public string[] menuTypes = new string[] { "" }; //specific menu types to show in the component select menu
+
+        //specific menu types to show in the component select menu
+        public string[] menuTypes = new string[] { "" }; 
 
         //resources (js, js file, or css file) attached to this component
         [JsonIgnore]
@@ -87,6 +133,7 @@ namespace Websilk
         public List<string> resourcesForComponentType;
 
         //panels inside the component
+        [ProtoMember(7)]
         public List<string> panelIds;
         [JsonIgnore]
         public List<Panel> panels;
@@ -378,7 +425,7 @@ namespace Websilk
                     }
                     else
                     {
-                        js.Append(S.Util.Serializer.WriteObjectAsString(position[x]));
+                        js.Append(S.Util.Serializer.WriteObjectToString(position[x]));
                     }
                 }
                 js.Append("]");

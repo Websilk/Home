@@ -137,7 +137,7 @@ namespace Websilk
             if(Cache[key] == null)
             {
                 var obj = value();
-                SaveToCache(key, serialize ? (object)Util.Serializer.WriteObjectAsString(obj) : obj);
+                SaveToCache(key, serialize ? (object)Util.Serializer.WriteObjectToString(obj) : obj);
                 return obj;
             }
             else

@@ -79,6 +79,8 @@
     <Folder Include="dbo\Stored Procedures\Documentation" />
     <Folder Include="dbo\Stored Procedures\Pages\Shadow" />
     <Folder Include="utility" />
+    <Folder Include="dbo\Stored Procedures\Pages\History" />
+    <Folder Include="dbo\Stored Procedures\Blocks\History" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="dbo\Tables\ErrorLog.sql" />
@@ -173,6 +175,11 @@
     <Build Include="dbo\Tables\Applications.sql" />
     <Build Include="dbo\Stored Procedures\Pages\Shadow\Pages_Shadow_Exists.sql" />
     <Build Include="dbo\Stored Procedures\Pages\Page_Delete.sql" />
+    <Build Include="dbo\Tables\Pages_History.sql" />
+    <Build Include="dbo\Stored Procedures\Pages\History\Page_History_Create.sql" />
+    <Build Include="dbo\Stored Procedures\Pages\History\Pages_History_GetList.sql" />
+    <Build Include="dbo\Stored Procedures\Blocks\History\Block_History_Create.sql" />
+    <Build Include="dbo\Tables\Blocks_History.sql" />
   </ItemGroup>
   <ItemGroup>
     <ArtifactReference Include="$(DacPacRootPath)\Extensions\Microsoft\SQLDB\Extensions\SqlServer\110\SqlSchemas\master.dacpac">

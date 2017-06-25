@@ -123,7 +123,7 @@ namespace Websilk
                 Data = scaffold.Data;
                 elements = scaffold.elements;
             }
-            serializedElements = S.Util.Serializer.WriteObjectAsString(elements);
+            serializedElements = S.Util.Serializer.WriteObjectToString(elements);
         }
 
         public string Render()

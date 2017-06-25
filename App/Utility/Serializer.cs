@@ -1,9 +1,11 @@
 ﻿using System;
-using System.Reflection;
 using System.IO;
+using System.Text;
+using System.Reflection;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
+using ProtoBuf;
 
 namespace Websilk.Utility
 {
@@ -17,7 +19,7 @@ namespace Websilk.Utility
         }
 
         #region "Write"
-        public string WriteObjectAsString(object obj, Formatting formatting = Formatting.None, TypeNameHandling nameHandling = TypeNameHandling.Auto, Newtonsoft.Json.Serialization.IContractResolver contractResolver = null)
+        public string WriteObjectToString(object obj, Formatting formatting = Formatting.None, TypeNameHandling nameHandling = TypeNameHandling.Auto, Newtonsoft.Json.Serialization.IContractResolver contractResolver = null)
         {
             var resolver = contractResolver;
             if(resolver == null)
@@ -35,22 +37,17 @@ namespace Websilk.Utility
 
         public byte[] WriteObject(object obj, Formatting formatting = Formatting.None, TypeNameHandling nameHandling = TypeNameHandling.Auto)
         {
-            return Util.Str.GetBytes(WriteObjectAsString(obj, formatting, nameHandling));
+            return Util.Str.GetBytes(WriteObjectToString(obj, formatting, nameHandling));
         }
 
         public void WriteObjectToFile(object obj, string file, Formatting formatting = Formatting.Indented, TypeNameHandling nameHandling = TypeNameHandling.Auto)
-        {
-            SaveToFile(obj, file, formatting, nameHandling);
-        }
-        
-        public void SaveToFile(object obj, string file, Formatting formatting = Formatting.Indented, TypeNameHandling nameHandling = TypeNameHandling.Auto)
         {
             var path = Util.Str.getFolder(file);
             if (!Directory.Exists(path))
             {
                 Directory.CreateDirectory(path);
             }
-            File.WriteAllText(file, WriteObjectAsString(obj, formatting, nameHandling));
+            File.WriteAllText(file, WriteObjectToString(obj, formatting, nameHandling));
         }
         #endregion
 
@@ -64,7 +61,58 @@ namespace Websilk.Utility
         {
             return ReadObject(File.ReadAllText(file), objType);
         }
-        
+
+        #endregion
+
+        #region "Write Compressed"
+        public string CompressObjectToString(object obj)
+        {
+            using (var ms = new MemoryStream())
+            {
+                var sr = new StreamReader(ms);
+                ProtoBuf.Serializer.SerializeWithLengthPrefix(ms, obj, PrefixStyle.Base128);
+                ms.Position = 0;
+                return sr.ReadToEnd();
+            }
+        }
+
+        public byte[] CompressObject(object obj)
+        {
+            return Util.Str.GetBytes(CompressObjectToString(obj));
+        }
+
+        public void CompressObjectToFile(object obj, string file)
+        {
+            var path = Util.Str.getFolder(file);
+            if (!Directory.Exists(path))
+            {
+                Directory.CreateDirectory(path);
+            }
+            using (var fs = new FileStream(file, FileMode.OpenOrCreate))
+            {
+                ProtoBuf.Serializer.SerializeWithLengthPrefix(fs, obj, PrefixStyle.Base128);
+            }
+        }
+        #endregion
+
+        #region "Read Compressed"
+        public object DecompressObject<T>(string str)
+        {
+            using (var ms = new MemoryStream())
+            {
+                var sw = new StreamWriter(ms);
+                sw.Write(str);
+                ms.Position = 0;
+                return ProtoBuf.Serializer.DeserializeWithLengthPrefix<T>(ms, PrefixStyle.Base128);
+            }
+            
+            //return ProtoBuf.Serializer.Deserialize(objType, new MemoryStream(b));
+        }
+
+        public object DecompressFromFile<T>(string file)
+        {
+            return DecompressObject<T>(File.ReadAllText(file));
+        }
         #endregion
     }
 

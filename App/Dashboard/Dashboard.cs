@@ -58,7 +58,8 @@ namespace Websilk.Pages
                         menuItem("Domains", "settings-domains", "/dashboard/settings/domains", "domains"),
                         menuItem("Themes", "settings-themes", "/dashboard/settings/themes", "themes"),
                         menuItem("Color Schemes", "settings-colorschemes", "/dashboard/settings/colors", "colors"),
-                        menuItem("Cache", "settings-cache", "/dashboard/settings/cache", "cache")
+                        menuItem("Cache", "settings-cache", "/dashboard/settings/cache", "cache"),
+                        menuItem("Advanced", "settings-advanced", "/dashboard/settings/advanced", "component-admin")
                     }
                 )
             };

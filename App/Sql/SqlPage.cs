@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Data.SqlClient;
 
 namespace Websilk.SqlQueries
@@ -134,6 +135,32 @@ namespace Websilk.SqlQueries
                 new SqlParameter("@pageId", pageId)
             };
             S.Sql.ExecuteNonQuery("EXEC Page_Delete @websiteId=@websiteId, @pageId=@pageId", parms);
+        }
+        #endregion
+
+        #region "History"
+        public void CreatePageHistory(int websiteId, int pageId, int userId, DateTime date)
+        {
+            var parms = new List<SqlParameter>()
+            {
+                new SqlParameter("@websiteId", websiteId),
+                new SqlParameter("@pageId", pageId),
+                new SqlParameter("@userId", S.User.userId),
+                new SqlParameter("@datemodified", date)
+            };
+            S.Sql.ExecuteNonQuery("EXEC Page_History_Create @websiteId=@websiteId, @pageId=@pageId, @userId=@userId, @datemodified=@datemodified", parms);
+        }
+
+        public SqlReader GetPageHistoryList(int websiteId, int pageId, DateTime dateStart, int length = 100)
+        {
+            var parms = new List<SqlParameter>()
+            {
+                new SqlParameter("@websiteId", websiteId),
+                new SqlParameter("@pageId", pageId),
+                new SqlParameter("@dateStart", dateStart),
+                new SqlParameter("@length", length)
+            };
+            return new SqlReader(S, "EXEC Pages_History_GetList @websiteId=@websiteId, @pageId=@pageId, @dateStart=@dateStart, @length=@length", parms);
         }
         #endregion
 

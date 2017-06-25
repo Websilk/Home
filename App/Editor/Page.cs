@@ -179,12 +179,12 @@ namespace Websilk.Services.Editor
                 else if (b.id.IndexOf("page_") < 0 && b.changed == true)
                 {
                     //save block
-                    page.SaveBlock(b, true);
+                    page.SaveBlock(b, true, true);
                 }
             }
             if (savepage == true)
             {
-                page.SavePage(newpage, true);
+                page.SavePage(newpage, true, true);
             }
         }
         #endregion

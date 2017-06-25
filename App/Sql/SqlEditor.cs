@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Data.SqlClient;
 
 namespace Websilk.SqlQueries
@@ -57,6 +58,18 @@ namespace Websilk.SqlQueries
                 new SqlParameter("@name", name)
             };
             return (int)S.Sql.ExecuteScalar("EXEC Block_Create @websiteId=@websiteId, @area=@area, @name=@name", parms);
+        }
+
+        public void CreateBlockHistory(int websiteId, int blockId, int userId, DateTime date)
+        {
+            var parms = new List<SqlParameter>()
+            {
+                new SqlParameter("@websiteId", websiteId),
+                new SqlParameter("@blockId", blockId),
+                new SqlParameter("@userId", S.User.userId),
+                new SqlParameter("@datemodified", date)
+            };
+            S.Sql.ExecuteNonQuery("EXEC Block_History_Create @websiteId=@websiteId, @blockId=@blockId, @userId=@userId, @datemodified=@datemodified", parms);
         }
         #endregion
     }

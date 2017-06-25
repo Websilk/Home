@@ -1,6 +1,8 @@
-﻿
+﻿using ProtoBuf;
+
 namespace Websilk.Components
 {
+    [ProtoContract]
     public class Login: Component
     {
         public string label = "Log In";

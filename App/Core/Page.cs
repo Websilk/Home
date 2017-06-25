@@ -4,6 +4,8 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using Newtonsoft.Json;
+using ProtoBuf;
+using SharpCompress;
 
 namespace Websilk
 {
@@ -22,27 +24,41 @@ namespace Websilk
             public string[] query;
         }
 
+        [ProtoContract]
         public struct structPage
         {
             //structure used to save page content to JSON file
+            [ProtoMember(1)]
             public int pageId;
+            [ProtoMember(2)]
             public int shadowId;
+            [ProtoMember(3)]
             public bool isShadow;
+            [ProtoMember(4)]
             public string layout;
+            [ProtoMember(5)]
             public List<structArea> areas;
         }
 
+        [ProtoContract]
         public struct structArea
         {
+            [ProtoMember(1)]
             public string name;
+            [ProtoMember(2)]
             public List<structBlock> blocks;
         }
 
+        [ProtoContract]
         public struct structBlock
         {
+            [ProtoMember(1)]
             public string name;
+            [ProtoMember(2)]
             public string id;
+            [ProtoMember(3)]
             public bool isPage;
+            [ProtoMember(4)]
             public List<Component> components;
             public bool changed;
         }
@@ -385,6 +401,8 @@ namespace Websilk
             var newpage = new structPage();
             if (file != "")
             {
+                //deserialize page
+                //newpage = (structPage)S.Util.Serializer.DecompressObject<structPage>(file);
                 newpage = (structPage)S.Util.Serializer.ReadObject(file, typeof(structPage));
             }
             else
@@ -730,6 +748,7 @@ namespace Websilk
             var file = S.Server.LoadFileFromCache(filename, false, !fromCache);
             if (file != "")
             {
+                //block = (structBlock)S.Util.Serializer.DecompressObject<structBlock>(file);
                 block = (structBlock)S.Util.Serializer.ReadObject(file, typeof(structBlock));
             }
             else
@@ -1036,7 +1055,7 @@ namespace Websilk
             return contractResolver;
         }
 
-        public void SavePage(structPage page, bool saveToDisk = true)
+        public void SavePage(structPage page, bool saveToDisk = true, bool saveToHistory = false)
         {
             //strip components from custom blocks
             StripCustomBlocks(page);
@@ -1049,21 +1068,48 @@ namespace Websilk
 
             //next, save page
             var path = GetPageFilePath(page.pageId, editFolder, editType);
-            var serialize = S.Util.Serializer.WriteObjectAsString(page, Formatting.None, TypeNameHandling.Auto, IgnorablePagePropertiesResolver(saveToDisk));
+            //var serialize = S.Util.Serializer.CompressObjectToString(page);
+            var serialize = S.Util.Serializer.WriteObjectToString(page, Formatting.None, TypeNameHandling.Auto, IgnorablePagePropertiesResolver(saveToDisk));
             S.Server.SaveToCache(path, serialize);
             if (saveToDisk == true)
             {
                 //schedule save to file system
                 S.Server.ScheduleEveryMinute.ScheduleSaveFile(S.Server.MapPath(path), serialize);
+            }
 
-                //schedule save page to history on file system
-                var now = DateTime.Now;
-                var historyPath = GetPageFilePath(page.pageId, "history/" + now.ToString("yyyy"), now.ToString("MM_dd_H_mm"));
-                S.Server.ScheduleEveryMinute.ScheduleSaveFile(S.Server.MapPath(historyPath), serialize);
+            if(saveToHistory == true)
+            {
+                //save page to history on file system
+                var date = DateTime.Now;
+                var history_file = S.Server.MapPath(GetPageHistoryPath(page.pageId, date));
+                var history_path = S.Util.Str.getFolder(history_file);
+                var oldfile = "";
+                if (!Directory.Exists(history_path))
+                {
+                    Directory.CreateDirectory(history_path);
+                }
+                else
+                {
+                    //check last history point to see if there are any changes to the file
+                    var dir = new DirectoryInfo(history_path);
+                    var files = dir.GetFiles();
+                    if(files.Length > 0)
+                    {
+                        var last_history = files.OrderBy(f => f.Name).Last().FullName;
+                        oldfile = File.ReadAllText(last_history);
+                    }
+                }
+                
+                if(serialize != oldfile)
+                {
+                    File.WriteAllText(history_file, serialize);
+                    sql.CreatePageHistory(websiteId, page.pageId, S.User.userId, date);
+                }
+                //S.Server.ScheduleEveryMinute.ScheduleSaveFile(S.Server.MapPath(GetPageHistoryPath(page.pageId, DateTime.Now)), serialize);
             }
         }
 
-        public void SaveShadowTemplate(ref structPage oldpage, bool saveToDisk = true)
+        public void SaveShadowTemplate(ref structPage oldpage, bool saveToDisk = true, bool saveToHistory = false)
         {
             //move shadow template blocks to a new page object
             var page = new structPage()
@@ -1122,25 +1168,76 @@ namespace Websilk
             oldpage = newpage;
 
             //finally, save shadow template page
-            SavePage(page, saveToDisk);
+            SavePage(page, saveToDisk, saveToHistory);
         }
 
-        public void SaveBlock(structBlock block, bool saveToDisk = true)
+        public void SaveBlock(structBlock block, bool saveToDisk = true, bool saveToHistory = false)
         {
             var path = GetBlockFilePath(block.id, editFolder, editType);
-            var serialize = S.Util.Serializer.WriteObjectAsString(block, Formatting.None, TypeNameHandling.Auto, IgnorablePagePropertiesResolver(saveToDisk));
+
+            //serialize block object
+            //var serialize = S.Util.Serializer.CompressObjectToString(block);
+            var serialize = S.Util.Serializer.WriteObjectToString(block, Formatting.None, TypeNameHandling.Auto, IgnorablePagePropertiesResolver(saveToDisk));
             S.Server.SaveToCache(path, serialize);
             if (saveToDisk == true)
             {
                 //schedule save block to file system
                 S.Server.ScheduleEveryMinute.ScheduleSaveFile(S.Server.MapPath(path), serialize);
+            }
 
-                //schedule save block to history on file system
-                var now = DateTime.Now;
-                var historyPath = GetBlockFilePath(block.id, "history/" + now.ToString("yyyy"), now.ToString("MM_dd_H_mm"));
-                S.Server.ScheduleEveryMinute.ScheduleSaveFile(S.Server.MapPath(historyPath), serialize);
+            if (saveToHistory == true)
+            {
+                //save block to history on file system
+                var sqlEditor = new SqlQueries.Editor(S);
+                var date = DateTime.Now;
+                var history_file = S.Server.MapPath(GetBlockHistoryPath(block.id, date));
+                var history_path = S.Util.Str.getFolder(history_file);
+                var oldfile = "";
+                if (!Directory.Exists(history_path))
+                {
+                    Directory.CreateDirectory(history_path);
+                }
+                else
+                {
+                    //check last history point to see if there are any changes to the file
+                    var dir = new DirectoryInfo(history_path);
+                    var files = dir.GetFiles();
+                    if (files.Length > 0)
+                    {
+                        var last_history = files.OrderBy(f => f.Name).Last().FullName;
+                        oldfile = File.ReadAllText(last_history);
+                    }
+                }
+                if (serialize != oldfile)
+                {
+                    File.WriteAllText(history_file, serialize);
+                    sqlEditor.CreateBlockHistory(websiteId, int.Parse(block.id), S.User.userId, date);
+                }
+
+                //sql.CreatePageHistory
+                //S.Server.ScheduleEveryMinute.ScheduleSaveFile(S.Server.MapPath(GetBlockHistoryPath(block.id, DateTime.Now)), serialize);
             }
         }
+        #endregion
+
+        #region "History"
+
+        /// <summary>
+        /// Relative path to a historical page file
+        /// </summary>
+        /// <param name="pageId"></param>
+        /// <param name="date">historical date to load</param>
+        /// <returns></returns>
+        public string GetPageHistoryPath(int pageId, DateTime date)
+        {
+            return GetPageFilePath(pageId, "history/" + date.ToString("yyyy"), date.ToString("MM_dd_H_mm"));
+        }
+
+        public string GetBlockHistoryPath(string blockId, DateTime date)
+        {
+            return GetBlockFilePath(blockId, "history/" + date.ToString("yyyy"), date.ToString("MM_dd_H_mm"));
+        }
+
         #endregion
 
         #region "Utility"

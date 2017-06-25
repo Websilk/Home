@@ -6,7 +6,7 @@
         public string NewConfig()
         {
             var serialize = new Utility.Serializer(new Utility.Util());
-            return serialize.WriteObjectAsString(new
+            return serialize.WriteObjectToString(new
             {
                 environment = "development",
                 data = new

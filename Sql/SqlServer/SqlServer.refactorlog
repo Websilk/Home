@@ -175,4 +175,11 @@
     <Property Name="ParentElementType" Value="SqlTable" />
     <Property Name="NewName" Value="keywords" />
   </Operation>
+  <Operation Name="Rename Refactor" Key="2c8d6fb3-fd5d-4a76-a5cb-f386356f2053" ChangeDateTime="06/21/2017 23:46:08">
+    <Property Name="ElementName" Value="[dbo].[Pages_History].[Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[Pages_History]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="pageId" />
+  </Operation>
 </Operations>

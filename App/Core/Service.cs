@@ -103,12 +103,12 @@ namespace Websilk
         /// <summary>
         /// Load an instance of the currently loaded Page
         /// </summary>
-        protected void GetPage()
+        protected void GetPage(bool pageInfo = true)
         {
             if(page == null)
             {
                 page = new Page(S);
-                page.getPageInfo(pageId);
+                if (pageInfo) { page.getPageInfo(pageId); }
             }
         }
 

@@ -703,6 +703,8 @@
             //details panel
             if (pos_details.top <= win.scrolly) {
                 details.find('.details-top').css({ top: win.scrolly - pos_details.top })
+            } else {
+                details.find('.details-top').css({ top: 0 })
             }
 
             //slideshow panel

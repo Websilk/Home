@@ -35,8 +35,10 @@ namespace Websilk
             [ProtoMember(3)]
             public bool isShadow;
             [ProtoMember(4)]
-            public string layout;
+            public DateTime history;
             [ProtoMember(5)]
+            public string layout;
+            [ProtoMember(6)]
             public List<structArea> areas;
         }
 
@@ -98,7 +100,7 @@ namespace Websilk
         public DateTime pageCreated;
         public DateTime pageModified;
         public bool pageSecurity = false;
-        public string pageVersion = ""; //either empty or a history stamp
+        public DateTime pageHistory; //either empty or history date
 
         //shadow template info (if available)
         public int shadowTemplateId = 0; //shadow template used to load custom blocks for the page
@@ -133,6 +135,14 @@ namespace Websilk
         {
             S = WebsilkCore;
             sql = new SqlQueries.Page(S);
+            if (S.Request.Query["history"].Count > 0)
+            {
+                //set up page to load from a history folder
+                var hist = S.Request.Query["history"].ToString().Split('-');
+                DateTime.TryParse(hist[0] + "-" + hist[1] + "-" + hist[2] + " " + hist[3] + ":" + hist[4] + ":00", out pageHistory);
+                editFolder = "history/" + pageHistory.ToString("yyyy");
+                editType = pageHistory.ToString("MM_dd_H_mm");
+            }
         }
         #endregion
 
@@ -269,6 +279,7 @@ namespace Websilk
                 pagePathIds = reader.Get("pathIds");
                 pageDescription = reader.Get("description");
                 pageCreated = reader.GetDateTime("datecreated");
+                pageModified = reader.GetDateTime("datemodified");
                 pageSecurity = reader.GetBool("security");
                 pageType = reader.GetShort("pagetype");
                 pageLayout = reader.Get("layout");
@@ -360,6 +371,7 @@ namespace Websilk
             page.pageId = pageId;
             page.shadowId = shadowTemplateId;
             page.areas = new List<structArea>();
+            page.history = pageHistory;
 
             //load shadow page first (if available)
             if(shadowTemplateId > 0)
@@ -1057,6 +1069,8 @@ namespace Websilk
 
         public void SavePage(structPage page, bool saveToDisk = true, bool saveToHistory = false)
         {
+            if (pageHistory != null) { return; } //cannot save a historical page
+
             //strip components from custom blocks
             StripCustomBlocks(page);
 
@@ -1173,6 +1187,8 @@ namespace Websilk
 
         public void SaveBlock(structBlock block, bool saveToDisk = true, bool saveToHistory = false)
         {
+            if (pageHistory != null) { return; } //cannot save a historical block
+
             var path = GetBlockFilePath(block.id, editFolder, editType);
 
             //serialize block object

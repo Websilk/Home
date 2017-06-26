@@ -6,23 +6,22 @@
             <div class="row message hide"><span></span></div>
         </div>
         <div class="row hover">
-            <div class="col field-label">URL Title</div>
+            <div class="col field-text label">URL Title:</div>
             <div class="col field-text">{{url-title}}</div>
         </div>
-        <div class="row hover">
-            <div class="col field-label" title="A custom page title displayed in the web browser tab & page head">Head Title</div>
-            <div class="col field-input expand"><input type="text" id="titlehead" value="{{title-head}}" /></div>
+        <div class="row hover" title="A custom page title displayed in the web browser tab & page head">
+            <div class="row field">Head Title</div>
+            <div class="row input"><input type="text" id="titlehead" value="{{title-head}}" /></div>
         </div>
         <div class="row hover margin-bottom-sm">
-            <div class="col field-label">Summary</div>
-            <div class="col field-input expand"><textarea id="description">{{description}}</textarea></div>
+            <div class="row field">Summary</div>
+            <div class="row input"><textarea id="description">{{description}}</textarea></div>
         </div>
         <div class="row text-right pad-top desc-chars font-faded"></div>
 
         <div class="row pad-top pad-bottom-sm title"><h6>Security</h6></div>
         <div class="row hover">
-            <div class="col field-label"></div>
-            <div class="col field-text">
+            <div class="col field-text pad-width">
                 <label>
                     <input type="checkbox" class="chk-secure" {{secure}} /><span>Private</span>
                     <span class="font-faded pad-left">Only administrators can view this web page</span>
@@ -30,8 +29,7 @@
             </div>
         </div>
         <div class="row hover margin-bottom-lg">
-            <div class="col field-label"></div>
-            <div class="col field-text">
+            <div class="col field-text pad-width">
                 <label>
                     <input type="checkbox" class="chk-active" {{active}} /><span>Active</span>
                     <span class="font-faded pad-left">If inactive, will redirect to 404 error page</span>
@@ -43,8 +41,7 @@
             <div class="col right"><a href="javascript:" class="button btn-shadow-create">New Shadow Template</a></div>
         </div>
         <div class="row hover">
-            <div class="col field-label"></div>
-            <div class="col field-text pad-right">
+            <div class="col field-text pad-width">
                 <label>
                     <input type="checkbox" class="chk-use-shadow" {{use-shadow}}/><span>Use a Shadow Template for this web page</span>
                 </label>
@@ -63,8 +60,7 @@
             </div>
         </div>
         <div class="row hover margin-bottom-lg">
-            <div class="col field-label"></div>
-            <div class="col field-text pad-right">
+            <div class="col field-text pad-width">
                 <label>
                     <input type="checkbox" class="chk-use-child-shadow" {{use-child-shadow}}/><span>Assign a Shadow Template to new child pages</span>
                 </label>

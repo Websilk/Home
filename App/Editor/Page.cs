@@ -14,6 +14,7 @@ namespace Websilk.Services.Editor
         {
             //load the current page
             GetPage();
+            if(page.pageHistory != null) { return; } //cannot save a historical page
             var tuple = page.loadPageAndLayout(page.pageId, true);
 
             //load page(s) from file/cache

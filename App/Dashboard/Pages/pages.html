@@ -6,6 +6,7 @@
     .tab-body-pages .btn-goback{width:50px;}
     .tab-body-pages .page-url{white-space:nowrap;}
     .page-details{overflow:hidden;}
+    /*.btn-page-view a{font-size:22px; padding:5px 50px !important;}*/
     .slides > .row:nth-child(n+2) .pages-list{padding-bottom:50px;}
     .page-create{height:100%;}
     .page-details-side > .absolute.bottom{width:100%; box-sizing:border-box;}
@@ -14,6 +15,18 @@
     @media (max-width:1024px){
         .tab-body-pages > .slideshow > .slides{ align-items:flex-start;}
         .tab-body-pages > .slideshow > .slides > .page-details{display:block;}
+    }
+
+    @media (max-width:1280px){
+        .view-create-page > .slideshow{display:none;}
+    }
+
+    @media (max-width:1920px){
+        .box .view-create-page .columns-list > li {min-width:100% !important;}
+    }
+
+    @media (min-width:1921px) and (max-width:2140px) {
+        .box .view-create-page .columns-list > li {min-width: 50% !important;}
     }
 </style>
 <div class="section pages-info margin-width-lg margin-top-lg">
@@ -60,7 +73,7 @@
             <div class="slides">
                 <div class="row page-details">
                     <div class="pages-list">
-                        <div class="col page-create expander eight desktop-sm-seven laptop-one-total"></div>
+                        <div class="col page-create expander four desktop-sm-seven laptop-one-total"></div>
                         <div class="root-list">
                             {{page-list}}
                             <div class="row pad inline-block">
@@ -90,56 +103,55 @@
 <script id="page_details" type="text/html">
     <div class="row page-details slide-for-#id#">
         <div class="row">
-            <div class="col page-create expander eight desktop-sm-seven laptop-one-total"></div>
+            <div class="col page-create expander four desktop-sm-seven laptop-one-total"></div>
             <div class="col page-details-side four desktop-sm-five laptop-one-total box-dark height">
-                <div class="row head pad">
-                    <div class="row title">
-                        <div class="col btn-goback pad-right">
-                            <a href="javascript:" onclick="S.dashboard.pages.goback(this, 1)" class="button circle">
-                                <svg viewBox="0 0 25 25" class="medium">
-                                    <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#icon-arrow-left" x="0" y="0" width="25" height="25"></use>
-                                </svg>
-                            </a>
+                <div class="row details-top">
+                    <div class="row head pad">
+                        <div class="row title">
+                            <div class="col btn-goback pad-right">
+                                <a href="javascript:" onclick="S.dashboard.pages.goback(this, 1)" class="button circle">
+                                    <svg viewBox="0 0 25 25" class="medium">
+                                        <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#icon-arrow-left" x="0" y="0" width="25" height="25"></use>
+                                    </svg>
+                                </a>
+                            </div>
+                            <div class="col page-title">
+                                <h4>#title#</h4>
+                            </div>
                         </div>
-                        <div class="col page-title">
-                            <h4>#title#</h4>
-                        </div>
                     </div>
-                </div>
-                <div class="row foot pad">
-                    <div class="col icon tiny pad-right-sm">
-                        <svg viewBox="0 0 32 32">
-                            <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#icon-arrow-right" x="0" y="0" width="32" height="32"></use>
-                        </svg>
-                    </div>
-                    <div class="col">
-                        <a href="#url#" class="text page-url" target="_blank">#url-name#</a>
-                    </div>
-                </div>
-                
-                <div class="row pad">
-                    #has-title-head#<h6 class="pad-width page-title-for-#id#">#title-head#</h6>#/has-title-head#
-                    <p class="summary pad-width page-summary-for-#id#">
-                        <span class="summary-details">#summary#</span>
-                        <br /><br />
-                        <span class="inline-block faded pad-top-sm">#created#</span>
-                    </p>
-                </div>
-
-                
-                <div class="pad-bottom shadow-template-for-#id#" #shadow-template# style="display:none" #/shadow-template# >
                     <div class="row foot pad">
-                        <div class="col icon tiny pad-top-sm pad-right-sm">
+                        <div class="col icon tiny pad-right-sm">
                             <svg viewBox="0 0 32 32">
                                 <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#icon-arrow-right" x="0" y="0" width="32" height="32"></use>
                             </svg>
                         </div>
                         <div class="col">
-                            <div><h6>Uses Shadow Template</h6></div>
-                            <div class="shadow-name bold">#shadow-template-name#</div>
+                            <a href="#url#" class="text page-url" target="_blank">#url-name#</a>
                         </div>
-                        <div class="col right">
-                            <a href="#shadow-template-url#" class="button apply shadow-url" target="_blank">View</a>
+                    </div>
+                    <div class="row pad">
+                        #has-title-head#<h6 class="pad-width page-title-for-#id#">#title-head#</h6>#/has-title-head#
+                        <p class="summary pad-width page-summary-for-#id#">
+                            <span class="summary-details">#summary#</span>
+                            <br /><br />
+                            <span class="inline-block faded pad-top-sm">#created#</span>
+                        </p>
+                    </div>
+                    <div class="pad-bottom shadow-template-for-#id#" #shadow-template-hide#>
+                        <div class="row foot pad">
+                            <div class="col icon tiny pad-top-sm pad-right-sm">
+                                <svg viewBox="0 0 32 32">
+                                    <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#icon-arrow-right" x="0" y="0" width="32" height="32"></use>
+                                </svg>
+                            </div>
+                            <div class="col">
+                                <div><h6>Uses Shadow Template</h6></div>
+                                <div class="shadow-name bold">#shadow-template-name#</div>
+                            </div>
+                            <div class="col right">
+                                <a href="#shadow-template-url#" class="button apply shadow-url" target="_blank">View</a>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -154,8 +166,8 @@
                             </svg>
                         </a>
                     </div>
-                    <div class="col btn-page-view pad-right"><a class="button apply" href="#url#" target="_blank">View</a></div>
                     <div class="col btn-page-settings pad-right"><a class="button" href="javascript:" onclick="#link-settings#">Settings</a></div>
+                    <div class="col btn-page-view pad-right"><a class="button apply" href="#url#" target="_blank">View</a></div>
                     <div class="col btn-page-history right pad-right">
                         <a class="button circle" href="javascript:" title="History log for page titled '#title#'">
                             <svg viewBox="0 0 36 36">

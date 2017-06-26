@@ -261,7 +261,7 @@ namespace Websilk.Services.Dashboard
             if (reader.Read())
             {
                 scaffold.Data["page-title"] = reader.Get("title");
-                scaffold.Data["url-title"] = reader.Get("title").ToLower();
+                scaffold.Data["url-title"] = reader.Get("title").Replace(" ","-");
                 scaffold.Data["parent-title"] = reader.Get("parenttitle");
                 scaffold.Data["title-head"] = reader.Get("title_head") != "" ? reader.Get("title_head") : reader.Get("title");
                 scaffold.Data["description"] = reader.Get("description");

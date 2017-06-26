@@ -1,9 +1,10 @@
 ﻿S.dashboard.pages = {
-    current_page: 0, current_path: [], page_info: null, slides: null, shadow_templates: [],
+    current_page: 0, current_elem:null, current_path: [], page_info: null, slides: null, shadow_templates: [],
 
     init: function () {
         this.slides = new S.slides('.tab-body-pages > .slideshow');
         this.current_page = 0;
+        this.current_elem = S.dashboard.pages.getCurrentPage(this.slides.current_slide + 1); 
         this.current_path = [];
 
         //reset selected page info
@@ -12,6 +13,8 @@
         //add window resize events
         S.events.doc.resize.callback.remove('dash-pages');
         S.events.doc.resize.callback.add('dash-pages', this.resize, this.resize, this.resize);
+        S.events.doc.scroll.callback.remove('dash-pages');
+        S.events.doc.scroll.callback.add('dash-pages', this.resize, this.resize, this.resize);
         this.resize();
 
         //set up button events for menu
@@ -46,7 +49,7 @@
             container.removeClass('view');
             setTimeout(function () {
                 container.html('');
-                S.dashboard.pages.slides.previous(count);
+                this.slides.previous(count);
             }, 250);
         } else {
             this.slides.previous(count);
@@ -60,6 +63,12 @@
             this.current_page = 0;
             this.reset_info();
         }
+        this.current_elem = this.getCurrentPage(this.slides.current_slide + 1); 
+        this.resize();
+    },
+
+    getCurrentPage(i) {
+        return $('.tab-body-pages > .slideshow > .slides > .row:nth-child(' + i + ')');
     },
 
     details: function (e) {
@@ -82,11 +91,10 @@
             'url-name': link.substr(1),
             'link-create': 'S.dashboard.pages.create.view(this, ' + pageid + ')',
             'link-settings': 'S.dashboard.pages.settings.view(this, ' + pageid + ')',
-            'shadow-template': e.getAttribute('data-use-template') != '1',
             'shadow-template-name': e.getAttribute('data-template-name') || '',
-            'shadow-template-url': e.getAttribute('data-template-url') || ''
+            'shadow-template-url': e.getAttribute('data-template-url') || '',
+            'shadow-template-hide': (e.getAttribute('data-use-template') != '1' ? 'style="display:none;"' : '')
         }
-        console.log(data);
 
         //create slideshow navigation anchor links for each page in the hierarchy
         var alinks = [links.length];
@@ -98,9 +106,7 @@
             }
             
         }
-        this.current_page = pageid;
-        this.current_path.push(pageid);
-        this.page_info = data;
+
         var slides = this.slides;
 
         //remove all siblings to the right
@@ -112,13 +118,24 @@
         //update title
         data.title = e.getAttribute('data-title');
 
+        //set global properties for selected page
+        this.current_page = pageid;
+        this.current_path.push(pageid);
+        this.page_info = data;
+
+        //hide all settings & create windows
+        var wins = $('.page-create').each(function (e) {
+            S.dashboard.pages.settings.cancel(e.firstChild);
+            S.dashboard.pages.create.cancel(e.firstChild);
+        });
+
+
         //load sub pages list
         if (isfolder == true) {
             var list = $('.tab-body-pages > .slideshow > .slides .pages-list').last();
             S.ajax.post("Dashboard/Pages/View", { websiteId: S.dashboard.website.id, parentId: pageid, start: 1, length: 1000, orderby: 4, viewType: 0, search: '' },
                 function (data) {
                     if (data.d != 'err') {
-                        console.log(data.d);
                         list.html(data.d);
                         list.find('.columns-list').addClass('small');
                         $('.slide-for-' + pageid).find('.url-path').html('<a class="no-link" href="javascript:" onclick="S.dashboard.pages.goback(this,' + (links.length) + ')">' + S.website.host.replace('/', '') + '</a>/' + alinks.join(''));
@@ -129,6 +146,7 @@
             $('.slide-for-' + pageid).find('.url-path').html('<a class="no-link" href="javascript:" onclick="S.dashboard.pages.goback(this,' + (links.length) + ')">' + S.website.host.replace('/', '') + '</a>/' + alinks.join(''));
         }
         slides.next();
+        this.current_elem = S.dashboard.pages.getCurrentPage(this.slides.current_slide + 1);
     },
 
     create: {
@@ -144,6 +162,8 @@
             }
             var scaffold = new S.scaffold(htm, data);
             var container = $(e).parents('.page-details').find('.page-create');
+            var slideshow = container.parent().addClass('view-create-page').find('.slideshow').first();
+            slideshow.removeClass('eight').addClass('four');
 
             if (container.find('.page-title').length == 0) {
                 container.append(scaffold.render());
@@ -180,12 +200,12 @@
             $('.btn-shadow-create').on('click', S.dashboard.pages.shadow.create.view);
 
             if (pageid > 0) {
-                var subpages = $(e).parents('.page-details').find('.slideshow');
-                subpages.addClass('hide');
+                //var subpages = $(e).parents('.page-details').find('.slideshow');
+                //subpages.addClass('hide');
             } else {
                 //hide root page list
-                var pagelist = $(e).parents('.page-details').find('.root-list');
-                pagelist.hide();
+                //var pagelist = $(e).parents('.page-details').find('.root-list');
+                //pagelist.hide();
             }
             container.addClass('view');
         },
@@ -214,18 +234,22 @@
         cancel: function (e) {
             var details = $(e).parents('.page-details')
             var container = $(e).parents('.page-create');
+            var slideshow = container.parent().addClass('view-create-page').find('.slideshow').first();
+            container.parent().removeClass('view-create-page');
             container.removeClass('view');
+            slideshow.removeClass('four').addClass('eight');
             setTimeout(function () {
                 container.html('');
                 if (S.dashboard.pages.current_page > 0) {
-                    var subpages = details.find('.slideshow');
-                    subpages.removeClass('hide');
+                    //var subpages = details.find('.slideshow');
+                    //subpages.removeClass('hide');
                 } else {
                     //show root page list
                     var pagelist = details.find('.root-list');
                     pagelist.show();
                 }
             }, 100);
+            S.dashboard.pages.resize();
         },
 
         submit: function (e) {
@@ -313,6 +337,10 @@
                 container.html('');
                 container.append(d.d);
 
+                //update slideshow classes
+                var slideshow = container.parent().addClass('view-create-page').find('.slideshow').first();
+                slideshow.removeClass('eight').addClass('four');
+
                 //add event listeners for page create form
                 container.find('form').on('submit', function (e) {
                     S.dashboard.pages.settings.submit(container.find('form').get());
@@ -368,8 +396,8 @@
                 container.find('.btn-page-delete a').on('click', S.dashboard.pages.settings.delete);
 
                 //show settings section
-                var subpages = $(e).parents('.page-details').find('.slideshow');
-                subpages.addClass('hide');
+                //var subpages = $(e).parents('.page-details').find('.slideshow');
+                //subpages.addClass('hide');
                 container.addClass('view');
 
                 S.dashboard.pages.settings.id = id;
@@ -387,18 +415,22 @@
         cancel: function (e) {
             var details = $(e).parents('.page-details')
             var container = $(e).parents('.page-create');
+            var slideshow = container.parent().addClass('view-create-page').find('.slideshow').first();
+            container.parent().removeClass('view-create-page');
             container.removeClass('view');
+            slideshow.removeClass('four').addClass('eight');
             setTimeout(function () {
                 container.html('');
                 if (S.dashboard.pages.current_page > 0) {
-                    var subpages = details.find('.slideshow');
-                    subpages.removeClass('hide');
+                    //var subpages = details.find('.slideshow');
+                    //subpages.removeClass('hide');
                 } else {
                     //show root page list
                     var pagelist = details.find('.root-list');
                     pagelist.show();
                 }
             }, 100);
+            setTimeout(function () { S.dashboard.pages.resize(); }, 500);
         },
 
         submit: function (e) {
@@ -569,9 +601,6 @@
             if ($('.tab-body-history.for-page-' + id).length > 0) { callback(); return; }
             var data = { id: id, startDate: new Date().toISOString(), length: 20 };
             S.ajax.post('Dashboard/Pages/ViewHistory', data, function (d) {
-                //console.log(d);
-                console.log(d.d);
-
                 //remove reference to previously-selected page id & add new reference
                 var sect = $('.tab-body-history');
                 var classes = sect[0].getAttribute('class').split(' ');
@@ -598,15 +627,17 @@
             var section = $('.pages-body > .section.is-selected').removeClass('is-selected');
             var height = section.height();
             section.animate({ top: height * -1 }, {
-                duration: speed, easing: 'easeInCubic', complete: function () {
+                duration: speed, easing: 'easeOutCubic', complete: function () {
                     function show_section() {
-                        console.log('showing...');
                         section.hide();
                         var newsect = $('.pages-body > .tab-body-' + name);
                         newsect.css({ 'opacity': 0, top: 0 }).addClass('is-selected').show();
                         var newh = newsect.height();
                         newsect.css({ top: newh * -1, 'opacity': 1 });
-                        newsect.animate({ top: 0 }, { duration: speed, easing: 'easeOutCubic' });
+                        newsect.animate({ top: 0 }, {
+                            duration: speed, easing: 'easeInCubic',
+                            complete: S.dashboard.pages.resize
+                        });
                     }
 
                     switch (name) {
@@ -629,10 +660,64 @@
     },
 
     resize: function () {
-        $('.section-pages .pages-list ul.columns-list').each(function (e) {
+        var win = S.window.pos();
+        var i = S.dashboard.pages.current_page + 1;
+        var pad = 80;
+        var section = S.dashboard.pages.current_elem;
+        var details = section.find('.page-details-side');
+        var bottom = details.find('.absolute.bottom');
+        var slideshow = section.find('.slideshow').first();
+        var pos_details = details.offset();
+        var pos_slideshow = slideshow.offset();
+        pos_details.height = details.height();
+        pos_slideshow.width = slideshow.width();
+
+        if (pos_details.top + pos_details.height > win.h + win.scrolly || pos_details.top < win.scrolly) { pad = 0; }
+        if (!(pos_details.top + pos_details.height > win.h + win.scrolly) && pos_details.top < win.scrolly) { pad = (win.scrolly + win.h) - (pos_details.top + pos_details.height); }
+
+        $('.section-pages .pages-list ul.columns-list').filter(
+            function (a) {
+                return a.style.display != 'none';
+            }
+        ).each(function (e) {
             var y = $(e).offset().top;
-            e.style.maxHeight = (window.innerHeight - y - 40) + 'px';
+            e.style.maxHeight = (win.scrolly + win.h - y - pad) + 'px';
+            //e.style.maxHeight = (win.scrolly + win.h - (
+            //    (win.scrolly + win.h) - (pos_slideshow.top + pos_details.height)
+            //) - y - pad) + 'px';
         });
+
+        if (bottom.length > 0) {
+
+            pad = 10;
+
+            //bottom buttons
+            if ((pos_details.top + pos_details.height + pad) > (win.h + win.scrolly)) {
+                var b = ((pos_details.top + pos_details.height + pad) - (win.h + win.scrolly));
+                if (b > 0) {
+                    bottom.css({ bottom: b });
+                }
+            } else if(bottom[0].style.bottom != '0') {
+                bottom[0].style.bottom = '0';
+            }
+            //details panel
+            if (pos_details.top <= win.scrolly) {
+                details.find('.details-top').css({ top: win.scrolly - pos_details.top })
+            }
+
+            //slideshow panel
+            pad = 0;
+            if (pos_details.top + pad <= win.scrolly) {
+                pos_slideshow.top = win.scrolly;
+                slideshow.css({ top: win.scrolly - (pos_details.top + pad) });
+            } else {
+                slideshow.css({ top: 0 });
+            }
+            //var bspace = (pos_details.top + pos_details.height) - (win.h + win.scrolly);
+            //bspace = bspace < 0 ? 0 : bspace;
+            //var h = (pos_details.top + pos_details.height) - (bspace) - pos_slideshow.top;
+            //slideshow.css({ height: h })
+        }
     }
 }
 

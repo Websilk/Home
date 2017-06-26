@@ -678,8 +678,11 @@
         pos_details.height = details.height();
         pos_slideshow.width = slideshow.width();
 
-        if (pos_details.top + pos_details.height > win.h + win.scrolly || pos_details.top < win.scrolly) { pad = 0; }
-        if (!(pos_details.top + pos_details.height > win.h + win.scrolly) && pos_details.top < win.scrolly) { pad = (win.scrolly + win.h) - (pos_details.top + pos_details.height); }
+        if (section.find('.view-create-page').length > 0) {
+            if (pos_details.top + pos_details.height > win.h + win.scrolly || pos_details.top < win.scrolly) { pad = 0; }
+            if (!(pos_details.top + pos_details.height > win.h + win.scrolly) && pos_details.top < win.scrolly) { pad = (win.scrolly + win.h) - (pos_details.top + pos_details.height); }
+        }
+        
 
         $('.section-pages .pages-list ul.columns-list').filter(
             function (a) {

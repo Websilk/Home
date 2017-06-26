@@ -29,7 +29,7 @@ S.slides.prototype.previous = function (count) {
     //show previous slide (from -count offset)
     console.log(count);
     this.current_slide -= (count > 0 ? count : 1);
-    this.items.css({ left: (this.current_slide * 100 * -1) + "%"});
+    this.items.css({ left: (this.current_slide * 100 * -1) + "%" });
 };
 
 S.slides.prototype.cleanAfter = function () {

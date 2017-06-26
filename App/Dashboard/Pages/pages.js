@@ -50,9 +50,15 @@
             setTimeout(function () {
                 container.html('');
                 this.slides.previous(count);
+                setTimeout(function () {
+                    container.parents('.page-details').children().remove();
+                }, 300);
             }, 250);
         } else {
             this.slides.previous(count);
+            setTimeout(function () {
+                container.parents('.page-details').children().remove();
+            }, 300);
         }
         for (var x = 1; x <= count; x++) {
             this.current_path.pop(count)

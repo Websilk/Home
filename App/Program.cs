@@ -2,9 +2,11 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
+using System.Diagnostics;
 
 namespace Websilk
 {
+    [DebuggerNonUserCode]
     public class Program
     {
         public static void Main(string[] args)
@@ -20,7 +22,6 @@ namespace Websilk
                     .UseContentRoot(Directory.GetCurrentDirectory())
                     .UseStartup<Startup>()
                     .Build();
-
             host.Run();
         }
     }

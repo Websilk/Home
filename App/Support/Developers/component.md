@@ -19,7 +19,7 @@ Your empty component class should look like:
 		}
 	}
 
-`ProtoBuf` is a Serialization class that highly compresses the component instance when serializing a page after a user saves their page within the [Page Editor](editor).
+`ProtoBuf` is a Serialization class that highly compresses the component instance when serializing a page after a user saves their page within the [Page Editor](../editor).
 
 You can find documentation for `ProtoBuf` at [https://github.com/mgravell/protobuf-net](https://github.com/mgravell/protobuf-net)
 

@@ -6,6 +6,9 @@
         //show toolbar dialog
         S.editor.toolbar.dialog.show(scaffold.render());
 
+        //hide windows
+        $('.editor .windows').hide();
+
         //set up button events
         $('#layout_list').on('change', function () { S.editor.layout.change(); });
         $('.editor .toolbar .dialog .button-done a').on('click', function () { S.editor.layout.hide(); });
@@ -33,6 +36,9 @@
         }
         //remove window resize event
         S.events.doc.resize.callback.remove('layout');
+
+        //show windows
+        $('.editor .windows').show();
     },
 
     outlines: {

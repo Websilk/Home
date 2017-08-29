@@ -25,7 +25,7 @@
             head.appendChild(link);
         },
 
-        add: function (css, id) {
+        add: function (id, css) {
             //add raw CSS to the page inside a style tag
             $('#' + id).remove();
             $('head').append('<style id="' + id + '" type="text/css">' + css + "</style>");

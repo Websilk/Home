@@ -28,6 +28,8 @@ S.editor.components = {
                 //clone component icon from window
                 var clone = item.elem.cloneNode(true);
                 $('.editor > .clone').append(clone);
+
+                //hide UI elements
                 S.editor.components.select.hide();
                 S.editor.components.hover.hide();
                 S.editor.components.hover.isdragging = true;
@@ -37,6 +39,9 @@ S.editor.components = {
 
                 //start component tracking
                 S.editor.components.track.drag.start.call(S.editor.components.track);
+
+                //hide UI elements
+                $('.editor .windows').animate({ opacity: 0 }, 250);
             },
 
             go: function (item) {
@@ -70,6 +75,9 @@ S.editor.components = {
                         S.editor.save.add(d.newId, 'new', {});
                     });
                 }
+
+                //show UI elements
+                $('.editor .windows').css({ opacity: 1 });
             }
         },
     },
@@ -110,7 +118,7 @@ S.editor.components = {
             }
 
             //setup menu
-            this.menu.add($('#template_select_menu_props').html(), 'props', ['all', 'props'], null, null, S.editor.components.select.properties.show);
+            this.menu.add($('#template_select_menu_props').html(), 'props', ['all', 'props'], null, null, S.editor.components.properties.show);
             this.menu.add($('#template_select_menu_alignment').html(), 'alignment', ['all', 'alignment'], null, S.editor.components.select.menu.alignment.hide, S.editor.components.select.menu.alignment.show);
             this.menu.alignment.init();
             $('#template_select_menu_props').remove();
@@ -159,6 +167,7 @@ S.editor.components = {
                 S.editor.components.selected = null;
                 S.events.doc.scroll.callback.remove('component-select');
             }
+            S.util.selection.clear();
         },
 
         resize: {
@@ -335,6 +344,7 @@ S.editor.components = {
                 self.type = null;
                 self.timer = null;
                 S.editor.components.hover.hide();
+                $('.component-shield').hide();
 
                 //update component CSS
                 if (pos != null) {
@@ -641,21 +651,6 @@ S.editor.components = {
                 }
             }
         },
-
-        properties: {
-            component: null,
-
-            show: function () {
-                //load component properties window
-                var self = S.editor.components.select.properties;
-                var c = S.editor.components.selected;
-                if (self.component != c[0]) {
-                    self.component = c;
-                } else {
-
-                }
-            }
-        }
     },
 
     // the hover box displayed on top of the currently hovered component /////////////////////////////////////////
@@ -757,7 +752,6 @@ S.editor.components = {
                 this.trigdrag = false;
                 this.elem.compHover.hide();
                 item.dragElem = S.editor.components.hovered.get();
-
             },
 
             go: function (item) {
@@ -775,6 +769,8 @@ S.editor.components = {
                         $('body').addClass('show-empty-cells');
                         //start component tracking
                         S.editor.components.track.drag.start.call(S.editor.components.track);
+                        //hide UI elements
+                        $('.editor .windows').hide();
                     }
                     return false;
                 }
@@ -826,6 +822,9 @@ S.editor.components = {
                     //reinitialize component events
                     S.editor.components.hover.reinit();
                     S.editor.components.hovered = null;
+
+                    //show UI elements
+                    $('.editor .windows').show();
                 }
             }
         },
@@ -1238,6 +1237,58 @@ S.editor.components = {
                 $('head').append(style);
                 S.editor.components.hover.hide();
             }
+        }
+    },
+
+    properties: {
+        component: [null], elem: null,
+
+        show: function () {
+            //load component properties window
+            var self = S.editor.components.properties;
+            var c = S.editor.components.selected; //component
+            var id = c[0].id.substr(1);
+            $('.component-select .menu-window').hide();
+            if (self.component[0] != c[0]) {
+                self.component = c;
+                var comp = S.components.getComponentById(id);
+                var cell = S.editor.components.track.getCell(c).elem;
+                var data = {
+                    componentId: comp.id,
+                    blockName: $(cell).parents('.is-block').attr('data-block'),
+                    panelId: $(cell).parents('.is-panel').attr('id').replace('panel_', ''),
+                    cellId: cell.id.replace('cell_', '')
+                };
+
+                //show component properties window
+                S.editor.window.load('ComponentProperties', {
+                    title: 'Properties for ' + comp.name + ' Component',
+                    width: '', //resizable
+                    alignAt: 'center',
+                    url: '/Editor/Components/Properties',
+                    urlData: data,
+                    reload: true,
+                    html: S.loader({ padding: '150px 0' }),
+                    onClose: S.editor.components.properties.hide,
+                    zIndex: 10
+                });
+            }
+            $('#winComponentProperties').show();
+            self.elem = $('#winComponentProperties');
+
+            S.events.doc.resize.callback.add('component-properties', S.editor.components.properties.resize, S.editor.components.properties.resize, S.editor.components.properties.resize);
+        },
+
+        hide: function () {
+            //triggered when component properties window is closed
+            S.events.doc.resize.callback.remove('component-properties');
+        },
+
+        resize: function () {
+            var self = S.editor.components.properties;
+            var props = self.elem;
+            var elem = self.component;
+            //move component properties window out of the way of the selected component
         }
     }
 };

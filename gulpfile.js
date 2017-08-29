@@ -51,7 +51,11 @@ paths.working = {
             paths.scripts + 'utility/DOMpurify.js',
             paths.scripts + 'editor/_init.js'
         ],
-        app: paths.app + '**/*.js'
+        app: paths.app + '**/*.js',
+        utility: [
+            paths.scripts + 'utility/*.js',
+            paths.scripts + 'utility/**/*.js'
+            ]
     },
 
     less:{
@@ -143,11 +147,23 @@ gulp.task('js:editor', function () {
     if (prod == true) { p = p.pipe(uglify()); }
     return p.pipe(gulp.dest('.', { overwrite: true }));
 });
+gulp.task('js:utility', function () {
+    var p = gulp.src(paths.working.js.utility)
+        .pipe(rename(function (path) {
+            path.dirname = path.dirname.toLowerCase();
+            path.basename = path.basename.toLowerCase();
+            path.extname = path.extname.toLowerCase();
+        }));
+
+    if (prod == true) { p = p.pipe(uglify()); }
+    return p.pipe(gulp.dest(paths.compiled.js + 'utility', { overwrite: true }));
+});
 
 gulp.task('js', function () {
     gulp.start('js:app');
     gulp.start('js:platform');
     gulp.start('js:editor');
+    gulp.start('js:utility');
 });
 
 //tasks for compiling LESS & CSS /////////////////////////////////////////////////////////////////////

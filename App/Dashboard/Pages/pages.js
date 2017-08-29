@@ -44,33 +44,34 @@
 
     goback: function (e, count) {
         var container = $(e).parents('.page-details').find('.page-create');
+        var self = S.dashboard.pages;
         if (container.hasClass('view')) {
             //first, hide "create page" form, then go back
             container.removeClass('view');
             setTimeout(function () {
                 container.html('');
-                this.slides.previous(count);
+                self.slides.previous(count);
                 setTimeout(function () {
                     container.parents('.page-details').children().remove();
                 }, 300);
             }, 250);
         } else {
-            this.slides.previous(count);
+            self.slides.previous(count);
             setTimeout(function () {
                 container.parents('.page-details').children().remove();
             }, 300);
         }
         for (var x = 1; x <= count; x++) {
-            this.current_path.pop(count)
+            self.current_path.pop(count)
         }
-        if (this.current_path.length > 0) {
-            this.current_page = this.current_path[this.current_path.length - 1];
+        if (self.current_path.length > 0) {
+            self.current_page = self.current_path[self.current_path.length - 1];
         }else{
-            this.current_page = 0;
-            this.reset_info();
+            self.current_page = 0;
+            self.reset_info();
         }
-        this.current_elem = this.getCurrentPage(this.slides.current_slide + 1); 
-        this.resize();
+        self.current_elem = self.getCurrentPage(self.slides.current_slide + 1); 
+        self.resize();
     },
 
     getCurrentPage(i) {
@@ -668,13 +669,17 @@
     resize: function () {
         var win = S.window.pos();
         var i = S.dashboard.pages.current_page + 1;
-        var pad = 80;
+        var pad = 10;
         var section = S.dashboard.pages.current_elem;
         var details = section.find('.page-details-side');
-        var bottom = details.find('.absolute.bottom');
         var slideshow = section.find('.slideshow').first();
+        var pagelist = slideshow.find('.pages-list').first();
+        var bottom = slideshow.find('.absolute.bottom').first();
+        var details_bottom = details.find('.absolute.bottom').first();
+        var pos_pagelist = pagelist.offset();
         var pos_details = details.offset();
         var pos_slideshow = slideshow.offset();
+        pos_pagelist.height = pagelist.height();
         pos_details.height = details.height();
         pos_slideshow.width = slideshow.width();
 
@@ -690,44 +695,44 @@
             }
         ).each(function (e) {
             var y = $(e).offset().top;
-            e.style.maxHeight = (win.scrolly + win.h - y - pad) + 'px';
-            //e.style.maxHeight = (win.scrolly + win.h - (
-            //    (win.scrolly + win.h) - (pos_slideshow.top + pos_details.height)
-            //) - y - pad) + 'px';
+            var h = (win.scrolly + win.h - y - pad - 60);
+            if (h < 200) { h = 200;}
+            e.style.maxHeight = h + 'px';
         });
 
         if (bottom.length > 0) {
+            
+            //slideshow panel
+            var topoff = 0;
+            if (pos_details.top <= win.scrolly) {
+                topoff = win.scrolly - (pos_details.top);
+                pos_slideshow.top = win.scrolly;
+                pagelist.css({ top: topoff });
+            } else {
+                pagelist.css({ top: 0 });
+            }
 
-            pad = 10;
+            //bottom sub-pages buttons
+            var b = ((pos_pagelist.top + pos_pagelist.height) - (win.h + win.scrolly) - topoff);
+            if (b < 0) { b = 0; }
+            bottom.css({ bottom: b });
 
-            //bottom buttons
+            //bottom details buttons
             if ((pos_details.top + pos_details.height + pad) > (win.h + win.scrolly)) {
                 var b = ((pos_details.top + pos_details.height + pad) - (win.h + win.scrolly));
                 if (b > 0) {
-                    bottom.css({ bottom: b });
+                    details_bottom.css({ bottom: b });
                 }
-            } else if(bottom[0].style.bottom != '0') {
-                bottom[0].style.bottom = '0';
+            } else if (details_bottom[0].style.bottom != '0') {
+                details_bottom[0].style.bottom = '0';
             }
+
             //details panel
             if (pos_details.top <= win.scrolly) {
                 details.find('.details-top').css({ top: win.scrolly - pos_details.top })
             } else {
                 details.find('.details-top').css({ top: 0 })
             }
-
-            //slideshow panel
-            pad = 0;
-            if (pos_details.top + pad <= win.scrolly) {
-                pos_slideshow.top = win.scrolly;
-                slideshow.css({ top: win.scrolly - (pos_details.top + pad) });
-            } else {
-                slideshow.css({ top: 0 });
-            }
-            //var bspace = (pos_details.top + pos_details.height) - (win.h + win.scrolly);
-            //bspace = bspace < 0 ? 0 : bspace;
-            //var h = (pos_details.top + pos_details.height) - (bspace) - pos_slideshow.top;
-            //slideshow.css({ height: h })
         }
     }
 }

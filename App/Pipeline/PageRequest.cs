@@ -27,7 +27,19 @@ namespace Websilk.Pipeline
             page.getPageInfoFromUrl();
 
             //register initial javascript
-            S.javascript.Add("init", "S.init(" + (S.User.useAjax ? "true" : "false") + "," + page.pageId + "," + page.pageType + ",'" + page.pagePathName.ToLower() + "','" + page.pageTitle + "','" + page.PageTitleForBrowserTab + "'," + page.websiteId + ",'" + page.websiteTitle + "', '" + (S.Request.IsHttps ? "https://" : "http://") + "','" + page.Url.host + "');");
+            S.javascript.Add("init", "S.init(" + 
+                (S.User.useAjax ? "true" : "false") + "," + 
+                page.pageId + "," + page.pageType + ",'" + 
+                page.pagePathName.ToLower() + "','" + 
+                page.pageTitle + "','" + 
+                page.PageTitleForBrowserTab + "'," + 
+                page.websiteId + ",'" + 
+                page.websiteTitle + "'," + 
+                "'" + (S.Request.IsHttps ? "https://" : "http://") + "'," + 
+                "'" + page.Url.host + "'," +
+                "'" + page.websiteTheme + "'" +
+                ");"
+            );
 
             //render the page
             var response = page.Render();

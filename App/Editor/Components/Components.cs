@@ -12,7 +12,7 @@ namespace Websilk.Services.Editor
         public string Load(string category)
         {
             var ui = new Scaffold(S, "/Editor/Components/ui.html");
-            var component = new Scaffold(S, "/Editor/Components/component.html");
+            var component = new Scaffold(S, "/Editor/Components/ui-item.html");
             var html = new StringBuilder();
             var sqlEditor = new SqlQueries.Editor(S);
             var reader = sqlEditor.GetComponentList(category);
@@ -160,37 +160,37 @@ namespace Websilk.Services.Editor
             //find existing component
             var components = page.GetAllComponents(panels);
 
-            foreach(var c in components)
+            foreach (var c in components)
             {
-                if(c.id == componentId)
+                if (c.id == componentId)
                 {
                     //remove component from existing block
                     var blocks = page.GetBlocks(newpage);
-                    foreach(var block in blocks)
+                    foreach (var block in blocks)
                     {
-                        if(block.id == c.blockId)
+                        if (block.id == c.blockId)
                         {
                             //make sure component exists in block
                             var exists = false;
                             foreach (var comp in block.components)
                             {
-                                if(comp.id == componentId)
+                                if (comp.id == componentId)
                                 {
                                     exists = true;
                                     break;
                                 }
                             }
 
-                            if(exists == true)
+                            if (exists == true)
                             {
                                 //found existing block
                                 var newblock = block;
                                 var comps = new List<Component>();
 
                                 //add all components (excluding existing component)
-                                foreach(var comp in block.components)
+                                foreach (var comp in block.components)
                                 {
-                                    if(comp.id != componentId)
+                                    if (comp.id != componentId)
                                     {
                                         comps.Add(comp);
                                     }
@@ -214,7 +214,7 @@ namespace Websilk.Services.Editor
                                 }
                                 break;
                             }
-                            
+
                         }
                     }
 
@@ -286,7 +286,44 @@ namespace Websilk.Services.Editor
                     break;
                 }
             }
-            return "success";
+            return "success"; 
+        }
+
+        public Inject Properties(string componentId, string blockName, string panelId, string cellId)
+        {
+            var inject = new Inject();
+            var html = new StringBuilder();
+            //load the current page
+            GetPage();
+            var tuple = page.loadPageAndLayout(page.pageId, true);
+
+            //load page(s) from file/cache
+            var newpage = tuple.Item3;
+
+            //load list of panels
+            var panels = tuple.Item4;
+
+            //find existing component
+            var components = page.GetAllComponents(panels);
+
+            foreach (var c in components)
+            {
+                if (c.id == componentId)
+                {
+                    //load component properties
+                    c.Load();
+                    var compProps = c.GetProperties();
+                    compProps.Load();
+                    html.Append(compProps.Render());
+                    break;
+                }
+            }
+            inject.html = html.ToString();
+            inject.element = "#winComponentProperties .content";
+            inject.inject = enumInjectTypes.replace;
+            inject.js = RenderJs();
+            inject.css = RenderCss();
+            return inject;
         }
     }
 }

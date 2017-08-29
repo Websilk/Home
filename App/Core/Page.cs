@@ -100,7 +100,8 @@ namespace Websilk
         public DateTime pageCreated;
         public DateTime pageModified;
         public bool pageSecurity = false;
-        public DateTime pageHistory; //either empty or history date
+        public DateTime pageHistory = DateTime.Now.AddYears(-1000); //either empty or history date
+        public bool hasAce = false;
 
         //shadow template info (if available)
         public int shadowTemplateId = 0; //shadow template used to load custom blocks for the page
@@ -612,15 +613,17 @@ namespace Websilk
                             panel.cells[0].components.Clear();
                             var cell = panel.cells[0];
                             var text = (Components.Textbox)createNewComponent("Textbox", panel.id, panel.cells[0].id, block.id);
+                            var extrainfo = "";
                             if (block.name == "Page Body")
                             {
                                 cell.css += "height:100%;";
                                 text.css = "height:100%;";
+                                extrainfo = "<br/>Instead, add a custom block to your page by clicking the dashboard icon above <span style=\"display:inline-block; width:16px; height:16px; padding:0 7px;\"><svg viewBox=\"0 0 32 32\" style=\"width:16px; height:16px;\"><use xmlns:xlink=\"http://www.w3.org/1999/xlink\" xlink:href=\"#icon-grid\" x=\"0\" y=\"0\" width=\"32\" height=\"32\"></use></svg></span> and choosing the Layout option.";
                             }
                             text.text = "<div class=\"placeholder-area" + 
                                 (block.name.ToLower() == "page body" ? " is-body-area" : "") + 
                                 "\"><h4>Shadow Template - Page Block: " + block.name.Replace("Page ","") + "</h4>" + 
-                                "<div>Because this page is a Shadow Template, you cannot add components to the page-level block \"" + block.name.Replace("Page ", "") + "\".</div>" +
+                                "<div>Because this page is a Shadow Template, you cannot add components to the page-level block \"" + block.name.Replace("Page ", "") + "\"." + extrainfo + "</div>" +
                                 "</div>";
                             var comp = loadComponent(text, panel, panel.cells[0], ref panels, true, false);
                             var pos = text.position[4];
@@ -688,7 +691,9 @@ namespace Websilk
             }
             if(useSVG == true)
             {
-                scaffold.Data["svg-icons"] = S.Server.LoadFileFromCache("/Content/themes/" + websiteTheme + "/icons.svg", true);
+                scaffold.Data["svg-icons"] = 
+                    S.Server.LoadFileFromCache("/Content/themes/" + websiteTheme + "/icons.svg", true) +
+                    S.Server.LoadFileFromCache("/Content/themes/" + websiteTheme + "/loader.svg", true);
             }
 
             if(isEditable == true)
@@ -1069,7 +1074,7 @@ namespace Websilk
 
         public void SavePage(structPage page, bool saveToDisk = true, bool saveToHistory = false)
         {
-            if (pageHistory != null) { return; } //cannot save a historical page
+            if (hasPageHistory()) { return; }  //cannot save a historical page
 
             //strip components from custom blocks
             StripCustomBlocks(page);
@@ -1187,7 +1192,7 @@ namespace Websilk
 
         public void SaveBlock(structBlock block, bool saveToDisk = true, bool saveToHistory = false)
         {
-            if (pageHistory != null) { return; } //cannot save a historical block
+            if (hasPageHistory()) { return; }  //cannot save a historical page
 
             var path = GetBlockFilePath(block.id, editFolder, editType);
 
@@ -1254,6 +1259,20 @@ namespace Websilk
             return GetBlockFilePath(blockId, "history/" + date.ToString("yyyy"), date.ToString("MM_dd_H_mm"));
         }
 
+        public bool hasPageHistory()
+        {
+            return pageHistory.Year > DateTime.Now.Year - 99;
+        }
+
+        #endregion
+
+        #region "Ace Editor"
+        public void loadAce(AceMode mode, AceTheme theme)
+        {
+            var acemode = "";
+            var acetheme = "";
+            S.javascript.Add("ace", "S.ace.load('" + acemode + "','" + acetheme + "')", false);
+        }
         #endregion
 
         #region "Utility"
@@ -1426,4 +1445,63 @@ namespace Websilk
             return scaffold.Render();
         }
     }
+    
+#region "Ace Editor Definitions"
+
+    public enum AceExtension
+    {
+        beautify = 0,
+    }
+
+    public enum AceMode
+    {
+        cSharp = 0,
+        css = 1,
+        html = 2,
+        json = 3,
+        less = 4,
+        markdown = 5,
+        xml = 6
+    }
+
+    public enum AceTheme
+    {
+        ambiance = 0,
+        chaos = 1,
+        chrome = 2,
+        clouds = 3,
+        clouds_midnight = 4,
+        cobalt = 5,
+        crimson_editor = 6,
+        dawn = 7,
+        dreamweaver = 8,
+        eclipse = 9,
+        github = 10,
+        gob = 11,
+        gruvbox = 12,
+        idle_fingers = 13,
+        iplastic = 14,
+        katzenmilch = 15,
+        kr_theme = 16,
+        kuroir = 17,
+        merbivore = 18,
+        merbivore_soft = 19,
+        mono_industrial = 20,
+        monokai = 21,
+        pastel_on_dark = 22,
+        solarized_dark = 23,
+        solarized_light = 24,
+        sqlserver = 25,
+        terminal = 26,
+        textmate = 27,
+        tomorrow = 28,
+        tomorrrow_night = 29,
+        tomorrow_night_blue = 30,
+        tomorrow_night_bright = 31,
+        tomorrow_night_eighties = 32,
+        twilight = 33,
+        vibrant_ink = 34,
+        xcode = 35
+    }
+#endregion
 }

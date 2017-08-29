@@ -21,15 +21,26 @@ S.slides.prototype.add = function (html, vars) {
 
 S.slides.prototype.next = function (count) {
     //show next slide (from +count offset)
+    var slides = this.items.children();
     this.current_slide += (count > 0 ? count : 1);
-    this.items.css({ left: (this.current_slide * 100 * -1) + '%'});
+    var index = this.current_slide;
+    $(slides[this.current_slide]).removeClass('hiding');
+    this.items.css({ left: (this.current_slide * 100 * -1) + '%' });
+    setTimeout(function () {
+        $(slides[index - 1]).addClass('hiding');
+    }, 200);
 };
 
 S.slides.prototype.previous = function (count) {
     //show previous slide (from -count offset)
-    console.log(count);
+    var slides = this.items.children();
     this.current_slide -= (count > 0 ? count : 1);
+    var index = this.current_slide;
+    $(slides[this.current_slide]).removeClass('hiding');
     this.items.css({ left: (this.current_slide * 100 * -1) + "%" });
+    setTimeout(function () {
+        $(slides[index + 1]).addClass('hiding');
+    }, 200);
 };
 
 S.slides.prototype.cleanAfter = function () {

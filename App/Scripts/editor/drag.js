@@ -26,6 +26,13 @@
         return false;
     },
 
+    indexOf: function (elem) {
+        for (var x = 0; x < this.items.length; x++) {
+            if (this.items[x].elem == elem) { return x;}
+        }
+        return -1;
+    },
+
     events: {
         start: function (index, e) {
             var item = this.items[index];
@@ -104,6 +111,7 @@
             if (item.hasOnDrag == true) { if (this.items[item.index].onDrag.call(item.options ? (item.options.callee ? item.options.callee : this) : this, item) == false) { return; } }
             var x = (item.pos.x + (item.cursor.x - item.start.x));
             var y = (item.pos.y + (item.cursor.y - item.start.y));
+            var useRight = false;
             if (item.options) {
                 if (item.options.boundTop != null) {
                     if (item.options.boundTop > y) { y = item.options.boundTop; }
@@ -117,8 +125,15 @@
                 if (item.options.boundLeft != null) {
                     if (item.options.boundLeft > x) { x = item.options.boundLeft; }
                 }
+                if (item.options.useRight == true) { useRight = true;}
             }
-            item.elem.style.left = x + 'px';
+            if (useRight == true) {
+                var win = S.window.pos();
+                item.elem.style.right = (win.w - (x + item.pos.w)) + 'px';
+            } else {
+                item.elem.style.left = x + 'px';
+            }
+            
             item.elem.style.top = y + 'px';
         },
 

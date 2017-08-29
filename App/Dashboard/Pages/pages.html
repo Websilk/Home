@@ -7,8 +7,9 @@
     .tab-body-pages .page-url{white-space:nowrap;}
     .page-details{overflow:hidden;}
     /*.btn-page-view a{font-size:22px; padding:5px 50px !important;}*/
-    .slides > .row:nth-child(n+2) .pages-list{padding-bottom:50px;}
+    .slides > .row:nth-child(n+2) .pages-list{padding-bottom:60px;}
     .page-create{height:100%;}
+    .page-details-side{overflow:hidden;}
     .page-details-side > .absolute.bottom{width:100%; box-sizing:border-box;}
     .tab-body-history .spreadsheet td:nth-child(4){width:160px;}
 
@@ -78,7 +79,7 @@
                             {{page-list}}
                             <div class="row pad inline-block">
                                 <div class="col btn-page-create pad-right">
-                                    <a class="button circle" href="javascript:" onclick="S.dashboard.pages.create.view(this, 0)">
+                                    <a class="button circle" href="javascript:" onclick="S.dashboard.pages.create.view(this, 0)" title="Create a new web page">
                                         <svg viewBox="0 0 25 25" class="medium">
                                             <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#icon-plus" x="0" y="0" width="25" height="25"></use>
                                         </svg>
@@ -139,7 +140,7 @@
                         </p>
                     </div>
                     <div class="pad-bottom shadow-template-for-#id#" #shadow-template-hide#>
-                        <div class="row foot pad">
+                        <div class="row foot pad box">
                             <div class="col icon tiny pad-top-sm pad-right-sm">
                                 <svg viewBox="0 0 32 32">
                                     <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#icon-arrow-right" x="0" y="0" width="32" height="32"></use>
@@ -150,7 +151,7 @@
                                 <div class="shadow-name bold">#shadow-template-name#</div>
                             </div>
                             <div class="col right">
-                                <a href="#shadow-template-url#" class="button apply shadow-url" target="_blank">View</a>
+                                <a href="#shadow-template-url#" class="button apply shadow-url" target="_blank">Edit</a>
                             </div>
                         </div>
                     </div>
@@ -159,22 +160,15 @@
                 <div class="pad-bottom-lg"><div class="pad-bottom">&nbsp;</div></div>
 
                 <div class="absolute bottom pad-bottom pad-left">
-                    <div class="col btn-page-create pad-right">
-                        <a class="button circle" href="javascript:" onclick="#link-create#" title="Create a new sub-page">
-                            <svg viewBox="0 0 25 25" class="medium">
-                                <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#icon-plus" x="0" y="0" width="25" height="25"></use>
-                            </svg>
-                        </a>
-                    </div>
-                    <div class="col btn-page-settings pad-right"><a class="button" href="javascript:" onclick="#link-settings#">Settings</a></div>
-                    <div class="col btn-page-view pad-right"><a class="button apply" href="#url#" target="_blank">View</a></div>
-                    <div class="col btn-page-history right pad-right">
+                    <div class="col btn-page-history pad-right">
                         <a class="button circle" href="javascript:" title="History log for page titled '#title#'">
                             <svg viewBox="0 0 36 36">
                                 <use xlink:href="#icon-history" x="0" y="0" width="36" height="36"></use>
                             </svg>
                         </a>
                     </div>
+                    <div class="col btn-page-settings pad-right"><a class="button" href="javascript:" onclick="#link-settings#">Settings</a></div>
+                    <div class="col btn-page-view pad-right"><a class="button apply" href="#url#" target="_blank">View</a></div>
                 </div>
             </div>
             <div class="col eight desktop-sm-seven laptop-one-total slideshow height">
@@ -186,8 +180,15 @@
                             </div>
                         </div>
                     </div>
-                    <div class="absolute bottom">
-                        <div class="col field-text url-path pad-left faded"></div>
+                    <div class="absolute bottom pad-bottom">
+                        <div class="col btn-page-create pad-left">
+                            <a class="button circle" href="javascript:" onclick="#link-create#" title="Create a new sub-page">
+                                <svg viewBox="0 0 25 25" class="medium">
+                                    <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#icon-plus" x="0" y="0" width="25" height="25"></use>
+                                </svg>
+                            </a>
+                        </div>
+                        <div class="col url-path pad-top-sm pad-left faded"></div>
                     </div>
                 </div>
             </div>

@@ -44,7 +44,7 @@ namespace Websilk.Services
                     response.pageId = page.pageId;
                     response.already = true;
 
-                    //load page components, excluding components from the currently loaded page
+                    //load page layout (if different) & page blocks (excluding blocks that are already loaded)
 
                     //render each component for the page
 

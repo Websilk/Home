@@ -6,8 +6,8 @@
             <div class="row message hide"><span></span></div>
         </div>
         <div class="row hover">
-            <div class="col field-text label">URL Title:</div>
-            <div class="col field-text">{{url-title}}</div>
+            <div class="col text label">URL Title:</div>
+            <div class="col text">{{url-title}}</div>
         </div>
         <div class="row hover" title="A custom page title displayed in the web browser tab & page head">
             <div class="row field">Head Title</div>
@@ -21,7 +21,7 @@
 
         <div class="row pad-top pad-bottom-sm title"><h6>Security</h6></div>
         <div class="row hover">
-            <div class="col field-text pad-width">
+            <div class="col text pad-width">
                 <label>
                     <input type="checkbox" class="chk-secure" {{secure}} /><span>Private</span>
                     <span class="font-faded pad-left">Only administrators can view this web page</span>
@@ -29,7 +29,7 @@
             </div>
         </div>
         <div class="row hover margin-bottom-lg">
-            <div class="col field-text pad-width">
+            <div class="col text pad-width">
                 <label>
                     <input type="checkbox" class="chk-active" {{active}} /><span>Active</span>
                     <span class="font-faded pad-left">If inactive, will redirect to 404 error page</span>
@@ -41,18 +41,18 @@
             <div class="col right"><a href="javascript:" class="button btn-shadow-create">New Shadow Template</a></div>
         </div>
         <div class="row hover">
-            <div class="col field-text pad-width">
+            <div class="col text pad-width">
                 <label>
                     <input type="checkbox" class="chk-use-shadow" {{use-shadow}}/><span>Use a Shadow Template for this web page</span>
                 </label>
             </div>
             <div class="shadow-list right nowrap" style="display:none;">
-                <div class="col field-text icon tiny pad-right">
+                <div class="col text icon tiny pad-right">
                     <svg viewBox="0 0 32 32">
                         <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#icon-arrow-right" x="0" y="0" width="32" height="32"></use>
                     </svg>
                 </div>
-                <div class="col field-input">
+                <div class="col input">
                     <select id="shadowId" data-id="{{shadow-id}}">
                         {{shadow-list}}
                     </select>
@@ -60,18 +60,18 @@
             </div>
         </div>
         <div class="row hover margin-bottom-lg">
-            <div class="col field-text pad-width">
+            <div class="col text pad-width">
                 <label>
                     <input type="checkbox" class="chk-use-child-shadow" {{use-child-shadow}}/><span>Assign a Shadow Template to new child pages</span>
                 </label>
             </div>
             <div class="shadow-child-list right nowrap" style="display:none;">
-                <div class="col field-text icon tiny pad-right">
+                <div class="col text icon tiny pad-right">
                     <svg viewBox="0 0 32 32">
                         <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#icon-arrow-right" x="0" y="0" width="32" height="32"></use>
                     </svg>
                 </div>
-                <div class="col field-input">
+                <div class="col input">
                     <select id="shadowChildId" data-id="{{shadow-child-id}}">
                         {{shadow-list}}
                     </select>
@@ -81,9 +81,9 @@
     </div>
     </div>
     <div class="absolute bottom row pad-bottom pad-width">
-        <div class="col btn-page-settings-update pad-right"><a class="button apply" href="javascript:">Update Page Settings</a></div>
+        <div class="col btn-page-settings-update pad-right"><a class="button apply" href="javascript:">Update Settings</a></div>
         <div class="col btn-page-cancel pad-right"><a class="button cancel" href="javascript:" onclick="S.dashboard.pages.settings.cancel(this)">Done</a></div>
-        <div class="col right btn-page-delete pad-left"><a class="button delete" href="javascript:">Delete Page</a></div>
+        <div class="col right btn-page-delete"><a class="button delete" href="javascript:">Delete Page</a></div>
     </div>
     <button type="submit" class="hide"></button>
 </form>

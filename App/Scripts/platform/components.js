@@ -12,10 +12,10 @@
     },
 
     addReferences: function(name, refs) { 
-        //add DOM element id references to a component type
+        //add DOM element id references array to a component type
         var index = -1;
         if (this.types.length > 0) {
-            index = this.types.map(function (a) { return a.name }).indexOf(name);
+            index = this.getTypeIndexByName(name);
         }
         if (index >= 0) {
             //add references to existing object
@@ -26,10 +26,18 @@
         }
     },
 
+    getTypeIndexByName: function(name) {
+        return S.components.types.map(function (a) { return a.name }).indexOf(name);
+    },
+
+    getIndexById: function (id) {
+        return S.components.items.map(function (a) { return a.id }).indexOf(id);
+    },
+
     remove: function (id) {
         //removes a component from the page, along with any references to the component
         if (this.items.length > 0) {
-            var index = this.items.map(function (a) { return a.id }).indexOf(id);
+            var index = this.getIndexById(id);
             var item = this.items[index];
 
             //check to see if there are any other components on the page of the same type
@@ -48,5 +56,10 @@
             $('#c' + item.id + ', #css_component_c' + item.id).remove();
             this.items.splice(index, 1);
         }
+    },
+
+    getComponentById: function (id) {
+        var a = S.components.items.filter(function (a) { return a.id == id; });
+        if (a.length > 0) { return a[0];}
     }
 }

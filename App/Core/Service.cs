@@ -112,6 +112,13 @@ namespace Websilk
             }
         }
 
+        protected Component GetComponent(string id)
+        {
+            var panels = page.GetAllPanels();
+            var components = page.GetAllComponents();
+
+        }
+
         protected string RenderJs()
         {
             return S.javascriptFiles.renderJavascriptFiles(false, S.javascript.renderJavascript(false));

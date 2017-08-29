@@ -1,5 +1,7 @@
 ﻿@import 'tapestry/less/util.less';
 
+textarea.code{font-family:monospace;}
+
 .tooltab{
     position:fixed; right:0; padding:7px 0 0 7px; margin:6px; border-radius:50px; width:36px; height:36px; box-sizing:border-box; display:none; z-index:5000;
     a{cursor:default;}
@@ -70,15 +72,14 @@
         }
     }
     > .clone{
-        position:absolute; z-index:5001;
+        position:absolute; z-index:5001; width:0; height:0;
     }
     
     .windows{width:0; height:0;} 
     .window{
-        position:absolute;
+        position:absolute; max-width:100%;
         .titlebar{
             cursor:move;
-            .title{top:-5px;}
             .close{cursor:default;}
         }
         .box > .arrow.top{ position:absolute; top:-24px; width: 0; height: 0; border-style: solid; border-width: 0 25px 25px 25px; }
@@ -89,7 +90,7 @@
 .component-hover{position:absolute; display:none; border:2px dashed transparent; cursor:move; z-index:3000;}
 
 .component-select{
-    cursor:move; position:absolute; display:none; z-index:3001;
+    cursor:move; position:absolute; display:none; z-index:3050;
     .side, .corner{position:absolute;line-height:0;font-size:0;}
     .r-top, .r-bottom{cursor:ns-resize;}
     .r-left, .r-right{cursor:ew-resize;}
@@ -132,7 +133,7 @@
 /* disable text selection on certain elements */
 .editor .toolbar{
     -webkit-touch-callout: none;
-    -webkit-user-select: none;s
+    -webkit-user-select: none;
     -khtml-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
@@ -173,11 +174,21 @@
 #textedit_fontfamily{width:100px;}
 #textedit_fontsize{width:50px;}
 .text-editor{position:absolute !important; z-index:1001;}
+.ace_editor{height:100%;}
 
 @media(max-width:1920px){
     .editor{
         .toolbar{
             > .container{ width:100%; }
+        }
+    }
+}
+
+@media(max-width:550px){
+    .editor{
+        .toolbar{
+             .logo{ display:none; }
+            nav.menu{float:left;}
         }
     }
 }

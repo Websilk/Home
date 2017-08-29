@@ -85,6 +85,19 @@ body{font-family: Jaldi, Arial, Helvetica, sans-serif;}
         .resize.corner{background-color:@bg;}
     }
     
+    .windows .top-menu{background:#293343;
+        ul.tabs li > .row.hover{color:#1cfbfd !important;}
+        ul.tabs li > .row.hover:hover{background:#294a7d; color:#56e8ff !important;}
+        ul.tabs li > .row.selected{background:#214060; color:#1cfbfd !important;}
+        ul.tabs li > .row.selected:hover{background:#214060; color:#1cfbfd !important;}
+    }
+
+    .window .row.hover.titlebar:hover{ background:#22466a; color:#3cffaf;
+        a.icon{
+            &:visited use,&:link use{color:#41a7b7 !important; fill:#41a7b7 !important;}
+            &:hover use,&:active use{color:#00ceef !important; fill:#00ceef !important;}
+        }
+    }
     
     .keyframes(save;{
         0% { color:#00ff86; fill:#00ff86; top:-4px; left: -4px; width:25px; height:25px; } 

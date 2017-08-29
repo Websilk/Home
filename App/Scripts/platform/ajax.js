@@ -66,7 +66,7 @@
                 }
                 //add any CSS to the page
                 if (data.d.css != null && data.d.css != '') {
-                    S.util.css.add(data.d.css, data.d.cssId);
+                    S.util.css.add(data.d.cssId, data.d.css);
                 }
                 //
                 //finally, execute callback javascript

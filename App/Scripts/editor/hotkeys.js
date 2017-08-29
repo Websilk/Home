@@ -82,10 +82,15 @@
                         if (!S.editor.visible) {
                             S.editor.show();
                         } else {
-                            //check for toolbar dialog
-                            if ($('.editor .toolbar .dialog')[0].style.display != 'none'){
+                            //hide different UI elements in order
+                            if (!$('body > .for-popup').hasClass('hide')) {
+                                //hide popup
+                                S.popup.hide();
+                            } else if ($('.editor .toolbar .dialog')[0].style.display != 'none') {
+                                //hide layout dialog
                                 S.editor.layout.hide();
                             } else {
+                                //hide editor
                                 S.editor.hide();
                             }
                         }

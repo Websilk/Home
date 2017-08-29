@@ -15,6 +15,7 @@ namespace Websilk
 
     [ProtoInclude(10, typeof(Components.Login))]
     [ProtoInclude(11, typeof(Components.Textbox))]
+    [ProtoInclude(12, typeof(Components.Menu))]
 
     //the Vender area is made up of auto-generated code. To auto-generate 
     //this code, log into the Websilk Dashboard and navigate to Settings > Advanced, 
@@ -187,6 +188,12 @@ namespace Websilk
         {
             get { return false; }
         }
+
+        /// <summary>
+        /// Returns a new instance of the Editor.Component.Properties class created for a specific component instance
+        /// </summary>
+        /// <returns></returns>
+        public virtual Editor.Component.Properties GetProperties() { return new Editor.Component.Properties(S, this); }
         #endregion
 
         #region "Events"

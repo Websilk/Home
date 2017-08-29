@@ -36,3 +36,15 @@ S.window.verticalScrollbarWidth = function () {
     }
     return 0;
 };
+
+
+//text selection ///////////////////////////////////////////
+S.util.selection = {
+    clear: function () {
+        if (document.selection) {
+            document.selection.empty();
+        } else if (window.getSelection) {
+            window.getSelection().removeAllRanges();
+        }
+    }
+};

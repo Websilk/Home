@@ -1,0 +1,202 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <Name>Sql</Name>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectVersion>4.1</ProjectVersion>
+    <ProjectGuid>{f550c6ac-987e-4c40-88da-9bcf2cd734cb}</ProjectGuid>
+    <DSP>Microsoft.Data.Tools.Schema.Sql.Sql120DatabaseSchemaProvider</DSP>
+    <OutputType>Database</OutputType>
+    <RootPath>
+    </RootPath>
+    <RootNamespace>Websilk</RootNamespace>
+    <AssemblyName>Websilk</AssemblyName>
+    <ModelCollation>1033,CI</ModelCollation>
+    <DefaultFileStructure>BySchemaAndSchemaType</DefaultFileStructure>
+    <DeployToDatabase>True</DeployToDatabase>
+    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
+    <TargetLanguage>CS</TargetLanguage>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <SqlServerVerification>False</SqlServerVerification>
+    <IncludeCompositeObjects>True</IncludeCompositeObjects>
+    <TargetDatabaseSet>True</TargetDatabaseSet>
+    <DefaultCollation>SQL_Latin1_General_CP1_CI_AS</DefaultCollation>
+    <DefaultFilegroup>PRIMARY</DefaultFilegroup>
+    <GenerateCreateScript>True</GenerateCreateScript>
+    <DacApplicationName>Websilk</DacApplicationName>
+    <TargetDatabase>SqlServer</TargetDatabase>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <OutputPath>bin\Release\</OutputPath>
+    <BuildScriptName>$(MSBuildProjectName).sql</BuildScriptName>
+    <TreatWarningsAsErrors>False</TreatWarningsAsErrors>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <DefineDebug>false</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <OutputPath>bin\Debug\</OutputPath>
+    <BuildScriptName>$(MSBuildProjectName).sql</BuildScriptName>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <DefineDebug>true</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <SqlTargetName>Websilk</SqlTargetName>
+  </PropertyGroup>
+  <PropertyGroup>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">11.0</VisualStudioVersion>
+    <!-- Default to the v11.0 targets path if the targets file for the current VS version is not found -->
+    <SSDTExists Condition="Exists('$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v$(VisualStudioVersion)\SSDT\Microsoft.Data.Tools.Schema.SqlTasks.targets')">True</SSDTExists>
+    <VisualStudioVersion Condition="'$(SSDTExists)' == ''">11.0</VisualStudioVersion>
+  </PropertyGroup>
+  <Import Condition="'$(SQLDBExtensionsRefPath)' != ''" Project="$(SQLDBExtensionsRefPath)\Microsoft.Data.Tools.Schema.SqlTasks.targets" />
+  <Import Condition="'$(SQLDBExtensionsRefPath)' == ''" Project="$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v$(VisualStudioVersion)\SSDT\Microsoft.Data.Tools.Schema.SqlTasks.targets" />
+  <ItemGroup>
+    <Folder Include="Properties" />
+    <Folder Include="dbo\" />
+    <Folder Include="dbo\Tables\" />
+    <Folder Include="dbo\Functions\" />
+    <Folder Include="dbo\Stored Procedures\" />
+    <Folder Include="dbo\Sequences\" />
+    <Folder Include="dbo\Stored Procedures\Websites" />
+    <Folder Include="dbo\Stored Procedures\Users" />
+    <Folder Include="dbo\Stored Procedures\Pages" />
+    <Folder Include="dbo\Stored Procedures\Components" />
+    <Folder Include="dbo\Stored Procedures\Photos" />
+    <Folder Include="dbo\Stored Procedures\Security" />
+    <Folder Include="dbo\Stored Procedures\Log" />
+    <Folder Include="dbo\Stored Procedures\Blocks" />
+    <Folder Include="dbo\Stored Procedures\Documentation" />
+    <Folder Include="dbo\Stored Procedures\Pages\Shadow" />
+    <Folder Include="utility" />
+    <Folder Include="dbo\Stored Procedures\Pages\History" />
+    <Folder Include="dbo\Stored Procedures\Blocks\History" />
+  </ItemGroup>
+  <ItemGroup>
+    <Build Include="dbo\Tables\ErrorLog.sql" />
+    <Build Include="dbo\Tables\WebsiteSubDomains.sql" />
+    <Build Include="dbo\Tables\WebSites.sql" />
+    <Build Include="dbo\Tables\Log.sql" />
+    <Build Include="dbo\Tables\LogAnalytics.sql" />
+    <Build Include="dbo\Tables\PasswordReset.sql" />
+    <Build Include="dbo\Tables\WebsiteSecurity.sql" />
+    <Build Include="dbo\Tables\Timeline.sql" />
+    <Build Include="dbo\Tables\WebsiteDomains.sql" />
+    <Build Include="dbo\Tables\Users.sql" />
+    <Build Include="dbo\Tables\Pages.sql" />
+    <Build Include="dbo\Functions\GetPagePath.sql" />
+    <Build Include="dbo\Functions\GetPagePathIds.sql" />
+    <Build Include="dbo\Functions\SplitArray.sql" />
+    <Build Include="dbo\Sequences\SequencePages.sql" />
+    <Build Include="dbo\Sequences\SequenceUsers.sql" />
+    <Build Include="dbo\Sequences\SequenceWebsites.sql" />
+    <Build Include="dbo\Tables\Components.sql" />
+    <Build Include="dbo\Tables\Photos.sql" />
+    <Build Include="dbo\Tables\PhotoFolders.sql" />
+    <Build Include="dbo\Sequences\SequencePhotoFolders.sql" />
+    <Build Include="dbo\Stored Procedures\Photos\Photo_Create.sql" />
+    <Build Include="dbo\Stored Procedures\Photos\Photo_Folder_Create.sql" />
+    <Build Include="dbo\Stored Procedures\Users\User_Create.sql" />
+    <Build Include="dbo\Stored Procedures\Websites\Website_Create.sql" />
+    <Build Include="dbo\Stored Procedures\Pages\Page_Create.sql" />
+    <Build Include="dbo\Stored Procedures\Security\Security_Create.sql" />
+    <Build Include="dbo\Stored Procedures\Photos\Photo_Delete.sql" />
+    <Build Include="dbo\Stored Procedures\Photos\Photo_Folder_Delete.sql" />
+    <Build Include="dbo\Stored Procedures\Photos\Photos_Delete.sql" />
+    <Build Include="dbo\Stored Procedures\Websites\Website_Delete.sql" />
+    <Build Include="dbo\Stored Procedures\Websites\Website_DeletePermanently.sql" />
+    <Build Include="dbo\Stored Procedures\Users\User_Disable.sql" />
+    <Build Include="dbo\Stored Procedures\Users\User_Enable.sql" />
+    <Build Include="dbo\Stored Procedures\Components\Component_Categories_GetList.sql" />
+    <Build Include="dbo\Stored Procedures\Components\Components_GetList.sql" />
+    <Build Include="dbo\Stored Procedures\Log\Log_GetAnalytics.sql" />
+    <Build Include="dbo\Stored Procedures\Log\Log_Results_GetSqlQueries.sql" />
+    <Build Include="dbo\Stored Procedures\Pages\Page_Info_GetFromDomain.sql" />
+    <Build Include="dbo\Stored Procedures\Pages\Page_Info_GetFromDomainAndTitle.sql" />
+    <Build Include="dbo\Stored Procedures\Pages\Page_Info_GetFromPageId.sql" />
+    <Build Include="dbo\Stored Procedures\Pages\Page_Info_GetFromSubDomainAndTitle.sql" />
+    <Build Include="dbo\Stored Procedures\Pages\Pages_GetList.sql" />
+    <Build Include="dbo\Stored Procedures\Pages\Page_Parents_GetList.sql" />
+    <Build Include="dbo\Stored Procedures\Pages\Page_GetTitle.sql" />
+    <Build Include="dbo\Stored Procedures\Photos\Photo_Get.sql" />
+    <Build Include="dbo\Stored Procedures\Photos\Photo_Folders_GetList.sql" />
+    <Build Include="dbo\Stored Procedures\Photos\Photos_GetList.sql" />
+    <Build Include="dbo\Stored Procedures\Security\Security_GetFeature.sql" />
+    <Build Include="dbo\Stored Procedures\Security\Security_GetWebsite.sql" />
+    <Build Include="dbo\Stored Procedures\Users\User_GetEmail.sql" />
+    <Build Include="dbo\Stored Procedures\Users\User_GetPassword.sql" />
+    <Build Include="dbo\Stored Procedures\Users\Users_GetList.sql" />
+    <Build Include="dbo\Stored Procedures\Websites\Website_Get.sql" />
+    <Build Include="dbo\Stored Procedures\Websites\Website_Domains_GetList.sql" />
+    <Build Include="dbo\Stored Procedures\Websites\Websites_GetList.sql" />
+    <Build Include="dbo\Stored Procedures\Security\Security_HasPassword.sql" />
+    <Build Include="dbo\Stored Procedures\Log\Log_Error_Create.sql" />
+    <Build Include="dbo\Stored Procedures\Log\Log_Request_Create.sql" />
+    <Build Include="dbo\Stored Procedures\Photos\Photos_Move.sql" />
+    <Build Include="dbo\Stored Procedures\Pages\Page_Publish.sql" />
+    <Build Include="dbo\Stored Procedures\Security\Security_ResetAllPasswords.sql" />
+    <Build Include="dbo\Stored Procedures\Users\User_UpdateAccount.sql" />
+    <Build Include="dbo\Stored Procedures\Users\User_UpdateEmail.sql" />
+    <Build Include="dbo\Stored Procedures\Users\User_UpdatePassword.sql" />
+    <Build Include="dbo\Stored Procedures\Websites\Website_TransferOwnership.sql" />
+    <Build Include="dbo\Stored Procedures\Pages\Page_UpdateModified.sql" />
+    <Build Include="dbo\Stored Procedures\Security\Security_Update.sql" />
+    <Build Include="dbo\Stored Procedures\Websites\Website_UpdateStatus.sql" />
+    <Build Include="dbo\Stored Procedures\Websites\Website_UpdateTitle.sql" />
+    <Build Include="dbo\Tables\Blocks.sql" />
+    <Build Include="dbo\Stored Procedures\Blocks\Block_Create.sql" />
+    <Build Include="dbo\Sequences\SequenceBlock.sql" />
+    <Build Include="dbo\Stored Procedures\Blocks\Blocks_GetList.sql" />
+    <Build Include="dbo\Stored Procedures\Blocks\Block_Get.sql" />
+    <Build Include="dbo\Stored Procedures\Blocks\Block_Exists.sql" />
+    <Build Include="dbo\Tables\Documentation.sql" />
+    <Build Include="dbo\Stored Procedures\Documentation\Documentation_Create.sql" />
+    <Build Include="dbo\Stored Procedures\Documentation\Documentation_Search.sql" />
+    <Build Include="dbo\Stored Procedures\Documentation\Documentation_Update.sql" />
+    <Build Include="dbo\Stored Procedures\Documentation\Documentation_GetList.sql" />
+    <Build Include="dbo\Stored Procedures\Pages\Page_Update.sql" />
+    <Build Include="dbo\Stored Procedures\Pages\Shadow\Pages_Shadow_GetList.sql" />
+    <Build Include="dbo\Tables\ApplicationsOwned.sql" />
+    <Build Include="dbo\Tables\Applications.sql" />
+    <Build Include="dbo\Stored Procedures\Pages\Shadow\Pages_Shadow_Exists.sql" />
+    <Build Include="dbo\Stored Procedures\Pages\Page_Delete.sql" />
+    <Build Include="dbo\Tables\Pages_History.sql" />
+    <Build Include="dbo\Stored Procedures\Pages\History\Page_History_Create.sql" />
+    <Build Include="dbo\Stored Procedures\Pages\History\Pages_History_GetList.sql" />
+    <Build Include="dbo\Stored Procedures\Blocks\History\Block_History_Create.sql" />
+    <Build Include="dbo\Tables\Blocks_History.sql" />
+    <Build Include="dbo\Stored Procedures\Users\User_Authenticate.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <ArtifactReference Include="$(DacPacRootPath)\Extensions\Microsoft\SQLDB\Extensions\SqlServer\110\SqlSchemas\master.dacpac">
+      <HintPath>$(DacPacRootPath)\Extensions\Microsoft\SQLDB\Extensions\SqlServer\110\SqlSchemas\master.dacpac</HintPath>
+      <SuppressMissingDependenciesErrors>False</SuppressMissingDependenciesErrors>
+      <DatabaseVariableLiteralValue>master</DatabaseVariableLiteralValue>
+    </ArtifactReference>
+    <ArtifactReference Include="$(DacPacRootPath)\Extensions\Microsoft\SQLDB\Extensions\SqlServer\110\SqlSchemas\msdb.dacpac">
+      <HintPath>$(DacPacRootPath)\Extensions\Microsoft\SQLDB\Extensions\SqlServer\110\SqlSchemas\msdb.dacpac</HintPath>
+      <SuppressMissingDependenciesErrors>False</SuppressMissingDependenciesErrors>
+      <DatabaseVariableLiteralValue>msdb</DatabaseVariableLiteralValue>
+    </ArtifactReference>
+  </ItemGroup>
+  <ItemGroup>
+    <PostDeploy Include="PostDeployment.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <PreDeploy Include="PreDeployment.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Sql.publish.xml" />
+    <None Include="utility\resetdb.sql" />
+  </ItemGroup>
+</Project>

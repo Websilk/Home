@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26403.3
+VisualStudioVersion = 15.0.26730.12
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{754FB4EF-AD10-4F29-A7D2-B58CC3DEB553}"
 	ProjectSection(SolutionItems) = preProject
@@ -10,9 +10,14 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		README.md = README.md
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Websilk", "App\Websilk.csproj", "{8BDEA53B-38E6-4527-9162-45D99C7A2640}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Websilk", "App\Websilk.csproj", "{8BDEA53B-38E6-4527-9162-45D99C7A2640}"
+	ProjectSection(ProjectDependencies) = postProject
+		{DAA7D506-487D-4E98-BAFB-CE16CB9739FA} = {DAA7D506-487D-4E98-BAFB-CE16CB9739FA}
+	EndProjectSection
 EndProject
-Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "SqlServer", "Sql\SqlServer\SqlServer.sqlproj", "{F550C6AC-987E-4C40-88DA-9BCF2CD734CB}"
+Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "Sql", "Sql\SqlServer\Sql.sqlproj", "{F550C6AC-987E-4C40-88DA-9BCF2CD734CB}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Query", "Query\Query.csproj", "{DAA7D506-487D-4E98-BAFB-CE16CB9739FA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -30,8 +35,15 @@ Global
 		{F550C6AC-987E-4C40-88DA-9BCF2CD734CB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F550C6AC-987E-4C40-88DA-9BCF2CD734CB}.Release|Any CPU.Build.0 = Release|Any CPU
 		{F550C6AC-987E-4C40-88DA-9BCF2CD734CB}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{DAA7D506-487D-4E98-BAFB-CE16CB9739FA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DAA7D506-487D-4E98-BAFB-CE16CB9739FA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DAA7D506-487D-4E98-BAFB-CE16CB9739FA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DAA7D506-487D-4E98-BAFB-CE16CB9739FA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {0ECC5725-BCE5-4B17-AB27-BF196D92295E}
 	EndGlobalSection
 EndGlobal

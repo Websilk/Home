@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using System;
+using Microsoft.AspNetCore.Http;
 
 namespace Websilk.Pipeline
 {
@@ -12,65 +13,30 @@ namespace Websilk.Pipeline
             //the Pipeline.PageRequest is simply the first page request for a Websilk website. 
 
             S = new Core(server, context);
-            var page = new Page(S);
-            S.isFirstLoad = true;
 
-            if (S.isFirstLoad == true)
-            {
-                getUserAgent(context);
-            }
-
-            //parse URL
-            page.Url = page.parseUrl(S.Request.Path.ToString().ToLower().Replace(" ", "-"));
-
-            //get page Info
-            page.getPageInfoFromUrl();
-
-            //register initial javascript
-            S.javascript.Add("init", "S.init(" + 
-                (S.User.useAjax ? "true" : "false") + "," + 
-                page.pageId + "," + page.pageType + ",'" + 
-                page.pagePathName.ToLower() + "','" + 
-                page.pageTitle + "','" + 
-                page.PageTitleForBrowserTab + "'," + 
-                page.websiteId + ",'" + 
-                page.websiteTitle + "'," + 
-                "'" + (S.Request.IsHttps ? "https://" : "http://") + "'," + 
-                "'" + page.Url.host + "'," +
-                "'" + page.websiteTheme + "'" +
-                ");"
-            );
-
-            //render the page
-            var response = page.Render();
-
-            //unload the core (before sending response)
-            S.Unload();
+            var pathquery = context.Request.Path.ToString().Split('?', 2);
+            var path = pathquery[0].Split('/');
+            var page = GetWebPage("websilk.pages." + path[0]);
 
             //render the server response
             S.Response.ContentType = "text/html";
-            S.Response.WriteAsync(response);
+            S.Response.WriteAsync(page.Render(path, pathquery.Length == 2 ? pathquery[1] : null));
 
         }
 
-        private void getUserAgent(HttpContext context)
+        private Page GetWebPage(string className)
         {
-            //check for web bots such as google bot
-            string agent = context.Request.Headers["User-Agent"].ToString().ToLower();
-            if (agent.Contains("bot") | agent.Contains("crawl") | agent.Contains("spider"))
+            //hard-code all known services to increase server performance
+            switch (className.ToLower())
             {
-                S.User.useAjax = false;
-                S.User.isBot = true;
-            }
+                case "websilk.pages.dashboard":
+                    return new Pages.Dashboard(S);
 
-            //check for mobile agent
-            if (agent.Contains("mobile") | agent.Contains("blackberry") | agent.Contains("android") | agent.Contains("symbian") | agent.Contains("windows ce") |
-                agent.Contains("fennec") | agent.Contains("phone") | agent.Contains("iemobile") | agent.Contains("iris") | agent.Contains("midp") | agent.Contains("minimo") |
-                agent.Contains("kindle") | agent.Contains("opera mini") | agent.Contains("opera mobi") | agent.Contains("ericsson") | agent.Contains("iphone") | agent.Contains("ipad"))
-            {
-                S.User.isMobile = true;
+                default:
+                    //last resort, find service class manually
+                    Type type = Type.GetType(className);
+                    return (Page)Activator.CreateInstance(type, new object[] { S });
             }
-            if (agent.Contains("tablet") | agent.Contains("ipad")) { S.User.isTablet = true; }
         }
     }
 }

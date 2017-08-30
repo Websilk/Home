@@ -21,7 +21,6 @@ namespace Websilk.Pipeline
             var param = "";
             byte[] bytes = new byte[0];
             string data = "";
-            string pageId = "";
             int dataType = 0; //0 = ajax, 1 = HTML form post, 2 = multi-part form (with file uploads)
 
             //figure out what kind of data was sent with the request
@@ -53,13 +52,7 @@ namespace Websilk.Pipeline
                     Dictionary<string, object> attr = JsonConvert.DeserializeObject<Dictionary<string, object>>(data);
                     foreach (KeyValuePair<string, object> item in attr)
                     {
-                        if(item.Key == "pageId")
-                        {
-                            pageId = item.Value.ToString();
-                        }else
-                        {
-                            parms.Add(item.Key.ToLower(), item.Value.ToString());
-                        }
+                        parms.Add(item.Key.ToLower(), item.Value.ToString());
                     }
                 }
                 else if (data.IndexOf("=") >= 0)
@@ -85,10 +78,6 @@ namespace Websilk.Pipeline
             string methodName = paths[2];
             if(paths.Length == 4) { className += "." + paths[2]; methodName = paths[3]; }
             var service = GetService(className);
-            if (S.Util.Str.IsNumeric(pageId))
-            {
-                service.pageId = int.Parse(pageId);
-            }
 
             if (dataType == 1)
             {
@@ -165,44 +154,21 @@ namespace Websilk.Pipeline
             //finally, unload the Websilk Core:
             //close SQL connection, save User info, etc (before sending response)
             S.Unload();
-
+            context.Response.ContentType = "text/json";
             if (result != null)
             {
-                switch (result.GetType().FullName)
-                {
-                    case "Websilk.Services.WebRequest":
-                        //send raw content (HTML)
-                        var res = (Services.WebRequest)result;
-                        context.Response.ContentType = res.contentType;
-                        context.Response.WriteAsync(res.html);
-                        break;
-
-                    default:
-                        //JSON serialize web service response
-                        string serialized = "{\"type\":\"" + result.GetType().FullName + "\", \"d\":" + JsonConvert.SerializeObject(result) + "}";
-
-                        context.Response.ContentType = "text/json";
-                        context.Response.WriteAsync(serialized);
-                        break;
-                }
+                context.Response.WriteAsync((string)result);
             }else {
-                context.Response.ContentType = "text/json";
-                context.Response.WriteAsync("{\"type\":\"Empty\",\"d\":{}}");
+                context.Response.WriteAsync("{\"error\":\"no content returned\"}");
             }
-        }
-
-        private static bool IsNumeric(string s)
-        {
-            float output;
-            return float.TryParse(s, out output);
         }
 
         private Service GetService(string className)
         {
             //hard-code all known services to increase server performance
             switch(className.ToLower()){
-                case "websilk.services.components.login":
-                    return new Services.Components.Login(S);
+                case "websilk.services.users":
+                    return new Services.Users(S);
 
                 default:
                     //last resort, find service class manually

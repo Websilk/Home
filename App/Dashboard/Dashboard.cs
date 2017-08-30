@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace Websilk.Pages
 {
-    public class Dashboard: StaticPage
+    public class Dashboard: Page
     {
         public struct structMenuItem
         {
@@ -17,12 +17,12 @@ namespace Websilk.Pages
             public List<structMenuItem> submenu;
         }
 
-        public Dashboard(Core WebsilkCore, Page page): base(WebsilkCore, page){}
+        public Dashboard(Core WebsilkCore): base(WebsilkCore){}
 
-        public override void Load()
+        public override string Render(string path)
         {
             //load the dashboard layout
-            scaffold = new Scaffold(S, "/Dashboard/dashboard.html");
+            var scaffold = new Scaffold(S, "/Dashboard/dashboard.html");
             S.cssFiles.Add("dashboard", "/css/dashboard/dashboard.css");
             var scaffMenu = new Scaffold(S, "/Dashboard/menu-item.html");
 
@@ -73,59 +73,41 @@ namespace Websilk.Pages
             }
             scaffold.Data["menu"] = "<ul class=\"menu\">" + menu.ToString() + "</ul>";
 
-            //add js file
-            S.javascriptFiles.Add("dashboard", "/js/dashboard/dashboard.js");
-
             //finally, add content of dashboard section
-            var inject = new Inject();
-            if (page.Url.path != "dashboard")
+
+            var subPath = "";
+            if (S.Request.Path.ToString() != "dashboard")
             {
-                inject = LoadSubPage(page.Url.path.Replace("dashboard/", ""));
+                subPath = S.Request.Path.ToString().Replace("dashboard/", "");
             }
             else
             {
-                inject = LoadSubPage("pages");
-                S.javascript.Add("url", "S.url.push(S.page.title, 'dashboard/pages');");
+                subPath = "pages";
             }
-
-            //initialize dashboard website info
-            S.javascript.Add("dash-init", 
-                "S.dashboard.website = {" + 
-                "id:" + page.websiteId + ", title:'" + page.websiteTitle.Replace("'","\\'") + "', domain:'" + domain + "'" + 
-                "};"
-            );
-
-            scaffold.Data["body"] = inject.html;
+            scaffold.Data["body"] = LoadSubPage(subPath);
+            return scaffold.Render();
         }
 
-        public override Inject LoadSubPage(string path)
+        private string LoadSubPage(string path)
         {
             //get correct sub page from path
-            StaticPage service = null;
-            var inject = new Inject();
+            Page service = null;
+            var html = "";
             var paths = path.Split(new string[] { "/" }, StringSplitOptions.RemoveEmptyEntries);
-            var section = "";
-            if (paths[0] == "analytics") { 
-                service = new DashboardPages.Analytics(S, page);
-                inject = service.LoadSubPage(string.Join("/", paths.Skip(1).ToArray()));
-                section = "analytics";
-            }
+
             else if(paths[0] == "downloads") { 
-                service = new DashboardPages.Downloads(S, page);
-                inject = service.LoadSubPage(string.Join("/", paths.Skip(1).ToArray()));
-                section = "downloads";
+                service = new DashboardPages.Downloads(S);
+                html = service.Render(string.Join("/", paths.Skip(1).ToArray()));
             }
             else if (paths[0] == "pages")
             {
-                service = new DashboardPages.Pages(S, page);
-                inject = service.LoadSubPage(string.Join("/", paths.Skip(1).ToArray()));
-                section = "pages";
+                service = new DashboardPages.Pages(S);
+                html = service.LoadSubPage(string.Join("/", paths.Skip(1).ToArray()));
             }
             else if (paths[0] == "photos")
             {
-                service = new DashboardPages.Photos(S, page);
-                inject = service.LoadSubPage(string.Join("/", paths.Skip(1).ToArray()));
-                section = "photos";
+                service = new DashboardPages.Photos(S);
+                html = service.LoadSubPage(string.Join("/", paths.Skip(1).ToArray()));
             }
             else if (paths[0] == "settings")
             {
@@ -133,33 +115,25 @@ namespace Websilk.Pages
                 {
                     if(paths[1] == "themes")
                     {
-                        service = new DashboardPages.Settings.Themes(S, page);
-                        inject = service.LoadSubPage(string.Join("/", paths.Skip(2).ToArray()));
+                        service = new DashboardPages.Settings.Themes(S);
+                        html = service.LoadSubPage(string.Join("/", paths.Skip(2).ToArray()));
                         section = "settings-themes";
                     }
                 }
             }
             else if (paths[0] == "timeline")
             {
-                service = new DashboardPages.Timeline(S, page);
-                inject = service.LoadSubPage(string.Join("/", paths.Skip(1).ToArray()));
+                service = new DashboardPages.Timeline(S);
+                html = service.LoadSubPage(string.Join("/", paths.Skip(1).ToArray()));
                 section = "timeline";
             }
             else if (paths[0] == "users")
             {
-                service = new DashboardPages.Users(S, page);
-                inject = service.LoadSubPage(string.Join("/", paths.Skip(1).ToArray()));
+                service = new DashboardPages.Users(S);
+                html = service.LoadSubPage(string.Join("/", paths.Skip(1).ToArray()));
                 section = "users";
             }
-            if (service != null)
-            {
-                S.javascript.Add("dash-subpage", "S.dashboard.sections.show('" + section + "');");
-                inject.element = ".dash-body";
-                inject.remove = ".dash-body > .section-" + section;
-                inject.html = "<div class=\"dash-section section-" + section + "\">" + inject.html + "</div>";
-                inject.inject = enumInjectTypes.append;
-            }
-            return inject;
+            return html;
         }
 
         private structMenuItem menuItem(string label, string id, string href, string icon, List<structMenuItem> submenu = null)

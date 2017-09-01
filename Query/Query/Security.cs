@@ -6,6 +6,9 @@ namespace Websilk.Query
 {
     public class Security: QuerySql
     {
+        public Security(string connectionString) : base(connectionString)
+        {
+        }
 
         public List<Models.Security> GetSecurity(int websiteId, int userId)
         {

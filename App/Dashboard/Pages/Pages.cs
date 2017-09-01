@@ -4,51 +4,39 @@ using System.Text;
 
 namespace Websilk.Pages.DashboardPages
 {
-    public class Pages: StaticPage
+    public class Pages: Page
     {
-        public Pages(Core WebsilkCore, Page page): base(WebsilkCore, page) { }
-
-        public override Services.Inject LoadSubPage(string path)
+        public Pages(Core WebsilkCore) : base(WebsilkCore)
         {
-            var inject = new Services.Inject();
-            if(path != "")
-            {
-                //load sub page
-                switch (path)
-                {
-                    case "settings":
+        }
 
-                        break;
-                }
-            }else
-            {
-                //load pages list
-                var servePage = new Services.Dashboard.Pages(S);
-                var websiteId = page.websiteId;
-                if (S.Request.Query.ContainsKey("websiteid")) { websiteId = int.Parse(S.Request.Query["websiteid"]); }
-                servePage.page = page;
-                scaffold = new Scaffold(S, "/Dashboard/Pages/pages.html");
-                scaffold.Data["page-list"] = servePage.View(websiteId, 0, 1, 1000, 4, 0, "");
-                scaffold.Data["page-create"] = S.Server.LoadFileFromCache("/Dashboard/Pages/create.html");
-                S.javascriptFiles.Add("dash-pages", "/js/dashboard/pages/pages.js");
-                S.javascript.Add("dash-pages", "S.dashboard.pages.init();");
+        public override string Render(string[] path, string query = "")
+        {
 
-                //get list of available shadow templates
-                var reader = page.sql.GetShadowTemplatesForWebsite(page.websiteId);
-                var js = "S.dashboard.pages.shadow_templates = [";
-                var i = 0;
-                while (reader.Read())
-                {
-                    if(i > 0) { js += ","; }
-                    js += "{id:" + reader.GetInt("pageId").ToString() + ", title:'" + reader.Get("title").Replace("'", "\\'") + "', url:'/" + reader.Get("path").Replace(" ", "-") + "'}";
-                    i++;
-                }
-                js += "];";
-                S.javascript.Add("dash-page-shadows", js);
+            //load pages list
+            var scaffold = new Scaffold(S);
+            var servePage = new Services.Dashboard.Pages(S);
+            var websiteId = page.websiteId;
+            if (S.Request.Query.ContainsKey("websiteid")) { websiteId = int.Parse(S.Request.Query["websiteid"]); }
+            servePage.page = page;
+            scaffold = new Scaffold(S, "/Dashboard/Pages/pages.html");
+            scaffold.Data["page-list"] = servePage.View(websiteId, 0, 1, 1000, 4, 0, "");
+            scaffold.Data["page-create"] = S.Server.LoadFileFromCache("/Dashboard/Pages/create.html");
+            S.javascriptFiles.Add("dash-pages", "/js/dashboard/pages/pages.js");
+            S.javascript.Add("dash-pages", "S.dashboard.pages.init();");
+
+            //get list of available shadow templates
+            var reader = page.sql.GetShadowTemplatesForWebsite(page.websiteId);
+            var js = "S.dashboard.pages.shadow_templates = [";
+            var i = 0;
+            while (reader.Read())
+            {
+                if(i > 0) { js += ","; }
+                js += "{id:" + reader.GetInt("pageId").ToString() + ", title:'" + reader.Get("title").Replace("'", "\\'") + "', url:'/" + reader.Get("path").Replace(" ", "-") + "'}";
+                i++;
             }
-            
-            inject.html = scaffold.Render();
-            return inject;
+            js += "];";
+            return scaffold.Render();
         }
     }
 }

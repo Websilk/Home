@@ -3,7 +3,7 @@
 	@websiteId int = 0,
 	@pageId int = 0,
 	@feature nvarchar(50) = '',
-	@security nvarchar(200) = ''
+	@security binary(32)
 
 AS
 	DECLARE @hasSecurity int = 0;

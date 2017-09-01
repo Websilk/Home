@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using System;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
 
 namespace Websilk
 {
@@ -6,21 +8,12 @@ namespace Websilk
     {
         public Server Server;
         public Utility.Util Util;
-        public Sql Sql;
-        public User User;
+        public UserSession User;
         public HttpContext Context;
         public HttpRequest Request;
         public HttpResponse Response;
         public ISession Session;
-
-        public bool isFirstLoad = false;
-
-        public WebResources javascript;
-        public WebResources javascriptFiles;
-        public WebResources css;
-        public WebResources cssFiles;
-        public WebResources html;
-        public WebResources htmlEditor;
+        private string _connString = "";
 
         public Core(Server server, HttpContext context)
         {
@@ -30,39 +23,37 @@ namespace Websilk
             Request = context.Request;
             Response = context.Response;
             Session = context.Session;
-            Sql = new Sql(Server, Util);
-            User = new User();
-
-            javascript = new WebResources(this);
-            javascriptFiles = new WebResources(this);
-            css = new WebResources(this);
-            cssFiles = new WebResources(this);
-            html = new WebResources(this);
-            htmlEditor = new WebResources(this);
+            User = new UserSession();
 
             //load user session
             if (Session.Get("user") != null)
             {
-                User = (User)Util.Serializer.ReadObject(Util.Str.GetString(Session.Get("user")), User.GetType());
+                User = (UserSession)Util.Serializer.ReadObject(Util.Str.GetString(Session.Get("user")), User.GetType());
             }
-            User.Load(this);
+            User.Init(this);
         }
 
         public void Unload()
         {
-            if(User.saveSession == true)
+            if (User.saveSession == true)
             {
                 Session.Set("user", Util.Serializer.WriteObject(User));
             }
-            Sql.Close();
         }
 
-        public bool isSessionLost()
-        {
-            if(isFirstLoad == false && Session.Get("user") == null) {
-                return true;
+        public string SqlConnectionString{
+            get {
+                if(_connString == "")
+                {
+                    var config = new ConfigurationBuilder()
+                    .AddJsonFile(Server.MapPath("config.json"))
+                    .Build();
+
+                    var sqlActive = config.GetSection("Data:Active").Value;
+                    _connString = config.GetSection("Data:" + sqlActive).Value;
+                }
+                return _connString;
             }
-            return false;
         }
     }
 

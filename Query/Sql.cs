@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Data.SqlClient;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Caching.Memory;
 using Dapper;
 
 namespace Websilk.Query
@@ -13,25 +13,21 @@ namespace Websilk.Query
 
         private SqlConnection conn = new SqlConnection();
         private SqlCommand cmd = new SqlCommand();
+        private string connString = "";
+
+        public Sql(string connectionString)
+        {
+            connString = connectionString;
+        }
 
 
         private void Start()
         {
             if (conn.State == System.Data.ConnectionState.Closed)
             {
-                conn.ConnectionString = GetConnectionString();
+                conn.ConnectionString = connString;
                 conn.Open();
             }
-        }
-
-        private string GetConnectionString()
-        {
-            var config = new ConfigurationBuilder()
-                .AddJsonFile(AppContext.BaseDirectory + "\\" + "config.json")
-                .Build();
-
-            var sqlActive = config.GetSection("Data:Active").Value;
-            return config.GetSection("Data:" + sqlActive).Value;
         }
 
         private string GetStoredProc(string storedproc, Dictionary<string, object> parameters = null)
@@ -109,7 +105,7 @@ namespace Websilk.Query
 
         public async Task<int> ExecuteNonQueryAsync(string storedproc, Dictionary<string, object> parameters = null)
         {
-            using (var newConnection = new SqlConnection(GetConnectionString()))
+            using (var newConnection = new SqlConnection(connString))
             using (var newCommand = new SqlCommand(GetStoredProc(storedproc, parameters), newConnection))
             {
                 try {

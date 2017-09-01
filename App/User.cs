@@ -6,8 +6,19 @@ using Newtonsoft.Json;
 
 namespace Websilk
 {
-    public class User
+    public class UserSession: User
     {
+        private User _User = null;
+
+        public override void Load()
+        {
+            base.Load();
+
+        }
+    }
+
+    public class User
+    { 
         public enum enumSecurity
         {
             read = 0,
@@ -41,16 +52,16 @@ namespace Websilk
         [JsonIgnore]
         public bool saveSession = false;
 
-        public User()
-        {
-        }
-
-        public void Load(Core WebsilkCore)
+        public void Init(Core WebsilkCore)
         {
             S = WebsilkCore;
 
             //generate visitor id
             if (visitorId == "" || visitorId == null) { visitorId = S.Util.Str.CreateID(); saveSession = true; }
+        }
+
+        public virtual void Load()
+        { 
         }
 
         /// <summary>
@@ -61,6 +72,7 @@ namespace Websilk
         /// <returns></returns>
         public bool LogIn(string email, string password, int websiteId, int ownerId)
         {
+            Load();
             saveSession = true;
             //var sqlUser = new SqlQueries.User(S);
             var query = new Query.Users();
@@ -91,28 +103,30 @@ namespace Websilk
 
         public void LogOut()
         {
+            Load();
             saveSession = true;
             S.Session.Remove("user");
         }
         
         public bool UpdatePassword(int userId, string password)
         {
+            Load();
             var update = false; //security check
             var emailAddr = email;
-            if(S.Server.resetPass == true && userId == 1)
+            var queryUser = new Query.Users(S.SqlConnectionString);
+
+            if (S.Server.resetPass == true && userId == 1)
             {
                 //securely change admin password
                 //get admin email address from database
-                var parameters = new List<SqlParameter>();
-                parameters.Add(new SqlParameter("@_userId", userId.ToString()));
-                emailAddr = (string)S.Sql.ExecuteScalar("EXEC User_GetEmail @userId=@_userId", parameters);
+                emailAddr = queryUser.GetEmail(userId);
                 if (emailAddr != "" && emailAddr != null) { update = true; }
             }
             if(update == true)
             {
                 var bCrypt = new BCrypt.Net.BCrypt();
                 var encrypted = BCrypt.Net.BCrypt.HashPassword(password, S.Server.bcrypt_workfactor);
-                var queryUser = new Query.Users();
+                
                 queryUser.UpdatePassword(userId, encrypted);
                 S.Server.resetPass = false;
             }
@@ -122,7 +136,8 @@ namespace Websilk
         #region "security"
         public structSecurityWebsite GetSecurityForWebsite(int userId, int websiteId, int ownerId)
         {
-            var query = new Query.Security();
+            Load();
+            var query = new Query.Security(S.SqlConnectionString);
             var security = new structSecurityWebsite();
             var items = new Dictionary<string, bool[]>();
             security.websiteId = websiteId;
@@ -152,6 +167,7 @@ namespace Websilk
 
         public bool checkSecurity(int websiteId, string feature, enumSecurity securityIndex)
         {
+            Load();
             var i = security.FindIndex(a => a.websiteId == websiteId);
             if(i >= 0)
             {

@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
-using Chroniton;
 
 namespace Websilk
 {
@@ -15,17 +14,16 @@ namespace Websilk
     {
         public void ConfigureServices(IServiceCollection services)
         {
+            //set up server-side memory cache
             services.AddDistributedMemoryCache();
+            services.AddMemoryCache();
+
             services.AddSession(opts =>
             {
                 //set up cookie expiration
-                opts.CookieName = "Websilk";
+                opts.Cookie.Name = "Websilk";
                 opts.IdleTimeout = TimeSpan.FromMinutes(60);
             });
-
-
-            //add server-side scheduler service (like CRON jobs)
-            services.AddSingleton<ISingularity, Singularity>(serviceProvider => Singularity.Instance);
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)

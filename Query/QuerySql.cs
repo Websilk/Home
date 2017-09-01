@@ -1,13 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
+﻿
 namespace Websilk.Query
 {
     public class QuerySql
     {
 
-        public Sql Sql = new Sql();
+        public Sql Sql;
+
+        public QuerySql(string connectionString)
+        {
+            Sql = new Sql(connectionString);
+        }
 
     }
 }

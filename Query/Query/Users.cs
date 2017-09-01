@@ -4,6 +4,9 @@ namespace Websilk.Query
 {
     public class Users : QuerySql
     {
+        public Users(string connectionString) : base(connectionString)
+        {
+        }
 
         #region "Account"
         public Models.User AuthenticateUser(string email, string password)

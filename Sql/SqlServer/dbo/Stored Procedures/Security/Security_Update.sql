@@ -8,7 +8,7 @@ CREATE PROCEDURE Security_Update
 	@pageId int = 0,
 	@userId int = 0,
 	@feature nvarchar(50),
-	@security nvarchar(200)
+	@security binary(32)
 
 AS
 BEGIN

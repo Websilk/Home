@@ -19,11 +19,10 @@ namespace Websilk.Pages
 
         public Dashboard(Core WebsilkCore): base(WebsilkCore){}
 
-        public override string Render(string path)
+        public override string Render(string[] path, string query)
         {
             //load the dashboard layout
             var scaffold = new Scaffold(S, "/Dashboard/dashboard.html");
-            S.cssFiles.Add("dashboard", "/css/dashboard/dashboard.css");
             var scaffMenu = new Scaffold(S, "/Dashboard/menu-item.html");
 
             //load user profile
@@ -32,16 +31,16 @@ namespace Websilk.Pages
             scaffold.Data["profile-name"] = S.User.displayName;
 
             //load website info
-            var domains = page.getDomainsForWebsite();
-            var domain = "";
-            if(domains.Count > 0)
-            {
-                domain = domains[0].domain;
-                scaffold.Data["has-domain"] = "true";
-                scaffold.Data["website-name"] = page.websiteTitle;
-                scaffold.Data["website-url"] = "http://www." + domain;
-                scaffold.Data["website-url-name"] = "www." + domain;
-            }
+            //var domains = page.getDomainsForWebsite();
+            //var domain = "";
+            //if(domains.Count > 0)
+            //{
+            //    domain = domains[0].domain;
+            //    scaffold.Data["has-domain"] = "true";
+            //    scaffold.Data["website-name"] = page.websiteTitle;
+            //    scaffold.Data["website-url"] = "http://www." + domain;
+            //    scaffold.Data["website-url-name"] = "www." + domain;
+            //}
 
             //generate menu system
             var menu = new StringBuilder();
@@ -94,20 +93,21 @@ namespace Websilk.Pages
             Page service = null;
             var html = "";
             var paths = path.Split(new string[] { "/" }, StringSplitOptions.RemoveEmptyEntries);
+            var subpath = paths.Skip(1).ToArray();
 
-            else if(paths[0] == "downloads") { 
+            if (paths[0] == "downloads") { 
                 service = new DashboardPages.Downloads(S);
-                html = service.Render(string.Join("/", paths.Skip(1).ToArray()));
+                html = service.Render(subpath);
             }
             else if (paths[0] == "pages")
             {
                 service = new DashboardPages.Pages(S);
-                html = service.LoadSubPage(string.Join("/", paths.Skip(1).ToArray()));
+                html = service.Render(subpath);
             }
             else if (paths[0] == "photos")
             {
                 service = new DashboardPages.Photos(S);
-                html = service.LoadSubPage(string.Join("/", paths.Skip(1).ToArray()));
+                html = service.Render(subpath);
             }
             else if (paths[0] == "settings")
             {
@@ -116,22 +116,19 @@ namespace Websilk.Pages
                     if(paths[1] == "themes")
                     {
                         service = new DashboardPages.Settings.Themes(S);
-                        html = service.LoadSubPage(string.Join("/", paths.Skip(2).ToArray()));
-                        section = "settings-themes";
+                        html = service.Render(paths.Skip(2).ToArray());
                     }
                 }
             }
             else if (paths[0] == "timeline")
             {
                 service = new DashboardPages.Timeline(S);
-                html = service.LoadSubPage(string.Join("/", paths.Skip(1).ToArray()));
-                section = "timeline";
+                html = service.Render(subpath);
             }
             else if (paths[0] == "users")
             {
                 service = new DashboardPages.Users(S);
-                html = service.LoadSubPage(string.Join("/", paths.Skip(1).ToArray()));
-                section = "users";
+                html = service.Render(subpath);
             }
             return html;
         }

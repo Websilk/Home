@@ -1,21 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace Websilk.Pages.DashboardPages
+﻿namespace Websilk.Pages.DashboardPages
 {
-    public class Downloads: StaticPage
+    public class Downloads: Page
     {
-        public Downloads(Core WebsilkCore, Page page): base(WebsilkCore, page) { }
-
-        public override Services.Inject LoadSubPage(string path)
+        public Downloads(Core WebsilkCore) : base(WebsilkCore)
         {
-            var inject = new Services.Inject();
-            if(path != "")
+        }
+
+        public override string Render(string[] path, string query = "", string body = "")
+        {
+            if(path.Length > 0)
             {
                 //load sub page
-                switch (path)
+                switch (path[0])
                 {
                     case "folders":
 
@@ -24,11 +20,10 @@ namespace Websilk.Pages.DashboardPages
             }else
             {
                 //load downloads list
-                scaffold = new Scaffold(S, "/Dashboard/Downloads/downloads.html");
+                var scaffold = new Scaffold(S, "/Dashboard/Downloads/downloads.html");
+                return scaffold.Render();
             }
-            
-            inject.html = scaffold.Render();
-            return inject;
+            return "";
         }
     }
 }

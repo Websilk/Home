@@ -9,6 +9,5 @@ CREATE PROCEDURE [dbo].[Website_Delete]
 AS
 BEGIN
 	SET NOCOUNT ON;
-	UPDATE Pages SET deleted=1, enabled=0 WHERE websiteId=@websiteId AND ownerId=@ownerid
-	UPDATE WebSites SET deleted=1, enabled=0 WHERE websiteId=@websiteId AND ownerId=@ownerid
+	DELETE FROM Websites WHERE websiteId=@websiteId AND ownerId=@ownerid
 END

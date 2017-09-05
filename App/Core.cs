@@ -8,7 +8,7 @@ namespace Websilk
     {
         public Server Server;
         public Utility.Util Util;
-        public UserSession User;
+        public User User;
         public HttpContext Context;
         public HttpRequest Request;
         public HttpResponse Response;
@@ -23,12 +23,12 @@ namespace Websilk
             Request = context.Request;
             Response = context.Response;
             Session = context.Session;
-            User = new UserSession();
+            User = new User();
 
             //load user session
             if (Session.Get("user") != null)
             {
-                User = (UserSession)Util.Serializer.ReadObject(Util.Str.GetString(Session.Get("user")), User.GetType());
+                User = (User)Util.Serializer.ReadObject(Util.Str.GetString(Session.Get("user")), User.GetType());
             }
             User.Init(this);
         }

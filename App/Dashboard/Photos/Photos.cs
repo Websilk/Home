@@ -1,34 +1,31 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
+﻿
 namespace Websilk.Pages.DashboardPages
 {
-    public class Photos: StaticPage
+    public class Photos: Page
     {
-        public Photos(Core WebsilkCore, Page page): base(WebsilkCore, page) { }
-
-        public override Services.Inject LoadSubPage(string path)
+        public Photos(Core WebsilkCore) : base(WebsilkCore)
         {
-            var inject = new Services.Inject();
-            if(path != "")
+        }
+
+        public override string Render(string[] path, string query = "", string body = "")
+        {
+            if (path.Length > 0)
             {
                 //load sub page
-                switch (path)
+                switch (path[0])
                 {
                     case "folders":
 
                         break;
                 }
-            }else
+            }
+            else
             {
                 //load photos list
-                scaffold = new Scaffold(S, "/Dashboard/Photos/photos.html");
+                var scaffold = new Scaffold(S, "/Dashboard/Photos/photos.html");
+                return scaffold.Render();
             }
-            
-            inject.html = scaffold.Render();
-            return inject;
+            return "";
         }
     }
 }

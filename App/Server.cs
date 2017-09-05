@@ -46,6 +46,20 @@ namespace Websilk
         //         where data is injected in between each array item.
         public Dictionary<string, structScaffold> Scaffold = new Dictionary<string, structScaffold>();
 
+
+        /// <summary>
+        /// Executed once the server is up & running
+        /// </summary>
+        public void Up()
+        {
+            var query = new Query.Users(sqlConnection);
+            var haspass = query.HasPasswords();
+            if(haspass == 1)
+            {
+                resetPass = true;
+            }
+        }
+
         #region "System.UI.Web.Page.Server methods"
         public string path(string strPath = "")
         {

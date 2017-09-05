@@ -11,7 +11,7 @@ CREATE PROCEDURE Security_GetFeature
 AS
 BEGIN
 	SET NOCOUNT ON;
-	SELECT security FROM WebsiteSecurity WHERE websiteid=@websiteid
+	SELECT [security] FROM [Security] WHERE websiteid=@websiteid
 	AND pageid = CASE WHEN @pageid > 0 THEN @pageid ELSE pageid END
 	AND userid=@userid AND feature=@feature
 

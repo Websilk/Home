@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using Websilk.Services;
 using System.Linq;
 
 namespace Websilk.Pages
@@ -19,11 +18,21 @@ namespace Websilk.Pages
 
         public Dashboard(Core WebsilkCore): base(WebsilkCore){}
 
-        public override string Render(string[] path, string query)
+        public override string Render(string[] path, string query = "", string body = "")
         {
+            websiteId = 1;
+            if (!S.User.checkSecurity(websiteId,"websilk", User.enumSecurity.read)) { return AccessDenied(); }
+
+            //set up client-side dependencies
+            colorsCss = "/css/colors/dashboard/aqua.css";
+            headCss += "<link type=\"text/css\" rel=\"stylesheet\" href=\"/css/dashboard/dashboard.css\"/>";
+            scripts += "<script src=\"/js/dashboard/dashboard.js\"></script>";
+
             //load the dashboard layout
             var scaffold = new Scaffold(S, "/Dashboard/dashboard.html");
             var scaffMenu = new Scaffold(S, "/Dashboard/menu-item.html");
+            var queryWebsites = new Query.Websites(S.SqlConnectionString);
+            var website = queryWebsites.GetWebsiteInfo(websiteId);
 
             //load user profile
             scaffold.Data["profile-img"] = "";
@@ -31,16 +40,9 @@ namespace Websilk.Pages
             scaffold.Data["profile-name"] = S.User.displayName;
 
             //load website info
-            //var domains = page.getDomainsForWebsite();
-            //var domain = "";
-            //if(domains.Count > 0)
-            //{
-            //    domain = domains[0].domain;
-            //    scaffold.Data["has-domain"] = "true";
-            //    scaffold.Data["website-name"] = page.websiteTitle;
-            //    scaffold.Data["website-url"] = "http://www." + domain;
-            //    scaffold.Data["website-url-name"] = "www." + domain;
-            //}
+            scaffold.Data["website-name"] = website.title;
+            scaffold.Data["website-url"] = "http://" + website.liveUrl;
+            scaffold.Data["website-url-name"] = website.liveUrl;
 
             //generate menu system
             var menu = new StringBuilder();
@@ -54,16 +56,14 @@ namespace Websilk.Pages
                 menuItem("Users", "users",  "/dashboard/users", "users"),
                 menuItem("Settings", "settings", "/dashboard/settings", "settings",
                     new List<structMenuItem>{
-                        menuItem("Domains", "settings-domains", "/dashboard/settings/domains", "domains"),
                         menuItem("Themes", "settings-themes", "/dashboard/settings/themes", "themes"),
-                        menuItem("Color Schemes", "settings-colorschemes", "/dashboard/settings/colors", "colors"),
                         menuItem("Cache", "settings-cache", "/dashboard/settings/cache", "cache"),
                         menuItem("Advanced", "settings-advanced", "/dashboard/settings/advanced", "component-admin")
                     }
                 )
             };
 
-            //TODO: get apps available to the user for this website
+            //TODO: get vendor apps available to the user for this website
 
             //render menu system
             foreach (var item in menus)
@@ -75,19 +75,27 @@ namespace Websilk.Pages
             //finally, add content of dashboard section
 
             var subPath = "";
-            if (S.Request.Path.ToString() != "dashboard")
-            {
-                subPath = S.Request.Path.ToString().Replace("dashboard/", "");
-            }
-            else
-            {
+            subPath = S.Request.Path.ToString().Replace("dashboard", "").Substring(1);
+            if(subPath == "") { 
                 subPath = "pages";
             }
-            scaffold.Data["body"] = LoadSubPage(subPath);
-            return scaffold.Render();
+            var html = "";
+            Page subpage = null;
+            var t = LoadSubPage(subPath);
+            subpage = t.Item1;
+            html = t.Item2;
+            scaffold.Data["body"] = html;
+
+            if(html == "") { return AccessDenied(); }
+
+            //set up page info
+            title = website.title + " - Dashboard - " + subpage.title;
+            scripts += subpage.scripts;
+
+            return base.Render(path, query, scaffold.Render());
         }
 
-        private string LoadSubPage(string path)
+        private Tuple<Page, string> LoadSubPage(string path)
         {
             //get correct sub page from path
             Page service = null;
@@ -97,17 +105,14 @@ namespace Websilk.Pages
 
             if (paths[0] == "downloads") { 
                 service = new DashboardPages.Downloads(S);
-                html = service.Render(subpath);
             }
             else if (paths[0] == "pages")
             {
                 service = new DashboardPages.Pages(S);
-                html = service.Render(subpath);
             }
             else if (paths[0] == "photos")
             {
                 service = new DashboardPages.Photos(S);
-                html = service.Render(subpath);
             }
             else if (paths[0] == "settings")
             {
@@ -116,21 +121,24 @@ namespace Websilk.Pages
                     if(paths[1] == "themes")
                     {
                         service = new DashboardPages.Settings.Themes(S);
-                        html = service.Render(paths.Skip(2).ToArray());
+                        subpath = paths.Skip(2).ToArray();
                     }
                 }
             }
             else if (paths[0] == "timeline")
             {
                 service = new DashboardPages.Timeline(S);
-                html = service.Render(subpath);
             }
             else if (paths[0] == "users")
             {
                 service = new DashboardPages.Users(S);
-                html = service.Render(subpath);
             }
-            return html;
+
+            //render sub page
+            service.websiteId = websiteId;
+            html = service.Render(subpath);
+
+            return new Tuple<Page, string>(service, html);
         }
 
         private structMenuItem menuItem(string label, string id, string href, string icon, List<structMenuItem> submenu = null)

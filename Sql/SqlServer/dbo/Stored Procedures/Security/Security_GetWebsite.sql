@@ -9,6 +9,6 @@ CREATE PROCEDURE Security_GetWebsite
 AS
 BEGIN
 	SET NOCOUNT ON;
-	SELECT pageid, feature, [security] FROM WebsiteSecurity 
+	SELECT pageid, feature, [security] FROM [Security] 
 	WHERE websiteid=@websiteid AND userid=@userid
 END

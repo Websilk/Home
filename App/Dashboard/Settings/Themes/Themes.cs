@@ -5,30 +5,18 @@ using System.Threading.Tasks;
 
 namespace Websilk.Pages.DashboardPages.Settings
 {
-    public class Themes: StaticPage
+    public class Themes: Page
     {
-        public Themes(Core WebsilkCore, Page page): base(WebsilkCore, page) { }
-
-        public override Services.Inject LoadSubPage(string path)
+        public Themes(Core WebsilkCore) : base(WebsilkCore)
         {
-            var inject = new Services.Inject();
-            if(path != "")
-            {
-                //load sub page
-                switch (path)
-                {
-                    case "???":
+        }
 
-                        break;
-                }
-            }else
-            {
-                //load settings interface
-                scaffold = new Scaffold(S, "/Dashboard/Settings/Themes/themes.html");
-            }
-            
-            inject.html = scaffold.Render();
-            return inject;
+        public override string Render(string[] path, string query = "", string body = "")
+        {
+
+                //load downloads list
+                var scaffold = new Scaffold(S, "/Dashboard/Settings/Themes/themes.html");
+                return scaffold.Render();
         }
     }
 }

@@ -14,7 +14,7 @@ namespace Websilk.Pipeline
 
             S = new Core(server, context);
 
-            var pathquery = context.Request.Path.ToString().Split('?', 2);
+            var pathquery = context.Request.Path.ToString().Substring(1).Split('?', 2);
             var path = pathquery[0].Split('/');
             var page = GetWebPage("websilk.pages." + path[0]);
 

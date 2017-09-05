@@ -166,8 +166,6 @@ namespace Websilk.Pipeline
         {
             //hard-code all known services to increase server performance
             switch(className.ToLower()){
-                case "websilk.services.users":
-                    return new Services.Users(S);
 
                 default:
                     //last resort, find service class manually

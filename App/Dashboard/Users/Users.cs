@@ -1,34 +1,31 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
+﻿
 namespace Websilk.Pages.DashboardPages
 {
-    public class Users: StaticPage
+    public class Users: Page
     {
-        public Users(Core WebsilkCore, Page page): base(WebsilkCore, page) { }
-
-        public override Services.Inject LoadSubPage(string path)
+        public Users(Core WebsilkCore) : base(WebsilkCore)
         {
-            var inject = new Services.Inject();
-            if(path != "")
+        }
+
+        public override string Render(string[] path, string query = "", string body = "")
+        {
+            if (path.Length > 0)
             {
                 //load sub page
-                switch (path)
+                switch (path[0])
                 {
-                    case "security":
+                    case "folders":
 
                         break;
                 }
-            }else
-            {
-                //load users list
-                scaffold = new Scaffold(S, "/Dashboard/Users/users.html");
             }
-            
-            inject.html = scaffold.Render();
-            return inject;
+            else
+            {
+                //load downloads list
+                var scaffold = new Scaffold(S, "/Dashboard/Users/users.html");
+                return scaffold.Render();
+            }
+            return "";
         }
     }
 }

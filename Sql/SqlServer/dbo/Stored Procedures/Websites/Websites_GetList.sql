@@ -16,14 +16,13 @@ BEGIN
 	FROM (
 		SELECT ROW_NUMBER() 
 		OVER (ORDER BY
-		CASE WHEN @orderby = 0 THEN w.datecreated END DESC,
-		CASE WHEN @orderby = 1 THEN w.title END ASC) 
-		AS rownum, w.*
-		FROM WebSites AS w
-		WHERE w.ownerId = CASE WHEN @userId > 0 THEN @userId ELSE w.ownerId END
-		AND w.deleted=0
-		AND w.enabled=1
-		AND w.title LIKE CASE WHEN @search <> '' THEN '%' + @search + '%' ELSE w.title END
+		CASE WHEN @orderby = 0 THEN datecreated END DESC,
+		CASE WHEN @orderby = 1 THEN title END ASC) 
+		AS rownum, *
+		FROM WebSites
+		WHERE ownerId = CASE WHEN @userId > 0 THEN @userId ELSE ownerId END
+		AND [enabled]=1
+		AND title LIKE CASE WHEN @search <> '' THEN '%' + @search + '%' ELSE title END
 	) AS tbl
 	WHERE rownum >= @start AND  rownum <= @start + @length
 END

@@ -72,6 +72,8 @@ namespace Websilk
             //configure server security
             server.bcrypt_workfactor = int.Parse(config.GetSection("Encryption:bcrypt_work_factor").Value);
 
+            server.Up();
+
             //run Websilk application
             app.Run(async (context) =>
             {
@@ -96,11 +98,11 @@ namespace Websilk
                 }
                 
                 server.requestCount += 1;
-                //if (isdev)
-                //{
-                //    Console.WriteLine("--------------------------------------------");
-                //    Console.WriteLine("{0} GET {1}", DateTime.Now.ToString("hh:mm:ss"), context.Request.Path);
-                //}
+                if (isdev)
+                {
+                    Console.WriteLine("--------------------------------------------");
+                    Console.WriteLine("{0} GET {1}", DateTime.Now.ToString("hh:mm:ss"), context.Request.Path);
+                }
 
                 if (paths.Length > 1)
                 {
@@ -140,8 +142,8 @@ namespace Websilk
                     requestEnd = DateTime.Now;
                     tspan = requestEnd - requestStart;
                     server.requestTime += (tspan.Seconds);
-                    //Console.WriteLine("END GET {0} {1} ms {2}", context.Request.Path, tspan.Milliseconds, requestType);
-                    //Console.WriteLine("");
+                    Console.WriteLine("END GET {0} {1} ms {2}", context.Request.Path, tspan.Milliseconds, requestType);
+                    Console.WriteLine("");
                 }
             });
         }
@@ -173,7 +175,7 @@ namespace Websilk
             //check for malicious namespace in web service request
             foreach(var p in paths)
             {
-                if (!p.All(char.IsLetter)) { return false; }
+                if (!p.All(a => char.IsLetter(a))) { return false; }
             }
             return true;
         }

@@ -6,40 +6,29 @@
 CREATE PROCEDURE [dbo].[Website_Create] 
 	@ownerId int = 1, 
 	@title nvarchar(100) = '',
-	@theme nvarchar(25) = '',
-	@colors nvarchar(25) = '',
-	@colorsEditor nvarchar(25) = '',
-	@colorsDash nvarchar(25) = '',
 	@description nvarchar(160) = '',
 	@status int = 1,
-	@icon bit = 0,
+	@logo bit = 0,
 	@security bit = 0,
 	@enabled bit = 1,
-	@domainname nvarchar(25) = ''
+	@liveUrl nvarchar(255) = '',
+	@stageUrl nvarchar(255) = ''
 AS
 BEGIN
 	SET NOCOUNT ON;
     DECLARE
-	@websiteId int, 
-    @templateId int,
-    @dashId int,
-    @homeId int,
-    @loginId int,
-	@aboutId int,
-	@contactId int,
-	@supportId int,
-    @404Id int,
-    @deniedId int,
+	@websiteId int = NEXT VALUE FOR SequenceWebsites, 
     @myDate datetime = GETDATE()
     
     -- first create the web site
-    INSERT INTO WebSites (
-	websiteid, ownerId, title, datecreated, [status], icon, [enabled], deleted) 
-	VALUES (
-	NEXT VALUE FOR SequenceWebsites, @ownerId, @title, @theme, @colors, @colorsEditor, @colorsDash, @myDate, 
-	0, 0, 0, 0, 0, 0, 0, 0, 0, @status, @icon, @enabled, 0)
-    
-    SELECT TOP 1 @websiteId = websiteId FROM WebSites WHERE ownerId=@ownerId ORDER BY websiteId DESC
+    INSERT INTO Websites (
+	websiteid, ownerId, title, datecreated, [status], logo, liveUrl, stageUrl, [enabled], deleted) 
+	VALUES (@websiteId, @ownerId, @title, @myDate, @status, @logo, @liveUrl, @stageUrl, @enabled, 0)
+
+	-- create home page for website
+	EXEC Page_Create @ownerId=@ownerId, @websiteId=@websiteId, @parentId=0, @title='Home', 
+	@description=@description, 
+	@security=0, @enabled=1
 
 	-- return the website ID
 	SELECT @websiteId

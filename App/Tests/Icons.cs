@@ -7,7 +7,7 @@ namespace Websilk.Services
     {
         public Icons(Core WebsilkCore) : base(WebsilkCore) { }
 
-        public WebRequest List()
+        public string List()
         {
             var scaffold = new Scaffold(S, "/Tests/icons.html");
             var icon = new Scaffold(S, "/Tests/icon.html");
@@ -107,11 +107,7 @@ namespace Websilk.Services
             }
             scaffold.Data["icons"] = icons.ToString();
             scaffold.Data["svg-icons"] = S.Server.LoadFileFromCache("/Content/themes/default/icons.svg", true);
-            return new WebRequest()
-            {
-                contentType = "text/html",
-                html = scaffold.Render()
-            };
+            return scaffold.Render();
         }
         
 

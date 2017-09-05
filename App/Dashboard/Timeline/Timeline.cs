@@ -1,34 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace Websilk.Pages.DashboardPages
+﻿namespace Websilk.Pages.DashboardPages
 {
-    public class Timeline: StaticPage
+    public class Timeline: Page
     {
-        public Timeline(Core WebsilkCore, Page page): base(WebsilkCore, page) { }
-
-        public override Services.Inject LoadSubPage(string path)
+        public Timeline(Core WebsilkCore) : base(WebsilkCore)
         {
-            var inject = new Services.Inject();
-            if(path != "")
-            {
-                //load sub page
-                switch (path)
-                {
-                    case "???":
+        }
 
-                        break;
-                }
-            }else
-            {
-                //load timeline
-                scaffold = new Scaffold(S, "/Dashboard/Timeline/timeline.html");
-            }
-            
-            inject.html = scaffold.Render();
-            return inject;
+        public override string Render(string[] path, string query = "", string body = "")
+        {
+            //load timeline
+            var scaffold = new Scaffold(S, "/Dashboard/Timeline/timeline.html");
+            return scaffold.Render();
         }
     }
 }

@@ -6,16 +6,6 @@ using Newtonsoft.Json;
 
 namespace Websilk
 {
-    public class UserSession: User
-    {
-        private User _User = null;
-
-        public override void Load()
-        {
-            base.Load();
-
-        }
-    }
 
     public class User
     { 
@@ -73,9 +63,8 @@ namespace Websilk
         public bool LogIn(string email, string password, int websiteId, int ownerId)
         {
             Load();
-            saveSession = true;
             //var sqlUser = new SqlQueries.User(S);
-            var query = new Query.Users();
+            var query = new Query.Users(S.SqlConnectionString);
             var dbpass = query.GetPassword(email);
             if(dbpass == "") { return false; }
             if(BCrypt.Net.BCrypt.Verify(password, dbpass))
@@ -93,7 +82,7 @@ namespace Websilk
                     if(!security.Any(a => a.websiteId == websiteId)){
                         security.Add(GetSecurityForWebsite(userId, websiteId, ownerId));
                     }
-                    
+                    saveSession = true;
                     return true;
                 }
             }
@@ -108,18 +97,18 @@ namespace Websilk
             S.Session.Remove("user");
         }
         
-        public bool UpdatePassword(int userId, string password)
+        public bool UpdateAdminPassword(string password)
         {
             Load();
             var update = false; //security check
             var emailAddr = email;
             var queryUser = new Query.Users(S.SqlConnectionString);
-
-            if (S.Server.resetPass == true && userId == 1)
+            var adminId = 1;
+            if (S.Server.resetPass == true)
             {
                 //securely change admin password
                 //get admin email address from database
-                emailAddr = queryUser.GetEmail(userId);
+                emailAddr = queryUser.GetEmail(adminId);
                 if (emailAddr != "" && emailAddr != null) { update = true; }
             }
             if(update == true)
@@ -127,7 +116,7 @@ namespace Websilk
                 var bCrypt = new BCrypt.Net.BCrypt();
                 var encrypted = BCrypt.Net.BCrypt.HashPassword(password, S.Server.bcrypt_workfactor);
                 
-                queryUser.UpdatePassword(userId, encrypted);
+                queryUser.UpdatePassword(adminId, encrypted);
                 S.Server.resetPass = false;
             }
             return false;

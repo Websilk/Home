@@ -10,6 +10,5 @@ CREATE PROCEDURE [dbo].[Website_UpdateTitle]
 AS
 BEGIN
 	SET NOCOUNT ON;
-	UPDATE websites SET title=@newName WHERE websiteid=@websiteId AND ownerId=@ownerId
-
+	UPDATE Websites SET title=@newName WHERE websiteid=@websiteId AND ownerId=@ownerId
 END

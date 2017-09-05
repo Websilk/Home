@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Text;
 using System.Data.SqlClient;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Caching.Memory;
 using Dapper;
 
 namespace Websilk.Query
@@ -27,6 +26,7 @@ namespace Websilk.Query
             {
                 conn.ConnectionString = connString;
                 conn.Open();
+                cmd.Connection = conn;
             }
         }
 
@@ -124,13 +124,13 @@ namespace Websilk.Query
         public List<T> Populate<T>(string storedproc, Dictionary<string, object> parameters = null)
         {
             Start();
-            return conn.Query<T>(GetStoredProc(storedproc, parameters), GetSqlParameters(parameters)).AsList<T>();
+            return conn.Query<T>(GetStoredProc(storedproc, parameters), parameters).AsList<T>();
         }
 
         public SqlMapper.GridReader PopulateMultiple(string storedproc, Dictionary<string, object> parameters = null)
         {
             Start();
-            return conn.QueryMultiple(GetStoredProc(storedproc, parameters), GetSqlParameters(parameters));
+            return conn.QueryMultiple(GetStoredProc(storedproc, parameters), parameters);
         }
     }
 }

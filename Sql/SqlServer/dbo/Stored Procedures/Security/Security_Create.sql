@@ -7,8 +7,8 @@
 
 AS
 	DECLARE @hasSecurity int = 0;
-	SELECT @hasSecurity = COUNT(*) FROM WebsiteSecurity WHERE userId=@userId AND websiteId=@websiteId AND pageId=@pageId AND feature=@feature
+	SELECT @hasSecurity = COUNT(*) FROM [Security] WHERE userId=@userId AND websiteId=@websiteId AND pageId=@pageId AND feature=@feature
 	IF(@hasSecurity = 0) BEGIN
-		INSERT INTO WebsiteSecurity (websiteId, userId, pageId, feature, security)
+		INSERT INTO [Security] (websiteId, userId, pageId, feature, security)
 		VALUES (@websiteId, @userId, @pageId, @feature, @security)
 	END 

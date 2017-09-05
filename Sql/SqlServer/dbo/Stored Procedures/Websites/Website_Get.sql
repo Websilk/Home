@@ -8,11 +8,9 @@ CREATE PROCEDURE [dbo].[Website_Get]
 AS
 BEGIN
 	SET NOCOUNT ON;
-	SELECT w.websiteId, w.title, p.pageid, p.datecreated,
-	(SELECT COUNT(*) FROM pages WHERE websiteid=@websiteId) AS totalPages
-	FROM websites w 
-	LEFT JOIN pages p ON p.pageid=w.pagehome 
-	WHERE w.websiteId=@websiteId
-	AND w.deleted=0
-	AND w.enabled=1
+	SELECT *
+	FROM websites
+	WHERE websiteId=@websiteId
+	AND deleted=0
+	AND [enabled]=1
 END

@@ -70,15 +70,16 @@
     <Folder Include="dbo\Sequences\" />
     <Folder Include="dbo\Stored Procedures\Websites" />
     <Folder Include="dbo\Stored Procedures\Users" />
-    <Folder Include="dbo\Stored Procedures\Photos" />
     <Folder Include="dbo\Stored Procedures\Security" />
     <Folder Include="dbo\Stored Procedures\Log" />
     <Folder Include="utility" />
+    <Folder Include="dbo\Stored Procedures\Pages" />
+    <Folder Include="dbo\Views" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="dbo\Tables\ErrorLog.sql" />
     <Build Include="dbo\Tables\Websites.sql" />
-    <Build Include="dbo\Tables\PasswordReset.sql" />
+    <Build Include="dbo\Tables\UsersPasswordReset.sql" />
     <Build Include="dbo\Tables\Timeline.sql" />
     <Build Include="dbo\Tables\Users.sql" />
     <Build Include="dbo\Functions\GetPagePath.sql" />
@@ -86,35 +87,21 @@
     <Build Include="dbo\Functions\SplitArray.sql" />
     <Build Include="dbo\Sequences\SequenceUsers.sql" />
     <Build Include="dbo\Sequences\SequenceWebsites.sql" />
-    <Build Include="dbo\Tables\Photos.sql" />
-    <Build Include="dbo\Tables\PhotoFolders.sql" />
-    <Build Include="dbo\Sequences\SequencePhotoFolders.sql" />
-    <Build Include="dbo\Stored Procedures\Photos\Photo_Create.sql" />
-    <Build Include="dbo\Stored Procedures\Photos\Photo_Folder_Create.sql" />
     <Build Include="dbo\Stored Procedures\Users\User_Create.sql" />
     <Build Include="dbo\Stored Procedures\Websites\Website_Create.sql" />
     <Build Include="dbo\Stored Procedures\Security\Security_Create.sql" />
-    <Build Include="dbo\Stored Procedures\Photos\Photo_Delete.sql" />
-    <Build Include="dbo\Stored Procedures\Photos\Photo_Folder_Delete.sql" />
-    <Build Include="dbo\Stored Procedures\Photos\Photos_Delete.sql" />
     <Build Include="dbo\Stored Procedures\Websites\Website_Delete.sql" />
-    <Build Include="dbo\Stored Procedures\Websites\Website_DeletePermanently.sql" />
     <Build Include="dbo\Stored Procedures\Users\User_Disable.sql" />
     <Build Include="dbo\Stored Procedures\Users\User_Enable.sql" />
-    <Build Include="dbo\Stored Procedures\Photos\Photo_Get.sql" />
-    <Build Include="dbo\Stored Procedures\Photos\Photo_Folders_GetList.sql" />
-    <Build Include="dbo\Stored Procedures\Photos\Photos_GetList.sql" />
     <Build Include="dbo\Stored Procedures\Security\Security_GetFeature.sql" />
     <Build Include="dbo\Stored Procedures\Security\Security_GetWebsite.sql" />
     <Build Include="dbo\Stored Procedures\Users\User_GetEmail.sql" />
     <Build Include="dbo\Stored Procedures\Users\User_GetPassword.sql" />
     <Build Include="dbo\Stored Procedures\Users\Users_GetList.sql" />
     <Build Include="dbo\Stored Procedures\Websites\Website_Get.sql" />
-    <Build Include="dbo\Stored Procedures\Websites\Website_Domains_GetList.sql" />
     <Build Include="dbo\Stored Procedures\Websites\Websites_GetList.sql" />
     <Build Include="dbo\Stored Procedures\Security\Security_HasPassword.sql" />
     <Build Include="dbo\Stored Procedures\Log\Log_Error_Create.sql" />
-    <Build Include="dbo\Stored Procedures\Photos\Photos_Move.sql" />
     <Build Include="dbo\Stored Procedures\Security\Security_ResetAllPasswords.sql" />
     <Build Include="dbo\Stored Procedures\Users\User_UpdateAccount.sql" />
     <Build Include="dbo\Stored Procedures\Users\User_UpdateEmail.sql" />
@@ -130,6 +117,16 @@
     <Build Include="dbo\Stored Procedures\Security\SecurityGroup_Get.sql" />
     <Build Include="dbo\Stored Procedures\Security\SecurityGroup_Delete.sql" />
     <Build Include="dbo\Stored Procedures\Security\SecurityGroup_GetList.sql" />
+    <Build Include="dbo\Tables\Pages.sql" />
+    <Build Include="dbo\Sequences\SequencePages.sql" />
+    <Build Include="dbo\Stored Procedures\Pages\Page_Create.sql" />
+    <Build Include="dbo\Stored Procedures\Pages\Page_Delete.sql" />
+    <Build Include="dbo\Stored Procedures\Pages\Page_Get.sql" />
+    <Build Include="dbo\Views\View_PageInfo.sql" />
+    <Build Include="dbo\Stored Procedures\Pages\Page_Update.sql" />
+    <Build Include="dbo\Stored Procedures\Pages\Page_UpdateModified.sql" />
+    <Build Include="dbo\Stored Procedures\Pages\Pages_GetList.sql" />
+    <Build Include="dbo\Stored Procedures\Users\Users_HasPasswords.sql" />
   </ItemGroup>
   <ItemGroup>
     <ArtifactReference Include="$(DacPacRootPath)\Extensions\Microsoft\SQLDB\Extensions\SqlServer\110\SqlSchemas\master.dacpac">

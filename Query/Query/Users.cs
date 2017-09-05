@@ -63,6 +63,15 @@ namespace Websilk.Query
                 }
             );
         }
+
+        /// <summary>
+        /// Checks to see if the website admin account is missing a password
+        /// </summary>
+        /// <returns>0 = All Users have passwords, 1 = admin is missing password, 2 = users are missing passwords</returns>
+        public int HasPasswords()
+        {
+            return Sql.ExecuteScalar<int>("Users_HasPasswords");
+        }
         #endregion
     }
 }

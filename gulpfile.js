@@ -26,7 +26,6 @@ var paths = {
     scripts: './App/Scripts/',
     css: './App/CSS/',
     app: './App/',
-    components: './App/Components/',
     themes: './App/Content/themes/',
     vendor: {
         root: './App/Vendor/**/'
@@ -39,17 +38,10 @@ paths.working = {
     js: {
         platform: [
             paths.webroot + 'js/selector.js',
-            paths.scripts + 'core/velocity.min.js',
+            paths.scripts + 'utility/velocity.min.js',
             paths.scripts + 'core/platform.js',
             paths.scripts + 'platform/[^_]*.js',
             paths.scripts + 'platform/_init.js'
-        ],
-        editor: [
-            paths.scripts + 'core/editor.js',
-            paths.scripts + 'editor/[^_]*.js',
-            paths.scripts + 'utility/rangy.js',
-            paths.scripts + 'utility/DOMpurify.js',
-            paths.scripts + 'editor/_init.js'
         ],
         app: paths.app + '**/*.js',
         utility: [
@@ -61,11 +53,9 @@ paths.working = {
     less:{
         platform: paths.css + 'platform.less',
         app: [
-            paths.app + '**/*.less',
-            '!' + paths.app + 'CSS/editor.less'
+            paths.app + '**/*.less'
         ],
         colors: paths.css + 'colors/**/**/*.less',
-        editor: paths.css + 'editor.less',
         tapestry: paths.css + 'tapestry/tapestry.less',
     },
 
@@ -95,11 +85,9 @@ paths.working = {
 //compiled paths
 paths.compiled = {
     platform: paths.webroot + 'js/platform.js',
-    editor: paths.webroot + 'js/editor.js',
     js: paths.webroot + 'js/',
     css: paths.webroot + 'css/',
     app: paths.webroot + 'css/',
-    components: paths.webroot + 'js/components/',
     themes: paths.webroot + 'css/themes/'
 };
 
@@ -141,12 +129,6 @@ gulp.task('js:selector', function () {
     return p.pipe(gulp.dest(paths.compiled.js, { overwrite: true }));
 });
 
-gulp.task('js:editor', function () {
-    var p = gulp.src(paths.working.js.editor, { base: '.' })
-            .pipe(concat(paths.compiled.editor));
-    if (prod == true) { p = p.pipe(uglify()); }
-    return p.pipe(gulp.dest('.', { overwrite: true }));
-});
 gulp.task('js:utility', function () {
     var p = gulp.src(paths.working.js.utility)
         .pipe(rename(function (path) {
@@ -162,7 +144,6 @@ gulp.task('js:utility', function () {
 gulp.task('js', function () {
     gulp.start('js:app');
     gulp.start('js:platform');
-    gulp.start('js:editor');
     gulp.start('js:utility');
 });
 
@@ -197,14 +178,6 @@ gulp.task('less:colors', function () {
     return p.pipe(gulp.dest(paths.compiled.css + 'colors', { overwrite: true }));
 });
 
-gulp.task('less:editor', function () {
-    var editor = gulp.src(paths.working.less.editor).pipe(less());
-    var util = gulp.src(paths.working.css.utility);
-    var p = merge(editor, util);
-    if (prod == true) { p = p.pipe(cleancss({ compatibility: 'ie8' })); }
-    return p.pipe(gulp.dest(paths.compiled.css, { overwrite: true }));
-});
-
 gulp.task('css:themes', function () {
     var p = gulp.src(paths.working.css.themes)
         .pipe(rename(function (path) {
@@ -233,7 +206,6 @@ gulp.task('less', function () {
     gulp.start('less:platform');
     gulp.start('less:app');
     gulp.start('less:colors');
-    gulp.start('less:editor');
 });
 
 gulp.task('css', function () {
@@ -264,12 +236,6 @@ gulp.task('watch', function () {
     pathjs.unshift(paths.working.js.app);
     gulp.watch(pathjs, ['js:app']);
 
-    //watch editor JS
-    gulp.watch([
-        paths.scripts + 'core/editor.js',
-        paths.scripts + 'editor/*.js'
-    ], ['js:editor']);
-
     //watch platform LESS
     gulp.watch([
         paths.working.less.platform,
@@ -285,12 +251,6 @@ gulp.task('watch', function () {
         pathless.unshift(paths.working.less.app[x]);
     }
     gulp.watch(pathless, ['less:app']);
-
-    //watch editor LESS
-    gulp.watch([
-        paths.working.less.editor,
-        paths.working.css.utility
-    ], ['less:editor']);
 
     //watch colors LESS
     gulp.watch([

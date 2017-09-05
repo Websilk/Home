@@ -544,87 +544,6 @@
         }
     },
 
-    shadow: { //shadow templates
-        loadList: function () {
-            var shadowId = $('#shadowId').val();
-            var shadowChildId = $('#shadowChildId').val();
-            var list = '';
-            var templates = S.dashboard.pages.shadow_templates;
-            for (var x = 0; x < templates.length; x++) {
-                list += '<option value="' + templates[x].id + '" data-url="' + templates[x].url + '">' + templates[x].title + '</option>';
-            }
-            $('#shadowId, #shadowChildId').html(list);
-            $('#shadowId').val(shadowId);
-            $('#shadowChildId').val(shadowChildId);
-        },
-
-        create: {
-            view: function () {
-                //view popup to create new shadow template
-                S.popup.show('New Shadow Template', $('#shadow_template_create').html());
-                $('.btn-shadow-save').on('click', S.dashboard.pages.shadow.create.save);
-            },
-
-            save: function () {
-                //save new shadow template
-                var msg = $('.popup .message');
-                msg.hide();
-                var data = {
-                    websiteId: S.website.id,
-                    name: $('#shadow_name').val()
-                }
-                if (!S.validate.alphaNumeric(data.name, [' '])) {
-                    S.message.show(msg, 'error', 'No special characters are allowed');
-                    return;
-                }
-
-                //submit "new shadow template" form
-                S.ajax.post("Dashboard/Pages/CreateShadowTemplate", data,
-                    function (d) {
-
-                        if (d.d == 'exists') {
-                            S.message.show(msg, 'error', 'A shadow template with the name "' + data.name + '" already exists');
-                            return false;
-                        } else if (d.d == 'err') {
-                            S.message.show(msg, 'error', 'An error occurred while trying to create a new shadow template');
-                            return false;
-                        } else {
-                            //show success message
-                            S.message.show(msg, '', 'Your shadow template, "' + data.name + '" has been created successfully');
-                            $('#shadow_name').val('');
-                            eval(d.d);
-
-                            //load shadow template list into drop down lists
-                            S.dashboard.pages.shadow.loadList();
-                        }
-                    }
-                );
-            }
-        }
-    },
-
-    history: {
-        view: function (id, callback) {
-            if ($('.tab-body-history.for-page-' + id).length > 0) { callback(); return; }
-            var data = { id: id, startDate: new Date().toISOString(), length: 20 };
-            S.ajax.post('Dashboard/Pages/ViewHistory', data, function (d) {
-                //remove reference to previously-selected page id & add new reference
-                var sect = $('.tab-body-history');
-                var classes = sect[0].getAttribute('class').split(' ');
-                for (var x = 0; x < classes.length; x++) {
-                    if (classes[x].indexOf('for-page-') == 0) {
-                        sect.removeClass(classes[x]);
-                    }
-                }
-                sect.addClass('for-page-' + id);
-                sect.html(d.d);
-
-                //execute callback
-                callback();
-            });
-        }
-    },
-
     tabs: {
         show: function (name) {
             if ($('.pages-body > .tab-body-' + name + '.is-selected').length > 0) { return;}
@@ -648,9 +567,9 @@
                     }
 
                     switch (name) {
-                        case 'history':
-                            S.dashboard.pages.history.view(0, show_section);
-                            break;
+                        //case 'history':
+                            //S.dashboard.pages.history.view(0, show_section);
+                            //break;
 
                         default: show_section(); break;
                     }
@@ -736,4 +655,6 @@
         }
     }
 }
+
+S.dashboard.pages.init();
 

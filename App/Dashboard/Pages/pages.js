@@ -2,6 +2,7 @@
     current_page: 0, current_elem:null, current_path: [], page_info: null, slides: null, shadow_templates: [],
 
     init: function () {
+        console.log('WTF');
         this.slides = new S.slides('.tab-body-pages > .slideshow');
         this.current_page = 0;
         this.current_elem = S.dashboard.pages.getCurrentPage(this.slides.current_slide + 1); 
@@ -19,7 +20,7 @@
 
         //set up button events for menu
         $('.section-pages li.tab-pages').on('click', function () { S.dashboard.pages.tabs.show('pages'); });
-        $('.section-pages li.tab-history').on('click', function () { S.dashboard.pages.tabs.show('history'); });
+        $('.section-pages li.tab-edit').on('click', function () { S.dashboard.pages.tabs.show('edit'); });
         $('.section-pages li.tab-shadow-templates').on('click', function () { S.dashboard.pages.tabs.show('shadow-templates'); });
         $('.section-pages li.tab-trash').on('click', function () { S.dashboard.pages.tabs.show('trash'); });
 
@@ -36,10 +37,10 @@
             'summary': '',
             'created': '',
             'url': '',
-            'url-name': S.website.host.substr(0, S.website.host.length - 1),
+            'url-name': S.website.host,
             'link-create': ''
         };
-        $('.section-pages .url-path').html('http://' + S.website.host + '/');
+        $('.section-pages .url-path').html(S.website.protocol + S.website.host + '/');
     },
 
     goback: function (e, count) {
@@ -94,7 +95,7 @@
             'date-created': e.getAttribute('data-created'),
             'summary': e.getAttribute('data-summary'),
             'created': 'created on ' + e.getAttribute('data-created'),
-            'url': S.website.protocol + S.website.host + link.substr(1),
+            'url': S.website.protocol + S.website.host + link,
             'url-name': link.substr(1),
             'link-create': 'S.dashboard.pages.create.view(this, ' + pageid + ')',
             'link-settings': 'S.dashboard.pages.settings.view(this, ' + pageid + ')',
@@ -145,12 +146,12 @@
                     if (data.d != 'err') {
                         list.html(data.d);
                         list.find('.columns-list').addClass('small');
-                        $('.slide-for-' + pageid).find('.url-path').html('<a class="no-link" href="javascript:" onclick="S.dashboard.pages.goback(this,' + (links.length) + ')">' + S.website.host.replace('/', '') + '</a>/' + alinks.join(''));
+                        $('.slide-for-' + pageid).find('.url-path').html('<a class="no-link" href="javascript:" onclick="S.dashboard.pages.goback(this,' + (links.length) + ')">' + S.website.host + '</a>/' + alinks.join(''));
                     }
                 }
             );
         } else {
-            $('.slide-for-' + pageid).find('.url-path').html('<a class="no-link" href="javascript:" onclick="S.dashboard.pages.goback(this,' + (links.length) + ')">' + S.website.host.replace('/', '') + '</a>/' + alinks.join(''));
+            $('.slide-for-' + pageid).find('.url-path').html('<a class="no-link" href="javascript:" onclick="S.dashboard.pages.goback(this,' + (links.length) + ')">' + S.website.host + '</a>/' + alinks.join(''));
         }
         slides.next();
         this.current_elem = S.dashboard.pages.getCurrentPage(this.slides.current_slide + 1);
@@ -164,8 +165,7 @@
             var data = {
                 'parent-title': info.path != '' ? 'For page "' + info.path.replace(/\//g, ' > ') + '"' : '',
                 'page-url': info['url-name'] + '/',
-                'create-title': pageid == 0 ? 'Page' : 'Sub Page',
-                'shadow-list': ''
+                'create-title': pageid == 0 ? 'Page' : 'Sub Page'
             }
             var scaffold = new S.scaffold(htm, data);
             var container = $(e).parents('.page-details').find('.page-create');
@@ -185,35 +185,6 @@
             container.find('.btn-page-cancel a').on('click', S.dashboard.pages.create.cancel);
             $('#txtcreatedesc').on('keyup', S.dashboard.pages.create.countChars);
             $('#txtcreatetitle').on('keyup', S.dashboard.pages.create.updateTitle);
-            container.find('.chk-use-shadow').on('change', function (e) {
-                if (e.target.checked) {
-                    $('.shadow-list').show();
-                } else {
-                    $('.shadow-list').hide();
-                }
-            });
-            container.find('.chk-use-child-shadow').on('change', function (e) {
-                if (e.target.checked) {
-                    $('.shadow-child-list').show();
-                } else {
-                    $('.shadow-child-list').hide();
-                }
-            });
-
-            //load shadow template list into drop down lists
-            S.dashboard.pages.shadow.loadList();
-
-            //set up new shadow template button
-            $('.btn-shadow-create').on('click', S.dashboard.pages.shadow.create.view);
-
-            if (pageid > 0) {
-                //var subpages = $(e).parents('.page-details').find('.slideshow');
-                //subpages.addClass('hide');
-            } else {
-                //hide root page list
-                //var pagelist = $(e).parents('.page-details').find('.root-list');
-                //pagelist.hide();
-            }
             container.addClass('view');
         },
 
@@ -338,11 +309,11 @@
         //page settings functions ///////////////////////////////
         id: null, 
         view: function (e, id) {
-            var data = { id: id };
+            var data = { id: id, websiteId: S.website.id };
             S.ajax.post('Dashboard/Pages/ViewSettings', data, function (d) {
                 var container = $(e).parents('.page-details').find('.page-create');
                 container.html('');
-                container.append(d.d);
+                container.append(d);
 
                 //update slideshow classes
                 var slideshow = container.parent().addClass('view-create-page').find('.slideshow').first();
@@ -358,46 +329,6 @@
                 container.find('.btn-page-settings-update a').on('click', function (e) { S.dashboard.pages.settings.submit(this); });
                 container.find('.btn-page-cancel a').on('click', S.dashboard.pages.settings.cancel);
                 container.find('#description').on('keyup', S.dashboard.pages.settings.countChars);
-
-                //add events for shadow templates
-                container.find('.chk-use-shadow').on('change', function (e) {
-                    if (e.target.checked) {
-                        $('.shadow-list').show();
-                    } else {
-                        $('.shadow-list').hide();
-                    }
-                });
-                container.find('.chk-use-child-shadow').on('change', function (e) {
-                    if (e.target.checked) {
-                        $('.shadow-child-list').show();
-                    } else {
-                        $('.shadow-child-list').hide();
-                    }
-                });
-
-                //check shadow checkboxes
-                if (container.find('.chk-use-shadow')[0].checked) {
-                    $('.shadow-list').show();
-                } else {
-                    $('.shadow-list').hide();
-                }
-                if (container.find('.chk-use-child-shadow')[0].checked) {
-                    $('.shadow-child-list').show();
-                } else {
-                    $('.shadow-child-list').hide();
-                }
-
-                //load shadow template list into drop down lists
-                S.dashboard.pages.shadow.loadList();
-
-                //select shadow template from list
-                container.find('#shadowId option').removeAttr('selected');
-                container.find('#shadowId option[value="' + container.find('#shadowId').attr('data-id') + '"]').attr('selected', 'selected');
-                container.find('#shadowChildId option').removeAttr('selected');
-                container.find('#shadowChildId option[value="' + container.find('#shadowChildId').attr('data-id') + '"]').attr('selected', 'selected');
-
-                //set up new shadow template button
-                container.find('.btn-shadow-create').on('click', S.dashboard.pages.shadow.create.view);
 
                 //set up delete button
                 container.find('.btn-page-delete a').on('click', S.dashboard.pages.settings.delete);

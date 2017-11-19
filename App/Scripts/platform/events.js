@@ -180,18 +180,12 @@
                     this.stop();
                     return;
                 }
-                if (S.viewport.getLevel() == true) {
-                    this.callback.execute('onLevelChange');
-                }
             },
 
             stop: function () {
                 if (this.timer.started == false) { return; }
                 clearInterval(this.timer.callback);
                 this.timer.started = false;
-                if (S.viewport.getLevel() == true) {
-                    this.callback.execute('onLevelChange');
-                }
                 this.callback.execute('onStop');
             },
 

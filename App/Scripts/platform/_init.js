@@ -1,14 +1,8 @@
 ﻿/*/////////////////////////////////////
 Initialize Websilk Platform
 /////////////////////////////////////*/
-S.init = function (ajax, pageid, pagetype, pagepath, title, tabTitle, websiteId, websiteTitle, websiteProtocol, websiteHost, theme) {
-    S.page.useAjax = ajax;
-    S.page.update(pageid, pagetype, pagepath, title, tabTitle, theme);
-    S.website.id = websiteId;
-    S.website.title = websiteTitle;
-    S.website.protocol = websiteProtocol;
-    S.website.host = websiteHost;
-    S.viewport.getLevel();
+S.init = function (website) {
+    S.website = website;
     S.events.url.callback.execute();
 }
 

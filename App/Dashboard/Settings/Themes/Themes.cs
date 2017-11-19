@@ -11,7 +11,7 @@ namespace Websilk.Pages.DashboardPages.Settings
         {
         }
 
-        public override string Render(string[] path, string query = "", string body = "")
+        public override string Render(string[] path, string body = "")
         {
 
                 //load downloads list

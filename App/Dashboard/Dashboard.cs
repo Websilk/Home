@@ -18,21 +18,36 @@ namespace Websilk.Pages
 
         public Dashboard(Core WebsilkCore): base(WebsilkCore){}
 
-        public override string Render(string[] path, string query = "", string body = "")
+        public override string Render(string[] path, string body = "")
         {
-            websiteId = 1;
-            if (!S.User.checkSecurity(websiteId,"websilk", User.enumSecurity.read)) { return AccessDenied(); }
+            //start with initial default website Id
+            this.website.id = 1;
+
+            if (S.Request.Query.ContainsKey("website"))
+            {
+                this.website.id = int.Parse(S.Request.Query["website"].ToString());
+            }
+
+            //get website information from database
+            var queryWebsites = new Query.Websites(S.SqlConnectionString);
+            var website = queryWebsites.GetWebsiteInfo(this.website.id);
+            this.website.protocol = "https://";
+            this.website.host = website.domain;
+            this.website.title = website.title;
+            this.website.liveUrl = website.liveUrl;
+            this.website.stageUrl = website.stageUrl;
+
+            //check security
+            if (!S.User.checkSecurity(this.website.id, "websilk", User.enumSecurity.read)) { return AccessDenied(); }
 
             //set up client-side dependencies
-            colorsCss = "/css/colors/dashboard/aqua.css";
+            colorsCss = "/css/colors/dashboard/default.css";
             headCss += "<link type=\"text/css\" rel=\"stylesheet\" href=\"/css/dashboard/dashboard.css\"/>";
             scripts += "<script src=\"/js/dashboard/dashboard.js\"></script>";
 
             //load the dashboard layout
             var scaffold = new Scaffold(S, "/Dashboard/dashboard.html");
             var scaffMenu = new Scaffold(S, "/Dashboard/menu-item.html");
-            var queryWebsites = new Query.Websites(S.SqlConnectionString);
-            var website = queryWebsites.GetWebsiteInfo(websiteId);
 
             //load user profile
             scaffold.Data["profile-img"] = "";
@@ -51,7 +66,7 @@ namespace Websilk.Pages
                 menuItem("Timeline", "timeline", "/dashboard/timeline", "timeline"),
                 menuItem("Pages", "pages", "/dashboard/pages", "pages"),
                 menuItem("Photos", "photos", "/dashboard/photos", "photos"),
-                menuItem("Downloads", "downloads", "/dashboard/downloads", "layers"),
+                menuItem("Files", "files", "/dashboard/files", "layers"),
                 menuItem("Analytics", "analytics", "/dashboard/analytics", "analytics"),
                 menuItem("Users", "users",  "/dashboard/users", "users"),
                 menuItem("Settings", "settings", "/dashboard/settings", "settings",
@@ -72,27 +87,27 @@ namespace Websilk.Pages
             }
             scaffold.Data["menu"] = "<ul class=\"menu\">" + menu.ToString() + "</ul>";
 
-            //finally, add content of dashboard section
-
-            var subPath = "";
-            subPath = S.Request.Path.ToString().Replace("dashboard", "").Substring(1);
-            if(subPath == "") { 
-                subPath = "pages";
-            }
+            //get dashboard section name
+            var subPath = S.Request.Path.ToString().Replace("dashboard", "").Substring(1);
+            if(subPath == "") { subPath = "pages"; }
             var html = "";
+
+            //load dashboard section
             Page subpage = null;
             var t = LoadSubPage(subPath);
             subpage = t.Item1;
             html = t.Item2;
+            if (html == "") { return AccessDenied(); }
             scaffold.Data["body"] = html;
-
-            if(html == "") { return AccessDenied(); }
 
             //set up page info
             title = website.title + " - Dashboard - " + subpage.title;
+
+            //include dashboard section javascript dependencies
             scripts += subpage.scripts;
 
-            return base.Render(path, query, scaffold.Render());
+            //render base layout along with dashboard section
+            return base.Render(path, scaffold.Render());
         }
 
         private Tuple<Page, string> LoadSubPage(string path)
@@ -135,7 +150,7 @@ namespace Websilk.Pages
             }
 
             //render sub page
-            service.websiteId = websiteId;
+            service.website.id = this.website.id;
             html = service.Render(subpath);
 
             return new Tuple<Page, string>(service, html);

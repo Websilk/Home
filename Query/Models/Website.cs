@@ -10,6 +10,7 @@ namespace Websilk.Query.Models
         public int status { get; set; }
         public bool enabled { get; set; }
         public bool deleted { get; set; }
+        public string domain { get; set; }
         public string liveUrl { get; set; }
         public string stageUrl { get; set; }
         public bool logo { get; set; }

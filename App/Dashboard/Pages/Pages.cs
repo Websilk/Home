@@ -9,10 +9,10 @@ namespace Websilk.Pages.DashboardPages
         {
         }
 
-        public override string Render(string[] path, string query = "", string body = "")
+        public override string Render(string[] path, string body = "")
         {
             //check security first
-            if (!S.User.checkSecurity(websiteId, "websilk", User.enumSecurity.read)) { return ""; }
+            if (!S.User.checkSecurity(website.id, "websilk", User.enumSecurity.read)) { return ""; }
 
             //set up webpage info
             title = "Pages";
@@ -20,17 +20,13 @@ namespace Websilk.Pages.DashboardPages
             {
                 title += " > " + string.Join(" > ", path);
             }
-            if(query != "")
-            {
-                title += " " + query.Replace("&", ", ").Replace("=",": ");
-            }
             scripts += "<script src=\"js/dashboard/pages/pages.js\"></script>";
 
             //load pages list
             var scaffold = new Scaffold(S, "/Dashboard/Pages/pages.html");
             var servePage = new Services.Dashboard.Pages(S);
-            if (S.Request.Query.ContainsKey("websiteid")) { websiteId = int.Parse(S.Request.Query["websiteid"]); }
-            scaffold.Data["page-list"] = servePage.View(websiteId, 0, 1, 1000, 4, 0, "");
+            if (S.Request.Query.ContainsKey("websiteid")) { website.id = int.Parse(S.Request.Query["websiteid"]); }
+            scaffold.Data["page-list"] = servePage.View(website.id, 0, 1, 1000, 4, 0, "");
             scaffold.Data["page-create"] = S.Server.LoadFileFromCache("/Dashboard/Pages/create.html");
             return scaffold.Render();
         }
@@ -98,11 +94,6 @@ namespace Websilk.Services.Dashboard
                 switch (page.title.ToLower())
                 {
                     case "home":
-                    case "login":
-                    case "error 404":
-                    case "access denied":
-                    case "about":
-                    case "contact":
                         options[3] = false;
                         break;
                     case "dashboard":
@@ -110,31 +101,14 @@ namespace Websilk.Services.Dashboard
                 }
 
                 //disable sub-page creation
-                switch (page.title.ToLower())
-                {
-                    case "login":
-                    case "error 404":
-                    case "access denied":
-                        options[1] = false;
-                        break;
-                }
-
-                //change row color
-                switch (page.title.ToLower())
-                {
-                    case "login":
-                    case "about":
-                    case "contact":
-                        color = "yellow";
-                        break;
-                    case "error 404":
-                    case "access denied":
-                        color = "red";
-                        break;
-                    case "home":
-                        color = "turqoise";
-                        break;
-                }
+                //switch (page.title.ToLower())
+                //{
+                //    case "error 404":
+                //    case "access denied":
+                //        options[1] = false;
+                //        break;
+                //}
+                
 
                 //setup options
                 if (secureDelete == false)
@@ -189,7 +163,7 @@ namespace Websilk.Services.Dashboard
 
         public string Create(int websiteId, int parentId, string title, string description, int type, int shadowId, int shadowChildId, bool secure, string layout = "", string service = "")
         {
-            if (!S.User.checkSecurity(websiteId, "dashboard/pages", Websilk.User.enumSecurity.create)) { return "err"; }
+            if (!S.User.checkSecurity(websiteId, "websilk/pages", Websilk.User.enumSecurity.create)) { return "err"; }
 
             //create new web page
             var query = new Query.Pages(S.SqlConnectionString);
@@ -223,7 +197,7 @@ namespace Websilk.Services.Dashboard
 
         public string UpdateSettings(int websiteId, int id, string title, string description, int type, int shadowId, int shadowChildId, bool secure, bool active)
         {
-            if (!S.User.checkSecurity(websiteId, "dashboard/pages", Websilk.User.enumSecurity.update)) { return "err"; }
+            if (!S.User.checkSecurity(websiteId, "websilk/pages", Websilk.User.enumSecurity.update)) { return "err"; }
 
             //create new web page
             var query = new Query.Pages(S.SqlConnectionString);
@@ -234,7 +208,7 @@ namespace Websilk.Services.Dashboard
         
         public string Delete(int websiteId, int id)
         {
-            if (!S.User.checkSecurity(websiteId, "dashboard/pages", Websilk.User.enumSecurity.update)) { return "err"; }
+            if (!S.User.checkSecurity(websiteId, "websilk/pages", Websilk.User.enumSecurity.update)) { return "err"; }
 
             //move page to trash can
             var query = new Query.Pages(S.SqlConnectionString);

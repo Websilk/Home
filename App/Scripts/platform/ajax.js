@@ -6,7 +6,6 @@
         this.expire = new Date();
         S.events.ajax.start();
         var d = data;
-        d.pageId = S.page.id;
 
         var options = {
             method: "POST",

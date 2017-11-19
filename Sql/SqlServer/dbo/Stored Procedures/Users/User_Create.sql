@@ -18,15 +18,16 @@ CREATE PROCEDURE [dbo].[User_Create]
 AS
 BEGIN
 	SET NOCOUNT ON;
-	DECLARE @date datetime = GETDATE()
+	DECLARE @date datetime = GETDATE(),
+	@id int = NEXT VALUE FOR SequenceUsers
 
     INSERT INTO Users (userId, email, [password], displayname, photo,
     lastlogin, datecreated, [status],
     signupip, referrer, [activation], deleted)
     VALUES
-    (NEXT VALUE FOR SequenceUsers, @email, @password, @displayname, @photo,
+    (@id, @email, @password, @displayname, @photo,
 	@date, @date, @status,
     @signupip, @referrer, @activation, @deleted)
     
-    SELECT userId FROM Users WHERE email=@email
+    SELECT @id
 END

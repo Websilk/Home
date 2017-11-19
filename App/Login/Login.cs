@@ -6,7 +6,7 @@
         {
         }
 
-        public override string Render(string[] path, string query = "", string body = "")
+        public override string Render(string[] path, string body = "")
         {
             //set up client-side dependencies
             colorsCss = "/css/colors/dashboard/aqua.css";
@@ -27,7 +27,7 @@
             }
 
             //load login page
-            return base.Render(path, query, scaffold.Render());
+            return base.Render(path, scaffold.Render());
         }
     }
 }

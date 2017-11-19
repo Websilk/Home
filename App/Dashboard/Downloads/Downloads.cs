@@ -6,7 +6,7 @@
         {
         }
 
-        public override string Render(string[] path, string query = "", string body = "")
+        public override string Render(string[] path, string body = "")
         {
             if(path.Length > 0)
             {

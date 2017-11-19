@@ -6,7 +6,7 @@
         {
         }
 
-        public override string Render(string[] path, string query = "", string body = "")
+        public override string Render(string[] path, string body = "")
         {
             //load timeline
             var scaffold = new Scaffold(S, "/Dashboard/Timeline/timeline.html");

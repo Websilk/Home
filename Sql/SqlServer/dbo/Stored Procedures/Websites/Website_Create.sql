@@ -11,6 +11,7 @@ CREATE PROCEDURE [dbo].[Website_Create]
 	@logo bit = 0,
 	@security bit = 0,
 	@enabled bit = 1,
+	@domain nvarchar(255) = '',
 	@liveUrl nvarchar(255) = '',
 	@stageUrl nvarchar(255) = ''
 AS
@@ -22,8 +23,8 @@ BEGIN
     
     -- first create the web site
     INSERT INTO Websites (
-	websiteid, ownerId, title, datecreated, [status], logo, liveUrl, stageUrl, [enabled], deleted) 
-	VALUES (@websiteId, @ownerId, @title, @myDate, @status, @logo, @liveUrl, @stageUrl, @enabled, 0)
+	websiteid, ownerId, title, datecreated, [status], logo, domain, liveUrl, stageUrl, [enabled], deleted) 
+	VALUES (@websiteId, @ownerId, @title, @myDate, @status, @logo, @domain, @liveUrl, @stageUrl, @enabled, 0)
 
 	-- create home page for website
 	EXEC Page_Create @ownerId=@ownerId, @websiteId=@websiteId, @parentId=0, @title='Home', 

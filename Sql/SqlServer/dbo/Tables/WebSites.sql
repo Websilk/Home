@@ -6,6 +6,7 @@
     [status]		INT				NULL,
     [enabled]		BIT				NULL,
     [deleted]		BIT				NULL,
+	[domain]		NVARCHAR(255)	NULL, 
     [liveUrl]		NVARCHAR(255)	NULL, 
     [stageUrl]		NVARCHAR(255)	NULL, 
 	[logo]			BIT				NOT NULL DEFAULT 0

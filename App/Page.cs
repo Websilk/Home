@@ -1,13 +1,10 @@
-﻿
-namespace Websilk
+﻿namespace Websilk
 {
     public class Page
     {
-
         public Core S;
-        public int websiteId;
-        
-        //layout properties
+
+        public Website website = new Website();
         public string title = "Websilk";
         public string description = "";
         public string headCss = "";
@@ -22,8 +19,9 @@ namespace Websilk
             svgIcons = S.Server.LoadFileFromCache("/content/themes/default/icons.svg");
         }
 
-        public virtual string Render(string[] path, string query = "", string body = "")
+        public virtual string Render(string[] path, string body = "")
         {
+            //renders HTML layout
             var scaffold = new Scaffold(S, "/layout.html");
             scaffold.Data["title"] = title;
             scaffold.Data["description"] = description;
@@ -32,6 +30,9 @@ namespace Websilk
             scaffold.Data["favicon"] = favicon;
             scaffold.Data["svg-icons"] = svgIcons;
             scaffold.Data["body"] = body;
+
+            //add initialization script
+            scripts = "<script type=\"text/javascript\">S.init(" + S.Util.Serializer.WriteObjectToString(website) + ");</script>\n" + scripts;
             scaffold.Data["scripts"] = scripts;
 
             return scaffold.Render();

@@ -13,7 +13,7 @@ IF (SELECT COUNT(*) FROM Users WHERE userId=1) = 0 BEGIN
 	EXEC User_Create @email='admin@localhost', @password='', @displayname='admin', @photo='', @status=1
 
 	/* Create Default Website */
-	EXEC @websiteId = Website_Create @ownerId=1, @title=@websiteTitle, @description=@pageDescription, 
-					@status=1, @logo='', @security=0, @enabled=1, @liveurl='www.websilk.io', @stageurl='new.websilk.io'
+	EXEC @websiteId = Website_Create @ownerId=1, @title=@websiteTitle, @description=@pageDescription, @status=1, @security=0, @enabled=1, 
+	@logo='', @domain='websilk.io', @liveurl='www.websilk.io', @stageurl='new.websilk.io'
 	
 END

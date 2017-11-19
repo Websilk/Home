@@ -14,14 +14,13 @@ namespace Websilk.Pipeline
 
             S = new Core(server, context);
 
-            var pathquery = context.Request.Path.ToString().Substring(1).Split('?', 2);
-            var path = pathquery[0].Split('/');
+            var path = context.Request.Path.ToString().Substring(1).Split('?', 2)[0].Split('/');
+
             var page = GetWebPage("websilk.pages." + path[0]);
 
             //render the server response
             S.Response.ContentType = "text/html";
-            S.Response.WriteAsync(page.Render(path, pathquery.Length == 2 ? pathquery[1] : null));
-
+            S.Response.WriteAsync(page.Render(path));
         }
 
         private Page GetWebPage(string className)

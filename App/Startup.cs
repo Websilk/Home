@@ -1,5 +1,4 @@
 using System;
-using System.IO;
 using System.Linq;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
@@ -43,9 +42,6 @@ namespace Websilk
             var errOptions = new DeveloperExceptionPageOptions();
             errOptions.SourceCodeLineCount = 10;
             app.UseDeveloperExceptionPage();
-
-            //get server info from config.json
-            checkForConfig();
 
             var config = new ConfigurationBuilder()
                 .AddJsonFile(server.MapPath("config.json"))
@@ -178,16 +174,6 @@ namespace Websilk
                 if (!p.All(a => char.IsLetter(a))) { return false; }
             }
             return true;
-        }
-
-        private void checkForConfig()
-        {
-            //generate a new config.json file
-            var configPath = Path.GetFullPath("config.json");
-            if (!File.Exists(configPath))
-            {
-                File.WriteAllText(configPath, (new Tests.Config()).NewConfig());
-            }
         }
     }
 }

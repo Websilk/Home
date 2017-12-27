@@ -9,6 +9,25 @@ namespace Websilk.Query
         }
 
         #region "Account"
+        public void CreateUser(Models.User user)
+        {
+            Sql.ExecuteNonQuery("User_Create",
+                new Dictionary<string, object>()
+                {
+                    {"email", user.email },
+                    {"password", user.password },
+                    {"displayname", user.displayname },
+                    {"photo", user.photo },
+                    {"status", user.status },
+                    {"signupip", user.signupip },
+                    {"referrer", user.referrer },
+                    {"activation", user.activation },
+                    {"deleted", user.deleted }
+                }
+            );
+        }
+
+
         public Models.User AuthenticateUser(string email, string password)
         {
             var list = Sql.Populate<Models.User>("User_Authenticate",
@@ -65,9 +84,8 @@ namespace Websilk.Query
         }
 
         /// <summary>
-        /// Checks to see if the website admin account is missing a password
+        /// Checks to see if the website admin account is missing a password. 0 = All Users have passwords, 1 = admin is missing password, 2 = users are missing passwords
         /// </summary>
-        /// <returns>0 = All Users have passwords, 1 = admin is missing password, 2 = users are missing passwords</returns>
         public int HasPasswords()
         {
             return Sql.ExecuteScalar<int>("Users_HasPasswords");

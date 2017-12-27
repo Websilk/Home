@@ -1,7 +1,7 @@
 ﻿-- =============================================
 -- Author:		Mark Entingh
 -- Create date: 10/5/2008
--- Description:	set [delete] = 1 for a website & all web pages as a temporary deletion
+-- Description:	set [delete] = 1 for a website & all web Pages as a temporary deletion
 -- =============================================
 CREATE PROCEDURE [dbo].[Website_Delete] 
 	@websiteId int = 0,
@@ -9,5 +9,5 @@ CREATE PROCEDURE [dbo].[Website_Delete]
 AS
 BEGIN
 	SET NOCOUNT ON;
-	DELETE FROM Websites WHERE websiteId=@websiteId AND ownerId=@ownerid
+	DELETE FROM Websites WHERE websiteId=@websiteId AND ownerId=@ownerId
 END

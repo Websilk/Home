@@ -4,11 +4,11 @@
 -- Description:	
 -- =============================================
 CREATE PROCEDURE User_UpdateAccount
-	@userid int = 0,
+	@userId int = 0,
 	@email nvarchar(75) = '',
 	@pass nvarchar(100) = ''
 AS
 BEGIN
 	SET NOCOUNT ON;
-	UPDATE Users SET email=@email, password=@pass WHERE userId=@userid
+	UPDATE Users SET email=@email, password=@pass WHERE userId=@userId
 END

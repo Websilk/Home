@@ -2,7 +2,6 @@
 
     doc: {
         load: function () {
-            S.url.checkAnchors();
         },
 
         ready: function () {
@@ -11,22 +10,7 @@
 
         mousedown: {
             trigger: function (target) {
-                var type = 'bg';
-                if (!target) { return type; }
-                var t = $(target);
-                if (t.length == 0) { return type; }
-                if (t.parents('.component').length > 0 || t.hasClass('component') == true) {
-                    type = 'component';
-                } else if (t.parents('.window').length > 0 || t.hasClass('window') == true) {
-                    type = 'window';
-                } else if (t.parents('.toolbar').length > 0 || t.hasClass('toolbar') == true) {
-                    type = 'toolbar';
-                } else if (t.parents('.component-select').length > 0 || t.hasClass('component-select') == true) {
-                    type = 'component-select';
-                } else if (t.parents('.component-hover').length > 0 || t.hasClass('component-hover') == true) {
-                    type = 'component-hover';
-                }
-                S.events.doc.click.type = type;
+
             }
         },
 
@@ -193,8 +177,8 @@
                 //register & execute callbacks when the window resizes
                 items: [],
 
-                add: function (elem, onStart, onGo, onStop, onLevelChange) {
-                    this.items.push({ elem: elem, onStart: onStart, onGo: onGo, onStop: onStop, onLevelChange: onLevelChange });
+                add: function (elem, onStart, onGo, onStop) {
+                    this.items.push({ elem: elem, onStart: onStart, onGo: onGo, onStop: onStop });
                 },
 
                 remove: function (elem) {
@@ -208,23 +192,17 @@
                         switch (type) {
                             case 'onStart':
                                 for (var x = 0; x < this.items.length; x++) {
-                                    if (this.items[x].onStart) {this.items[x].onStart();}
+                                    if (this.items[x].onStart) { this.items[x].onStart(); }
                                 } break;
 
                             case 'onGo':
                                 for (var x = 0; x < this.items.length; x++) {
-                                    if (this.items[x].onGo) {this.items[x].onGo();}
+                                    if (this.items[x].onGo) { this.items[x].onGo(); }
                                 } break;
 
                             case 'onStop':
                                 for (var x = 0; x < this.items.length; x++) {
-                                    if (this.items[x].onStop) {this.items[x].onStop();}
-                                } break;
-
-                            case 'onLevelChange':
-
-                                for (var x = 0; x < this.items.length; x++) {
-                                    if (this.items[x].onLevelChange) {this.items[x].onLevelChange(lvl);}
+                                    if (this.items[x].onStop) { this.items[x].onStop(); }
                                 } break;
                         }
                     }
@@ -253,10 +231,6 @@
             S.events.ajax.loaded = true;
             $(document.body).removeClass('wait');
             S.window.changed = true;
-            S.events.images.load();
-
-            //replace all relative URLs with ajax posts
-            setTimeout(function () { S.url.checkAnchors(); }, 500);
         },
 
         error: function (status, err) {
@@ -339,26 +313,6 @@
                 }
                 return true;
             }
-        }
-    },
-
-    images: {
-        load: function () {
-            imgs = $('img:not([src=""])');
-            if (!imgs.length) { S.events.images.complete(); return; }
-            var df = [];
-            imgs.each(function () {
-                var dfnew = $.Deferred();
-                df.push(dfnew);
-                var img = new Image();
-                img.onload = function () { dfnew.resolve(); }
-                img.src = this.src;
-            });
-            //$.when.apply($, df).done(S.events.images.complete);
-        },
-
-        complete: function () {
-            S.events.doc.resize.trigger();
         }
     }
 };

@@ -13,7 +13,7 @@ CREATE PROCEDURE [dbo].[Users_GetList]
 AS
 BEGIN
 	SET NOCOUNT ON;
-	SELECT userId, email, displayname, photo, status, datecreated
+	SELECT userId, email, displayname, photo, status, dateCreated
 	FROM (SELECT ROW_NUMBER() 
 	OVER (ORDER BY
 	CASE WHEN @orderby = 0 THEN u.email END DESC,

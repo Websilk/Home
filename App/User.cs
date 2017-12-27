@@ -1,14 +1,14 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Http;
 using System.Collections.Generic;
 using System.Linq;
-using System.Data.SqlClient;
-using Newtonsoft.Json;
+using System.Text;
 
 namespace Websilk
 {
-
     public class User
-    { 
+    {
+        public Core S;
+
         public enum enumSecurity
         {
             read = 0,
@@ -24,150 +24,120 @@ namespace Websilk
             public Dictionary<string, bool[]> security;
         }
 
-        [JsonIgnore]
-        public Core S;
-        
-        public int userId = 0;
-        public string visitorId = "";
-        public string email = "";
-        public string photo = "";
-        public string displayName = "";
-        public bool isBot = false;
-        public bool useAjax = true;
-        public bool isMobile = false;
-        public bool isTablet = false;
+        public List<structSecurityWebsite> security;
 
-        public List<structSecurityWebsite> security = new List<structSecurityWebsite>();
-
-        [JsonIgnore]
-        public bool saveSession = false;
-
-        public void Init(Core WebsilkCore)
+        public User(Core DatasilkCore)
         {
-            S = WebsilkCore;
-
-            //generate visitor id
-            if (visitorId == "" || visitorId == null) { visitorId = S.Util.Str.CreateID(); saveSession = true; }
+            S = DatasilkCore;
         }
 
-        public virtual void Load()
-        { 
+        public List<structSecurityWebsite> Security
+        {
+            get {
+                if(security == null)
+                {
+                    if (S.Session.Keys.Contains("security"))
+                    {
+                        //get security from user session
+                        var bytes = S.Session.Get("security");
+                        var sec = Encoding.UTF8.GetString(bytes, 0, bytes.Length);
+                        security = (List<structSecurityWebsite>)S.Util.Serializer.ReadObject(sec, typeof(List<structSecurityWebsite>));
+                    }
+                    else
+                    {
+                        //create new security object
+                        security = new List<structSecurityWebsite>();
+                    }
+                }
+                return security;
+            }
+            set { security = value; }
         }
-
-        /// <summary>
-        /// Authenticate user credentials and log into user account
-        /// </summary>
-        /// <param name="email"></param>
-        /// <param name="pass"></param>
-        /// <returns></returns>
         public bool LogIn(string email, string password, int websiteId, int ownerId)
         {
-            Load();
-            //var sqlUser = new SqlQueries.User(S);
-            var query = new Query.Users(S.SqlConnectionString);
-            var dbpass = query.GetPassword(email);
-            if(dbpass == "") { return false; }
-            if(BCrypt.Net.BCrypt.Verify(password, dbpass))
+            var query = new Query.Users(S.Server.sqlConnectionString);
+            var user = query.AuthenticateUser(email, password);
+            if (user != null)
             {
-                //password verified by Bcrypt
-                var user = query.AuthenticateUser(email, dbpass);
-                if (user != null)
+                //populate S.User properties
+                S.User.LogIn(user.userId, user.email, "", user.datecreated, user.displayname, 1, user.photo);
+
+                //get initial security for this website
+                if (!Security.Any(a => a.websiteId == websiteId))
                 {
-                    userId = user.userId;
-                    this.email = email;
-                    photo = user.photo;
-                    displayName = user.displayname;
-
-                    //get initial security for this website
-                    if(!security.Any(a => a.websiteId == websiteId)){
-                        security.Add(GetSecurityForWebsite(userId, websiteId, ownerId));
-                    }
-                    saveSession = true;
-                    return true;
+                    Security.Add(GetSecurityForWebsite(user.userId, websiteId, ownerId));
+                    var sec = S.Util.Serializer.WriteObjectToString(security);
+                    S.Session.Set("security", Encoding.ASCII.GetBytes(sec));
                 }
+                return true;
             }
-            
+
             return false;
         }
 
-        public void LogOut()
+        #region "passwords"
+        public string EncryptPassword(string email, string password)
         {
-            Load();
-            saveSession = true;
-            S.Session.Remove("user");
+            var bCrypt = new BCrypt.Net.BCrypt();
+            return BCrypt.Net.BCrypt.HashPassword(email + S.Server.salt + password, S.Server.bcrypt_workfactor);
         }
-        
-        public bool UpdateAdminPassword(string password)
+
+        public bool DecryptPassword(string email, string password, string encrypted)
         {
-            Load();
-            var update = false; //security check
-            var emailAddr = email;
-            var queryUser = new Query.Users(S.SqlConnectionString);
-            var adminId = 1;
-            if (S.Server.resetPass == true)
-            {
-                //securely change admin password
-                //get admin email address from database
-                emailAddr = queryUser.GetEmail(adminId);
-                if (emailAddr != "" && emailAddr != null) { update = true; }
-            }
-            if(update == true)
-            {
-                var bCrypt = new BCrypt.Net.BCrypt();
-                var encrypted = BCrypt.Net.BCrypt.HashPassword(password, S.Server.bcrypt_workfactor);
-                
-                queryUser.UpdatePassword(adminId, encrypted);
-                S.Server.resetPass = false;
-            }
-            return false;
+            return BCrypt.Net.BCrypt.Verify(email + S.Server.salt + password, encrypted);
         }
+        #endregion
 
         #region "security"
         public structSecurityWebsite GetSecurityForWebsite(int userId, int websiteId, int ownerId)
         {
-            Load();
-            var query = new Query.Security(S.SqlConnectionString);
-            var security = new structSecurityWebsite();
+            var query = new Query.Security(S.Server.sqlConnectionString);
+            var secure = new structSecurityWebsite();
             var items = new Dictionary<string, bool[]>();
-            security.websiteId = websiteId;
-            security.ownerId = ownerId;
+            secure.websiteId = websiteId;
+            secure.ownerId = ownerId;
             var sec = query.GetSecurity(websiteId, userId);
-            if(sec != null)
+            if (sec != null)
             {
-                foreach(var item in sec)
+                
+
+                IEnumerable<bool> GetBits(byte b)
+                {
+                    for (int i = 0; i < 8; i++)
+                    {
+                        yield return (b & 0x80) != 0;
+                        b *= 2;
+                    }
+                }
+
+                foreach (var item in sec)
                 {
                     var data = item.security;
-                    var d = new string[] { };
-                    var b = new List<bool>();
-                    if(data != "")
+                    if (data != null)
                     {
-                        d = data.Split(',');
-                        foreach(var v in d)
-                        {
-                            if(v == "1") { b.Add(true); }else { b.Add(false); }
-                        }
+                        //get security items
+                        bool[] bits = data.SelectMany(GetBits).ToArray();
+                        items.Add(item.feature, bits);
                     }
-                    items.Add(item.feature, b.ToArray());
                 }
             }
-            security.security = items;
-            return security;
+            secure.security = items;
+            return secure;
         }
 
         public bool checkSecurity(int websiteId, string feature, enumSecurity securityIndex)
         {
-            Load();
-            var i = security.FindIndex(a => a.websiteId == websiteId);
-            if(i >= 0)
+            var i = Security.FindIndex(a => a.websiteId == websiteId);
+            if (i >= 0)
             {
-                var website = security[i];
-                if(website.ownerId == userId) { return true; } //website owner
+                var website = Security[i];
+                if (website.ownerId == S.User.userId) { return true; } //website owner
                 if (website.security.ContainsKey(feature))
                 {
                     var data = website.security[feature];
-                    if(data != null)
+                    if (data != null)
                     {
-                        if(data.Length >= (int)securityIndex + 1)
+                        if (data.Length >= (int)securityIndex + 1)
                         {
                             return data[(int)securityIndex];
                         }
@@ -176,6 +146,9 @@ namespace Websilk
             }
             return false;
         }
+
         #endregion
+
+        
     }
 }

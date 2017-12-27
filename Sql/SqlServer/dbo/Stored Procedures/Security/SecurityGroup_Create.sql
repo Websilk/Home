@@ -1,10 +1,10 @@
 ﻿CREATE PROCEDURE [dbo].[SecurityGroup_Create]
 	@name nvarchar(30) = '',
 	@security binary(32) = null,
-	@datecreated datetime = null
+	@dateCreated datetime = null
 AS
 
-IF @datecreated = null SET @datecreated = GETDATE()
+IF @dateCreated = null SET @dateCreated = GETDATE()
 
 DECLARE @id int = NEXT VALUE FOR SequenceSecurityGroups
-INSERT INTO SecurityGroups (groupId, [security], [name], datecreated) VALUES(@id, @security, @name, @datecreated)
+INSERT INTO SecurityGroups (groupId, [security], [name], dateCreated) VALUES(@id, @security, @name, @dateCreated)

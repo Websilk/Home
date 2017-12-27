@@ -1,7 +1,7 @@
 ﻿CREATE TABLE [dbo].[PasswordReset] (
     [resetId]     NVARCHAR (32) NOT NULL,
     [email]       NVARCHAR (50) NOT NULL,
-    [datecreated] DATETIME      NOT NULL, 
+    [dateCreated] DATETIME      NOT NULL, 
     CONSTRAINT [PK_PasswordReset] PRIMARY KEY ([email])
 );
 

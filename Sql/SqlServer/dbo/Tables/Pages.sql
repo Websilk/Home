@@ -7,7 +7,7 @@
     [security]           BIT            NOT NULL DEFAULT 0,
     [enabled]            BIT            NOT NULL DEFAULT 1,
     [deleted]            BIT            NOT NULL DEFAULT 0,
-    [datecreated]        DATETIME       NOT NULL DEFAULT GETDATE(),
+    [dateCreated]        DATETIME       NOT NULL DEFAULT GETDATE(),
     [datemodified]       DATETIME       NOT NULL DEFAULT GETDATE(),
     [title]              NVARCHAR (250) NOT NULL DEFAULT '',
 

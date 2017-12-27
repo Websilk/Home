@@ -23,13 +23,16 @@ BEGIN
     
     -- first create the web site
     INSERT INTO Websites (
-	websiteid, ownerId, title, datecreated, [status], logo, domain, liveUrl, stageUrl, [enabled], deleted) 
+	websiteId, ownerId, title, dateCreated, [status], logo, domain, liveUrl, stageUrl, [enabled], deleted) 
 	VALUES (@websiteId, @ownerId, @title, @myDate, @status, @logo, @domain, @liveUrl, @stageUrl, @enabled, 0)
 
 	-- create home page for website
 	EXEC Page_Create @ownerId=@ownerId, @websiteId=@websiteId, @parentId=0, @title='Home', 
 	@description=@description, 
 	@security=0, @enabled=1
+
+	-- create security for website owner
+	EXEC Security_Create @userId=@ownerId, @websiteId=@websiteId, @security=0x11111111111111111111111111111111
 
 	-- return the website ID
 	SELECT @websiteId

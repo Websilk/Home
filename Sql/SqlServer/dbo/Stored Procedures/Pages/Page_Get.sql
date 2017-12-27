@@ -12,5 +12,5 @@ AS
 BEGIN
 	SET NOCOUNT ON;
 
-    SELECT * FROM View_PageInfo WHERE pageid=@pageId AND websiteId=@websiteId
+    SELECT * FROM View_PageInfo WHERE pageId=@pageId AND websiteId=@websiteId
 END

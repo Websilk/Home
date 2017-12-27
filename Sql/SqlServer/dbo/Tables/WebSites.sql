@@ -2,7 +2,7 @@
     [websiteId]		INT				NOT NULL,
     [ownerId]		INT				NOT NULL,
     [title]			NVARCHAR (100)	NOT NULL,
-    [datecreated]	DATETIME		NOT NULL,
+    [dateCreated]	DATETIME		NOT NULL,
     [status]		INT				NULL,
     [enabled]		BIT				NULL,
     [deleted]		BIT				NULL,

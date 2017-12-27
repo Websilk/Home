@@ -1,11 +1,12 @@
 {
+  "namespace":  "Websilk",
   "environment": "development",
-  "port": "80",
   "data": {
     "active": "SqlServerTrusted",
-    "SqlServerTrusted": "server=.\\SQL2016; database=WebsilkDev; Trusted_Connection=true"
+    "SqlServerTrusted": "server=.\\SQL2017; database=Websilk; Trusted_Connection=true"
   },
   "encryption": {
+    "salt": "?",
     "bcrypt_work_factor": "10"
   }
 }

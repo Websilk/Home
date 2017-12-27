@@ -1,17 +1,13 @@
-using System.Collections.Generic;
-using Microsoft.AspNetCore.Http;
-
-namespace Websilk
+﻿namespace Websilk
 {
-    public class Service
+    public class Service : global::Service
     {
-        protected Core S;
-        public Dictionary<string, string> Form = new Dictionary<string, string>();
-        public IFormFileCollection Files;
+        public User User;
+        public Website website = new Website();
 
-        public Service(Core WebsilkCore) {
-            S = WebsilkCore;
+        public Service(Core DatasilkCore) : base(DatasilkCore)
+        {
+            User = new User(DatasilkCore);
         }
-
     }
 }

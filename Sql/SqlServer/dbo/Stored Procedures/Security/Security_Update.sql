@@ -13,20 +13,20 @@ CREATE PROCEDURE Security_Update
 AS
 BEGIN
 	SET NOCOUNT ON;
-	IF (SELECT COUNT(*) FROM WebsiteSecurity 
-	WHERE websiteid=@websiteId 
-	AND pageid = CASE WHEN @pageid > 0 THEN @pageid ELSE pageid END
-	AND userid=@userid AND feature=@feature) = 0
+	IF (SELECT COUNT(*) FROM [Security]
+	WHERE websiteId=@websiteId 
+	AND pageId = CASE WHEN @pageId > 0 THEN @pageId ELSE pageId END
+	AND userId=@userId AND feature=@feature) = 0
 	BEGIN
-		INSERT INTO WebsiteSecurity (websiteid, pageid, userid, feature, security)
+		INSERT INTO [Security] (websiteId, pageId, userId, feature, security)
 		VALUES(@websiteId, @pageId, @userId, @feature, @security)
 
 	END
 	ELSE
 	BEGIN
-		UPDATE WebsiteSecurity SET security=@security WHERE websiteid=@websiteId 
-		AND pageid = CASE WHEN @pageid > 0 THEN @pageid ELSE pageid END
-		AND userid=@userid AND feature=@feature
+		UPDATE [Security] SET security=@security WHERE websiteId=@websiteId 
+		AND pageId = CASE WHEN @pageId > 0 THEN @pageId ELSE pageId END
+		AND userId=@userId AND feature=@feature
 	END
 
 

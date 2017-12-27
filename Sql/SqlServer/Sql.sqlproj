@@ -67,7 +67,6 @@
     <Folder Include="dbo\Tables\" />
     <Folder Include="dbo\Functions\" />
     <Folder Include="dbo\Stored Procedures\" />
-    <Folder Include="dbo\Sequences\" />
     <Folder Include="dbo\Stored Procedures\Websites" />
     <Folder Include="dbo\Stored Procedures\Users" />
     <Folder Include="dbo\Stored Procedures\Security" />
@@ -75,6 +74,7 @@
     <Folder Include="utility" />
     <Folder Include="dbo\Stored Procedures\Pages" />
     <Folder Include="dbo\Views" />
+    <Folder Include="dbo\Sequences" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="dbo\Tables\ErrorLog.sql" />
@@ -85,8 +85,6 @@
     <Build Include="dbo\Functions\GetPagePath.sql" />
     <Build Include="dbo\Functions\GetPagePathIds.sql" />
     <Build Include="dbo\Functions\SplitArray.sql" />
-    <Build Include="dbo\Sequences\SequenceUsers.sql" />
-    <Build Include="dbo\Sequences\SequenceWebsites.sql" />
     <Build Include="dbo\Stored Procedures\Users\User_Create.sql" />
     <Build Include="dbo\Stored Procedures\Websites\Website_Create.sql" />
     <Build Include="dbo\Stored Procedures\Security\Security_Create.sql" />
@@ -113,12 +111,10 @@
     <Build Include="dbo\Tables\Security.sql" />
     <Build Include="dbo\Tables\SecurityGroups.sql" />
     <Build Include="dbo\Stored Procedures\Security\SecurityGroup_Create.sql" />
-    <Build Include="dbo\Sequences\SequenceSecurityGroups.sql" />
     <Build Include="dbo\Stored Procedures\Security\SecurityGroup_Get.sql" />
     <Build Include="dbo\Stored Procedures\Security\SecurityGroup_Delete.sql" />
     <Build Include="dbo\Stored Procedures\Security\SecurityGroup_GetList.sql" />
     <Build Include="dbo\Tables\Pages.sql" />
-    <Build Include="dbo\Sequences\SequencePages.sql" />
     <Build Include="dbo\Stored Procedures\Pages\Page_Create.sql" />
     <Build Include="dbo\Stored Procedures\Pages\Page_Delete.sql" />
     <Build Include="dbo\Stored Procedures\Pages\Page_Get.sql" />
@@ -127,6 +123,11 @@
     <Build Include="dbo\Stored Procedures\Pages\Page_UpdateModified.sql" />
     <Build Include="dbo\Stored Procedures\Pages\Pages_GetList.sql" />
     <Build Include="dbo\Stored Procedures\Users\Users_HasPasswords.sql" />
+    <Build Include="dbo\Sequences\SequencePages.sql" />
+    <Build Include="dbo\Sequences\SequenceSecurityGroups.sql" />
+    <Build Include="dbo\Sequences\SequenceUsers.sql" />
+    <Build Include="dbo\Sequences\SequenceWebsites.sql" />
+    <Build Include="dbo\Stored Procedures\Websites\Websites_Exist.sql" />
   </ItemGroup>
   <ItemGroup>
     <ArtifactReference Include="$(DacPacRootPath)\Extensions\Microsoft\SQLDB\Extensions\SqlServer\110\SqlSchemas\master.dacpac">

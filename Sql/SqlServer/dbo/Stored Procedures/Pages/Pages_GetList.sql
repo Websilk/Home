@@ -14,16 +14,16 @@ AS
 BEGIN
 	SELECT * FROM (
 		SELECT ROW_NUMBER() OVER(ORDER BY 
-			CASE WHEN @orderby = 0 THEN p.datecreated END ASC,
-			CASE WHEN @orderby = 1 THEN p.datecreated END DESC,
+			CASE WHEN @orderby = 0 THEN p.dateCreated END ASC,
+			CASE WHEN @orderby = 1 THEN p.dateCreated END DESC,
 			CASE WHEN @orderby = 2 THEN p.datemodified END ASC,
 			CASE WHEN @orderby = 3 THEN p.datemodified END DESC,
 			CASE WHEN @orderby = 4 THEN p.title END ASC,
 			CASE WHEN @orderby = 5 THEN p.title END DESC,
 			CASE WHEN @orderby = 6 THEN p.[security] END DESC
 		) as rownum, 
-		p.*, (SELECT COUNT(*) FROM pages WHERE websiteid=@websiteId AND parentid=p.pageid) AS haschildren
-		FROM pages p
+		p.*, (SELECT COUNT(*) FROM Pages WHERE websiteId=@websiteId AND parentId=p.pageId) AS haschildren
+		FROM Pages p
 		WHERE p.websiteId=@websiteId AND p.[enabled]=1 AND p.[deleted]=0 
 		AND p.[security] = CASE WHEN @orderby = 6 THEN 1 ELSE p.[security] END
 		AND p.parentId = @parentId

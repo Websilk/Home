@@ -4,15 +4,15 @@
 -- Description:	
 -- =============================================
 CREATE PROCEDURE Security_GetFeature
-	@websiteid int = 0, 
-	@pageid int = 0,
-	@userid int = 0,
+	@websiteId int = 0, 
+	@pageId int = 0,
+	@userId int = 0,
 	@feature nvarchar(50) = ''
 AS
 BEGIN
 	SET NOCOUNT ON;
-	SELECT [security] FROM [Security] WHERE websiteid=@websiteid
-	AND pageid = CASE WHEN @pageid > 0 THEN @pageid ELSE pageid END
-	AND userid=@userid AND feature=@feature
+	SELECT [security] FROM [Security] WHERE websiteId=@websiteId
+	AND pageId = CASE WHEN @pageId > 0 THEN @pageId ELSE pageId END
+	AND userId=@userId AND feature=@feature
 
 END

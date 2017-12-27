@@ -4,7 +4,7 @@
 -- Description:	
 -- =============================================
 CREATE PROCEDURE Log_Error_Create 
-	@datecreated datetime = '', 
+	@dateCreated datetime = '', 
 	@errorNumber int = 0,
 	@userId int = 0,
 	@message nvarchar(MAX) = '',
@@ -12,6 +12,6 @@ CREATE PROCEDURE Log_Error_Create
 AS
 BEGIN
 	SET NOCOUNT ON;
-	INSERT INTO ErrorLog (datecreated, userId, errornumber, [message], stackTrace) 
-	VALUES(@datecreated, @userId, @errorNumber, @message, @stackTrace)
+	INSERT INTO ErrorLog (dateCreated, userId, errorNumber, [message], stackTrace) 
+	VALUES(@dateCreated, @userId, @errorNumber, @message, @stackTrace)
 END

@@ -16,10 +16,10 @@ BEGIN
 	FROM (
 		SELECT ROW_NUMBER() 
 		OVER (ORDER BY
-		CASE WHEN @orderby = 0 THEN datecreated END DESC,
+		CASE WHEN @orderby = 0 THEN dateCreated END DESC,
 		CASE WHEN @orderby = 1 THEN title END ASC) 
 		AS rownum, *
-		FROM WebSites
+		FROM Websites
 		WHERE ownerId = CASE WHEN @userId > 0 THEN @userId ELSE ownerId END
 		AND [enabled]=1
 		AND title LIKE CASE WHEN @search <> '' THEN '%' + @search + '%' ELSE title END

@@ -2,14 +2,15 @@
 using System.Security.Cryptography;
 using System.Text;
 
-namespace Websilk.Utility
+namespace Utility
 {
     public class Encryption
     {
         private Util Util;
-        public Encryption(Util util)
+
+        public Encryption()
         {
-            Util = util;
+            Util = new Util();
         }
 
         public string GetMD5Hash(string str)

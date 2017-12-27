@@ -12,15 +12,13 @@ namespace Websilk.Query
 
         public List<Models.Security> GetSecurity(int websiteId, int userId)
         {
-            var list = Sql.Populate<Models.Security>("Security_GetWebsite",
+            return Sql.Populate<Models.Security>("Security_GetWebsite",
                 new Dictionary<string, object>()
                 {
                     {"websiteId", websiteId },
                     {"userId", userId }
                 }
             );
-            if (list.Count > 0) { return list; }
-            return null;
         }
     }
 }

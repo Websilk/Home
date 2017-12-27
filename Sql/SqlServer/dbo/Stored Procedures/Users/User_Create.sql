@@ -9,8 +9,8 @@ CREATE PROCEDURE [dbo].[User_Create]
 	@email nvarchar(75) = '',
 	@password nvarchar(100) = '',
 	@displayname nvarchar(25) = '',
-	@photo nvarchar(30) = '',
-	@status int = 0,
+	@photo int = 0,
+	@status int = 1,
 	@signupip nvarchar(15) = '',
 	@referrer nvarchar(250) = '',
 	@activation nchar(20) = '',
@@ -22,7 +22,7 @@ BEGIN
 	@id int = NEXT VALUE FOR SequenceUsers
 
     INSERT INTO Users (userId, email, [password], displayname, photo,
-    lastlogin, datecreated, [status],
+    lastlogin, dateCreated, [status],
     signupip, referrer, [activation], deleted)
     VALUES
     (@id, @email, @password, @displayname, @photo,

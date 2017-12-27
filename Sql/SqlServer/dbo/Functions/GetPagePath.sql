@@ -15,11 +15,11 @@ BEGIN
 		@title nvarchar(250),
 		@parentId int = 0
 
-	SELECT @title=title, @parentId=parentId FROM pages WHERE pageid=@pageId 
+	SELECT @title=title, @parentId=parentId FROM Pages WHERE pageId=@pageId 
 	
 	IF @parentId is not null AND @parentId > 0 BEGIN
 		DECLARE @parentTitle nvarchar(250)
-		SELECT @parentTitle=title FROM pages WHERE pageId=@parentId 
+		SELECT @parentTitle=title FROM Pages WHERE pageId=@parentId 
 		SET @Result = dbo.GetPagePath(@parentId) + '/' + @title
 	END 
 	ELSE BEGIN

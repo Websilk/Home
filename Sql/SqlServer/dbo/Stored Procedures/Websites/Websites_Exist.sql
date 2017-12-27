@@ -1,0 +1,5 @@
+﻿CREATE PROCEDURE [dbo].[Websites_Exist]
+AS
+	IF (SELECT COUNT(*) FROM Websites) = 0 BEGIN
+		SELECT 0
+	END ELSE BEGIN SELECT 1 END

@@ -4,11 +4,11 @@
 -- Description:	
 -- =============================================
 CREATE PROCEDURE Security_GetWebsite
-	@websiteid int = 0, 
-	@userid int = 0
+	@websiteId int = 0, 
+	@userId int = 0
 AS
 BEGIN
 	SET NOCOUNT ON;
-	SELECT pageid, feature, [security] FROM [Security] 
-	WHERE websiteid=@websiteid AND userid=@userid
+	SELECT * FROM [Security] 
+	WHERE websiteId=@websiteId AND userId=@userId
 END

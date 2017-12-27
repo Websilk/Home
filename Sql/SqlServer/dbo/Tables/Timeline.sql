@@ -2,7 +2,7 @@
     [timelineId]  NVARCHAR (10)  NOT NULL,
     [userId]    INT            NULL,
     [websiteId]   INT            NULL,
-    [datecreated] DATETIME       NOT NULL,
+    [dateCreated] DATETIME       NOT NULL,
     [title]       NVARCHAR (255) NOT NULL,
     [url]         NVARCHAR (255) NULL,
     [photo]       NVARCHAR (255) NULL,
@@ -13,12 +13,12 @@
 
 GO
 
-CREATE INDEX [index_timeline] ON [dbo].[Timeline] (datecreated DESC)
+CREATE INDEX [index_timeline] ON [dbo].[Timeline] (dateCreated DESC)
 
 GO
 
-CREATE INDEX [index_timeline_website] ON [dbo].[Timeline] (websiteId, datecreated DESC)
+CREATE INDEX [index_timeline_website] ON [dbo].[Timeline] (websiteId, dateCreated DESC)
 
 GO
 
-CREATE INDEX [index_timeline_user] ON [dbo].[Timeline] (userId, datecreated DESC)
+CREATE INDEX [index_timeline_user] ON [dbo].[Timeline] (userId, dateCreated DESC)

@@ -1,51 +1,15 @@
 ﻿namespace Websilk
 {
-    public class Page
+    public class Page : global::Page
     {
-        public Core S;
-
+        public User User;
         public Website website = new Website();
-        public string title = "Websilk";
-        public string description = "";
-        public string headCss = "";
-        public string colorsCss = "";
-        public string favicon = "";
-        public string svgIcons = "";
-        public string scripts = "";
 
-        public Page(Core WebsilkCore)
+        public Page(Core DatasilkCore) : base(DatasilkCore)
         {
-            S = WebsilkCore;
-            svgIcons = S.Server.LoadFileFromCache("/content/themes/default/icons.svg");
+            User = new User(DatasilkCore);
+            AddCSS("/css/colors/default.css");
         }
-
-        public virtual string Render(string[] path, string body = "")
-        {
-            //renders HTML layout
-            var scaffold = new Scaffold(S, "/layout.html");
-            scaffold.Data["title"] = title;
-            scaffold.Data["description"] = description;
-            scaffold.Data["head-css"] = headCss;
-            scaffold.Data["colors-css"] = colorsCss;
-            scaffold.Data["favicon"] = favicon;
-            scaffold.Data["svg-icons"] = svgIcons;
-            scaffold.Data["body"] = body;
-
-            //add initialization script
-            scripts = "<script type=\"text/javascript\">S.init(" + S.Util.Serializer.WriteObjectToString(website) + ");</script>\n" + scripts;
-            scaffold.Data["scripts"] = scripts;
-
-            return scaffold.Render();
-        }
-
-        public string AccessDenied()
-        {
-            if(S.User.userId <= 0)
-            {
-                var login = new Pages.Login(S);
-                return login.Render(new string[] { });
-            }
-            return "Access Denied";
-        }
+        
     }
 }

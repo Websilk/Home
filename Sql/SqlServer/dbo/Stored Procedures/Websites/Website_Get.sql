@@ -9,7 +9,7 @@ AS
 BEGIN
 	SET NOCOUNT ON;
 	SELECT *
-	FROM websites
+	FROM Websites
 	WHERE websiteId=@websiteId
 	AND deleted=0
 	AND [enabled]=1

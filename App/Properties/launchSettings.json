@@ -3,7 +3,7 @@
     "windowsAuthentication": false,
     "anonymousAuthentication": true,
     "iisExpress": {
-      "applicationUrl": "http://localhost:7770/dashboard",
+      "applicationUrl": "http://localhost:7770",
       "sslPort": 0
     }
   },

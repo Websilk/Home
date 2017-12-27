@@ -10,5 +10,5 @@ CREATE PROCEDURE [dbo].[Website_UpdateStatus]
 AS
 BEGIN
 	UPDATE Websites SET status = @status
-	WHERE websiteid=@websiteId AND ownerid=@ownerId
+	WHERE websiteId=@websiteId AND ownerId=@ownerId
 END

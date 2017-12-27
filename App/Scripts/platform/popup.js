@@ -39,7 +39,7 @@
         var htm = '<div class="row">';
 
         if (title != '') {
-            htm += '<div class="col pad"><h6>' + title + '</h6></div>';
+            htm += '<div class="col pad-sm"><h4>' + title + '</h4></div>';
         }
         if (opts.close == true) {
             //add close button to top of page
@@ -51,7 +51,7 @@
         this.elem = popup;
 
         $('body > .for-popup .popup').remove();
-        forpopup.append(div).removeClass('hide');
+        forpopup.removeClass('hide').append(div);
 
         //set up events
         S.events.doc.resize.callback.add('popup', S.popup.resize, S.popup.resize, S.popup.resize);
@@ -66,10 +66,14 @@
         S.popup.resize();
     },
 
-    hide: function(){
+    hide: function () {
         //remove events
         $('body > .for-popup').addClass('hide');
         S.events.doc.resize.callback.remove('popup');
+    },
+
+    bg: function (e) {
+        if (e.target == $('.bg.for-popup')[0]) { S.popup.hide(); }
     },
 
     resize: function () {

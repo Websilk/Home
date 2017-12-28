@@ -1,11 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace App.Services
+﻿namespace Websilk.Services
 {
-    public class Pages
+    public class Pages : Service
     {
+        public Pages(Core DatasilkCore) : base(DatasilkCore)
+        {
+        }
     }
 }

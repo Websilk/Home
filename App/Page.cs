@@ -1,6 +1,6 @@
 ﻿namespace Websilk
 {
-    public class Page : global::Page
+    public class Page : Datasilk.Page
     {
         public User User;
         public Website website = new Website();

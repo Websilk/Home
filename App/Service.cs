@@ -1,6 +1,6 @@
 ﻿namespace Websilk
 {
-    public class Service : global::Service
+    public class Service : Datasilk.Service
     {
         public User User;
         public Website website = new Website();

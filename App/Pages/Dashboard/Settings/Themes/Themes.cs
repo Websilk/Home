@@ -15,7 +15,7 @@ namespace Websilk.Pages.DashboardPages.Settings
         {
 
                 //load downloads list
-                var scaffold = new Scaffold(S, "/Pages/Dashboard/Settings/Themes/themes.html");
+                var scaffold = new Scaffold(S.Server.MapPath("/Pages/Dashboard/Settings/Themes/themes.html"), S.Server.Scaffold);
                 return scaffold.Render();
         }
     }

@@ -50,8 +50,8 @@ namespace Websilk.Pages
             AddScript("js/pages/dashboard/dashboard.js");
 
             //load the dashboard layout
-            var scaffold = new Scaffold(S, "/Pages/Dashboard/dashboard.html");
-            var scaffMenu = new Scaffold(S, "/Pages/Dashboard/menu-item.html");
+            var scaffold = new Scaffold(S.Server.MapPath("/Pages/Dashboard/dashboard.html"), S.Server.Scaffold);
+            var scaffMenu = new Scaffold(S.Server.MapPath("/Pages/Dashboard/menu-item.html"), S.Server.Scaffold);
 
             //load user profile
             scaffold.Data["profile-img"] = "";

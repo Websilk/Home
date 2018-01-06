@@ -22,7 +22,7 @@ namespace Websilk.Pages.DashboardPages
             else
             {
                 //load downloads list
-                var scaffold = new Scaffold(S, "/Pages/Dashboard/Users/users.html");
+                var scaffold = new Scaffold(S.Server.MapPath("/Pages/Dashboard/Users/users.html"), S.Server.Scaffold);
                 return scaffold.Render();
             }
             return "";

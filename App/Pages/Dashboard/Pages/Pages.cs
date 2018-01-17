@@ -23,7 +23,7 @@ namespace Websilk.Pages.DashboardPages
             AddScript("js/pages/dashboard/pages/pages.js");
 
             //load pages list
-            var scaffold = new Scaffold("/Pages/Dashboard/Pages/pages.html");
+            var scaffold = new Scaffold("/Pages/Dashboard/Pages/pages.html", S.Server.Scaffold);
             var servePage = new Services.Dashboard.Pages(S);
             if (S.Request.Query.ContainsKey("websiteid")) { website.id = int.Parse(S.Request.Query["websiteid"]); }
             scaffold.Data["page-list"] = servePage.View(website.id, 0, 1, 1000, 4, 0, "");
@@ -77,7 +77,7 @@ namespace Websilk.Services.Dashboard
             var secureSettings = User.checkSecurity(websiteId, "websilk/pages", Websilk.User.enumSecurity.update);
 
             var options = new bool[] { false, false, false, false };
-            var pageItem = new Scaffold("/Pages/Dashboard/Pages/page-item.html");
+            var pageItem = new Scaffold("/Pages/Dashboard/Pages/page-item.html", S.Server.Scaffold);
 
             var pageLink = "";
             var color = "";
@@ -178,7 +178,7 @@ namespace Websilk.Services.Dashboard
 
         public string ViewSettings(int websiteId, int id)
         {
-            var scaffold = new Scaffold("/pages/dashboard/pages/settings.html");
+            var scaffold = new Scaffold("/pages/dashboard/pages/settings.html", S.Server.Scaffold);
             var query = new Query.Pages(S.Server.sqlConnectionString);
             var page = query.GetPageInfo(websiteId, id);
             if (page != null)

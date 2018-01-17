@@ -20,7 +20,7 @@
             }else
             {
                 //load downloads list
-                var scaffold = new Scaffold(S, "/Pages/Dashboard/Downloads/downloads.html");
+                var scaffold = new Scaffold("/Pages/Dashboard/Downloads/downloads.html");
                 return scaffold.Render();
             }
             return "";

@@ -9,8 +9,8 @@ namespace Websilk.Services
 
         public string List()
         {
-            var scaffold = new Scaffold(S, "/Tests/icons.html");
-            var icon = new Scaffold(S, "/Tests/icon.html");
+            var scaffold = new Scaffold("/Tests/icons.html");
+            var icon = new Scaffold("/Tests/icon.html");
             var icons = new StringBuilder();
 
             var list = new List<string>()

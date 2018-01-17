@@ -22,7 +22,7 @@ namespace Websilk.Pages.DashboardPages
             else
             {
                 //load photos list
-                var scaffold = new Scaffold(S, "/Pages/Dashboard/Photos/photos.html");
+                var scaffold = new Scaffold("/Pages/Dashboard/Photos/photos.html");
                 return scaffold.Render();
             }
             return "";
